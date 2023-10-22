@@ -56,6 +56,7 @@ option(RADIUM_GENERATE_LIB_ENGINE "Include Radium::Engine in CMake project." ON)
 option(RADIUM_GENERATE_LIB_GUI "Include Radium::Gui in CMake project." ON)
 option(RADIUM_GENERATE_LIB_PLUGINBASE "Include Radium::PluginBase in CMake project." ON)
 option(RADIUM_GENERATE_LIB_HEADLESS "Include Radium::Headless in CMake project." ON)
+option(RADIUM_GENERATE_LIB_DATAFLOW "Include Radium::Dataflow* in CMake project." ON)
 option(
     RADIUM_UPDATE_VERSION
     "Update version file each time the project is compiled (update compilation time in version.cpp)."
@@ -302,6 +303,7 @@ message_setting("RADIUM_GENERATE_LIB_CORE")
 message_setting("RADIUM_GENERATE_LIB_ENGINE")
 message_setting("RADIUM_GENERATE_LIB_GUI")
 message_setting("RADIUM_GENERATE_LIB_HEADLESS")
+message_setting("RADIUM_GENERATE_LIB_DATAFLOW")
 message_setting("RADIUM_GENERATE_LIB_IO")
 message_setting("RADIUM_GENERATE_LIB_PLUGINBASE")
 string(REPLACE ";" " " COMPONENTS_LIST "${RADIUM_COMPONENTS}")

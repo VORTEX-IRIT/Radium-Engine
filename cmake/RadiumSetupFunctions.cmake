@@ -966,18 +966,27 @@ function(configure_radium_library)
     # add the cmake command to install target
     add_custom_install_target(${ARGS_TARGET})
 
+    get_target_property(TargetType ${ARGS_TARGET} TYPE)
+    if(TargetType STREQUAL INTERFACE_LIBRARY)
+        set(PropertyQualifier INTERFACE)
+    else()
+        set(PropertyQualifier PUBLIC)
+        target_compile_definitions(${ARGS_TARGET} PRIVATE ${ARGS_TARGET}_EXPORTS)
+    endif()
+
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_definitions(${ARGS_TARGET} PUBLIC _DEBUG)
-        if(MSVC OR MSVC_IDE)
+        target_compile_definitions(${ARGS_TARGET} ${PropertyQualifier} _DEBUG)
+        if((MSVC OR MSVC_IDE) AND NOT (TargetType STREQUAL INTERFACE_LIBRARY))
             install(FILES $<TARGET_PDB_FILE:${ARGS_TARGET}> DESTINATION bin)
         endif()
     endif()
-    target_compile_features(${ARGS_TARGET} PUBLIC cxx_std_17)
+
+    target_compile_features(${ARGS_TARGET} ${PropertyQualifier} cxx_std_17)
     if(OPENMP_FOUND)
-        target_link_libraries(${ARGS_TARGET} PUBLIC OpenMP::OpenMP_CXX)
+        target_link_libraries(${ARGS_TARGET} ${PropertyQualifier} OpenMP::OpenMP_CXX)
     endif(OPENMP_FOUND)
-    target_compile_definitions(${ARGS_TARGET} PRIVATE ${ARGS_TARGET}_EXPORTS)
-    target_include_directories(${ARGS_TARGET} PUBLIC $<INSTALL_INTERFACE:include/>)
+    target_include_directories(${ARGS_TARGET} ${PropertyQualifier} $<INSTALL_INTERFACE:include/>)
+
     add_library(${ARGS_NAMESPACE}::${ARGS_TARGET} ALIAS ${ARGS_TARGET})
 
     install(

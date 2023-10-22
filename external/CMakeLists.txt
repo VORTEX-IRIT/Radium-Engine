@@ -101,6 +101,8 @@ else()
     add_subdirectory(IO)
     # add Gui dependencies
     add_subdirectory(Gui)
+    # add Dataflow dependencies
+    add_subdirectory(Dataflow)
 
     # generate radium-option.cmake configuration file
     file(REMOVE "${CMAKE_INSTALL_PREFIX}/radium-options.cmake")

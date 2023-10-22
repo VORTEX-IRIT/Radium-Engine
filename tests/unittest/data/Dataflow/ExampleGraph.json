@@ -1,0 +1,220 @@
+{
+    "instance": "Example graph",
+    "model": {
+        "graph": {
+            "connections": [
+                {
+                    "in_node": "reduced vector",
+                    "in_port": "from",
+                    "out_node": "Collection reducer - original collection",
+                    "out_port": "out"
+                },
+                {
+                    "in_node": "Collection reducer - original collection",
+                    "in_port": "in",
+                    "out_node": "Vector",
+                    "out_port": "to"
+                },
+                {
+                    "in_node": "Collection reducer - original collection",
+                    "in_port": "f",
+                    "out_node": "Reducer",
+                    "out_port": "f"
+                },
+                {
+                    "in_node": "Collection reducer - original collection",
+                    "in_port": "init",
+                    "out_node": "Neutral",
+                    "out_port": "to"
+                },
+                {
+                    "in_node": "Collection reducer - transformed collection",
+                    "in_port": "in",
+                    "out_node": "Collection transformer",
+                    "out_port": "out"
+                },
+                {
+                    "in_node": "Collection reducer - transformed collection",
+                    "in_port": "f",
+                    "out_node": "Reducer",
+                    "out_port": "f"
+                },
+                {
+                    "in_node": "Collection transformer",
+                    "in_port": "in",
+                    "out_node": "Vector",
+                    "out_port": "to"
+                },
+                {
+                    "in_node": "Collection transformer",
+                    "in_port": "f",
+                    "out_node": "Doubler",
+                    "out_port": "f"
+                },
+                {
+                    "in_node": "transformed/reduced vector",
+                    "in_port": "from",
+                    "out_node": "Collection reducer - transformed collection",
+                    "out_port": "out"
+                },
+                {
+                    "in_node": "validation value",
+                    "in_port": "from",
+                    "out_node": "Validator : evaluate the validation predicate",
+                    "out_port": "r"
+                },
+                {
+                    "in_node": "Validator : evaluate the validation predicate",
+                    "in_port": "a",
+                    "out_node": "Collection reducer - original collection",
+                    "out_port": "out"
+                },
+                {
+                    "in_node": "Validator : evaluate the validation predicate",
+                    "in_port": "b",
+                    "out_node": "Collection reducer - transformed collection",
+                    "out_port": "out"
+                },
+                {
+                    "in_node": "Validator : evaluate the validation predicate",
+                    "in_port": "f",
+                    "out_node": "Validator",
+                    "out_port": "f"
+                }
+            ],
+            "factories": [],
+            "nodes": [
+                {
+                    "instance": "Vector",
+                    "model": {
+                        "comment": "Unable to save data when serializing a SingleDataSourceNode<RaVector<float>>.",
+                        "name": "Source<RaVector<float>>"
+                    },
+                    "position": {
+                        "x": -288.0,
+                        "y": 58.0
+                    }
+                },
+                {
+                    "instance": "Doubler",
+                    "model": {
+                        "comment": "Unable to save data when serializing a FunctionSourceNode<function<float (float const&)>>.",
+                        "name": "Source<function<float (float const&)>>"
+                    },
+                    "position": {
+                        "x": -290.0,
+                        "y": 139.0
+                    }
+                },
+                {
+                    "instance": "Neutral",
+                    "model": {
+                        "name": "Source<float>",
+                        "number": 0.0
+                    },
+                    "position": {
+                        "x": -289.0,
+                        "y": -83.0
+                    }
+                },
+                {
+                    "instance": "Reducer",
+                    "model": {
+                        "comment": "Unable to save data when serializing a FunctionSourceNode<function<float (float const&, float const&)>>.",
+                        "name": "Source<function<float (float const&, float const&)>>"
+                    },
+                    "position": {
+                        "x": -292.0,
+                        "y": 224.0
+                    }
+                },
+                {
+                    "instance": "reduced vector",
+                    "model": {
+                        "name": "Sink<float>"
+                    },
+                    "position": {
+                        "x": 459.0,
+                        "y": -140.0
+                    }
+                },
+                {
+                    "instance": "Collection reducer - original collection",
+                    "model": {
+                        "comment": "Reduce operator could not be serialized for Reduce<RaVector<float>>",
+                        "name": "Reduce<RaVector<float>>"
+                    },
+                    "position": {
+                        "x": 159.0,
+                        "y": -133.0
+                    }
+                },
+                {
+                    "instance": "Collection reducer - transformed collection",
+                    "model": {
+                        "comment": "Reduce operator could not be serialized for Reduce<RaVector<float>>",
+                        "name": "Reduce<RaVector<float>>"
+                    },
+                    "position": {
+                        "x": 461.0,
+                        "y": 79.0
+                    }
+                },
+                {
+                    "instance": "Collection transformer",
+                    "model": {
+                        "comment": "Transform operator could not be serialized for Transform<RaVector<float>>",
+                        "name": "Transform<RaVector<float>>"
+                    },
+                    "position": {
+                        "x": 159.0,
+                        "y": 53.0
+                    }
+                },
+                {
+                    "instance": "transformed/reduced vector",
+                    "model": {
+                        "name": "Sink<float>"
+                    },
+                    "position": {
+                        "x": 720.0,
+                        "y": -62.0
+                    }
+                },
+                {
+                    "instance": "Validator",
+                    "model": {
+                        "comment": "Unable to save data when serializing a FunctionSourceNode<function<bool (float const&, float const&)>>.",
+                        "name": "Source<function<bool (float const&, float const&)>>"
+                    },
+                    "position": {
+                        "x": -291.0,
+                        "y": 309.0
+                    }
+                },
+                {
+                    "instance": "validation value",
+                    "model": {
+                        "name": "Sink<bool>"
+                    },
+                    "position": {
+                        "x": 969.0,
+                        "y": 197.0
+                    }
+                },
+                {
+                    "instance": "Validator : evaluate the validation predicate",
+                    "model": {
+                        "comment": "Binary operator could not be serialized for BinaryOp<float x float -> bool>",
+                        "name": "BinaryOp<float x float -> bool>"
+                    },
+                    "position": {
+                        "x": 705.0,
+                        "y": 158.0
+                    }
+                }
+            ]
+        },
+        "name": "Core DataflowGraph"
+    }
+}

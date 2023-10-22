@@ -35,6 +35,7 @@ set(core_sources
     Geometry/TriangleMesh.cpp
     Geometry/Volume.cpp
     Geometry/deprecated/TopologicalMesh.cpp
+    Random/RandomPointSet.cpp
     Resources/Resources.cpp
     Tasks/TaskQueue.cpp
     Utils/Attribs.cpp
@@ -107,6 +108,7 @@ set(core_headers
     Math/Math.hpp
     Math/Quadric.hpp
     RaCore.hpp
+    Random/RandomPointSet.hpp
     Resources/Resources.hpp
     Tasks/Task.hpp
     Tasks/TaskQueue.hpp

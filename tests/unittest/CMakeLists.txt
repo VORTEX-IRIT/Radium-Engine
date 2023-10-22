@@ -12,7 +12,7 @@ set(test_src
     Core/camera.cpp
     Core/color.cpp
     Core/containers.cpp
-    Core/demangle.cpp
+    Core/typeutils.cpp
     Core/distance.cpp
     Core/enumconverter.cpp
     Core/geometryData.cpp
@@ -22,6 +22,7 @@ set(test_src
     Core/obb.cpp
     Core/observer.cpp
     Core/polyline.cpp
+    Core/random.cpp
     Core/raycast.cpp
     Core/resources.cpp
     Core/string.cpp
@@ -30,6 +31,11 @@ set(test_src
     Core/topomesh.cpp
     Core/variableset.cpp
     Core/vectorarray.cpp
+    Dataflow/customnodes.cpp
+    Dataflow/graph.cpp
+    Dataflow/nodes.cpp
+    Dataflow/serialization.cpp
+    Dataflow/sourcesandsinks.cpp
     Engine/environmentmap.cpp
     Engine/renderparameters.cpp
     Engine/signalmanager.cpp
@@ -54,7 +60,7 @@ target_include_directories(unittests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(unittests PUBLIC ${RA_DEFAULT_COMPILE_OPTIONS})
 target_compile_definitions(unittests PRIVATE UNIT_TESTS) # add -DUNIT_TESTS define
 
-target_link_libraries(unittests PRIVATE Catch2::Catch2 Core Engine Gui)
+target_link_libraries(unittests PRIVATE Catch2::Catch2 Core Engine Gui Dataflow)
 add_dependencies(unittests Catch2 Core Engine Gui)
 
 find_package(Filesystem COMPONENTS Final Experimental REQUIRED)

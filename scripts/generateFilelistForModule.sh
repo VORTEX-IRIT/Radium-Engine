@@ -7,12 +7,16 @@ fi
 
 BASE=$1
 LOWBASE=$(echo "$BASE" | tr '[:upper:]' '[:lower:]')
+LOWBASE=$(echo "$LOWBASE" | tr '/' '_')
 OUTPUT="../src/${BASE}/filelist.cmake"
 
 echo "generate [${BASE}] filelist"
 echo "-- input files from         [../src/${BASE}]"
 echo "-- output vars prefix       [${LOWBASE}]"
 echo "-- output file is           [${OUTPUT}]"
+DELIM='/'
+SLASHES=$( awk -F"$DELIM" '{print NF-1}' <<<"${BASE}" )
+(( SLASHES = 4 + SLASHES ))
 
 rm -f "${OUTPUT}"
 
@@ -32,7 +36,7 @@ function genList(){
     if [ ! -z "$L" ]
     then
         echo  "set(${LOWBASE}_${suffix}" >> "${OUTPUT}"
-        echo "${L}" | cut -f 4- -d/ | grep -v pch.hpp | sort | xargs -n1 echo "   "  >> "${OUTPUT}"
+        echo "${L}" | cut -f $SLASHES- -d/ | grep -v pch.hpp | sort | xargs -n1 echo "   "  >> "${OUTPUT}"
         echo ")" >> "${OUTPUT}"
         echo ""  >> "${OUTPUT}"
     fi

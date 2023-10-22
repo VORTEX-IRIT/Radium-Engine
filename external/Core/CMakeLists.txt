@@ -19,7 +19,7 @@ add_custom_target(CoreExternals ALL)
 
 if(NOT DEFINED Eigen3_DIR)
     check_externals_prerequisite()
-    status_message("" "eigen3" "remote git")
+    status_message("[CoreExternal]" "eigen3" "remote git")
 
     ExternalProject_Add(
         Eigen3
@@ -41,7 +41,7 @@ endif()
 
 if(NOT DEFINED OpenMesh_DIR)
     check_externals_prerequisite()
-    status_message("" "OpenMesh" "remote git")
+    status_message("[CoreExternal]" "OpenMesh" "remote git")
     # I found some problems when generating xcode project for OpenMesh: the libXXX.dylib link to
     # libXXX.Major.minor.dylib (eg libOpenMesh.2.1.dylib) is not generated and the script failed.
     # Need to generate this link manually. TODO, find why only OpenMesh is problematic
@@ -63,7 +63,7 @@ endif()
 
 if(NOT DEFINED cpplocate_DIR OR NOT cpplocate_DIR)
     check_externals_prerequisite()
-    status_message("" "cpplocate" "remote git")
+    status_message("[CoreExternal]" "cpplocate" "remote git")
     ExternalProject_Add(
         cpplocate
         GIT_REPOSITORY https://github.com/cginternals/cpplocate.git

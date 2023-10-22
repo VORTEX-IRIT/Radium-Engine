@@ -1,0 +1,71 @@
+{
+  "instance": "helloGraph",
+  "model": {
+    "graph": {
+      "connections": [
+        {
+          "in_node": "Filter",
+          "in_port": "in",
+          "out_node": "Source",
+          "out_port": "to"
+        },
+        {
+          "in_node": "Filter",
+          "in_port": "f",
+          "out_node": "Selector",
+          "out_port": "f"
+        },
+        {
+          "in_node": "Sink",
+          "in_port": "from",
+          "out_node": "Filter",
+          "out_port": "out"
+        }
+      ],
+      "factories": [],
+      "nodes": [
+        {
+          "instance": "Source",
+          "model": {
+            "name": "Source<RaVector<float>>"
+          },
+          "position": {
+            "x": -195.0,
+            "y": -82.0
+          }
+        },
+        {
+          "instance": "Selector",
+          "model": {
+            "name": "Source<function<bool (float const&)>>"
+          },
+          "position": {
+            "x": -279.0,
+            "y": 35.0
+          }
+        },
+        {
+          "instance": "Filter",
+          "model": {
+            "name": "Filter<RaVector<float>>"
+          },
+          "position": {
+            "x": 44.0,
+            "y": -45.0
+          }
+        },
+        {
+          "instance": "Sink",
+          "model": {
+            "name": "Sink<RaVector<float>>"
+          },
+          "position": {
+            "x": 267.0,
+            "y": 12.0
+          }
+        }
+      ]
+    },
+    "name": "Core DataflowGraph"
+  }
+}

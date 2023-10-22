@@ -31,7 +31,7 @@ set(CONFIG_PACKAGE_LOCATION lib/cmake/Radium)
 
 # -----------------------------------------------------------------------------------
 # Include sources and declare components
-foreach(lib Core Engine IO PluginBase Gui Headless)
+foreach(lib Core Engine IO PluginBase Gui Headless Dataflow)
     string(TOUPPER ${lib} upcase_lib)
     if(RADIUM_GENERATE_LIB_${upcase_lib})
         add_subdirectory(${lib})

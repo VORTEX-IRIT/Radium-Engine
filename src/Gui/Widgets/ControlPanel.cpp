@@ -158,7 +158,8 @@ void ControlPanel::addColorInput(
     Ra::Core::Utils::Color color,
     bool withAlpha,
     const std::string& tooltip ) {
-    auto button    = new QPushButton( name.c_str(), this );
+    auto button = new QPushButton( name.c_str(), this );
+    button->setObjectName( name.c_str() );
     auto srgbColor = Ra::Core::Utils::Color::linearRGBTosRGB( color );
     auto clrBttn   = QColor::fromRgbF( srgbColor[0], srgbColor[1], srgbColor[2], srgbColor[3] );
     auto clrDlg    = [callback, clrBttn, withAlpha, button, name]() mutable {

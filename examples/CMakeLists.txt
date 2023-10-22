@@ -15,6 +15,7 @@ foreach(
     APP
     CoreExample
     CustomCameraManipulator
+    DataflowExamples
     DrawPrimitives
     EntityAnimation
     EnvMap

@@ -1,0 +1,38 @@
+# -------------- Configuration of the Radium DataflowCore targets and definitions -----------------------
+# Setup Engine and check for dependencies
+
+if (DataflowRendering_FOUND AND NOT TARGET DataflowRendering)
+    set(Configure_DataflowRendering ON)
+    # verify dependencies
+    if(NOT DataflowCore_FOUND)
+        # if in source dir
+        if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../Dataflow/Core/RadiumDataflowCoreConfig.cmake")
+            set(DataflowCore_FOUND TRUE)
+            include(${CMAKE_CURRENT_LIST_DIR}/../Dataflow/Core/RadiumDataflowCoreConfig.cmake)
+        else()
+            # if in install dir
+            if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../DataflowCore/RadiumDataflowCoreConfig.cmake")
+                set(DataflowCore_FOUND TRUE)
+                include(${CMAKE_CURRENT_LIST_DIR}/../DataflowCore/RadiumDataflowCoreConfig.cmake)
+            else()
+                set(Radium_FOUND False)
+                set(Radium_NOT_FOUND_MESSAGE "Radium::DataflowQtGui: dependency DataflowCore not found")
+                set(Configure_DataflowRendering OFF)
+            endif()
+        endif()
+    endif()
+    if(NOT Engine_FOUND)
+        if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../Engine/RadiumEngineConfig.cmake")
+            set(Gui_FOUND TRUE)
+            include(${CMAKE_CURRENT_LIST_DIR}/../Engine/RadiumEngineConfig.cmake)
+        else()
+            set(Radium_FOUND False)
+            set(Radium_NOT_FOUND_MESSAGE "Radium::DataflowRendering: dependency Engine not found")
+            set(Configure_DataflowRendering OFF)
+        endif()
+    endif()
+endif()
+
+if(Configure_DataflowRendering)
+    include("${CMAKE_CURRENT_LIST_DIR}/../Dataflow/Rendering/DataflowRenderingTargets.cmake")
+endif()

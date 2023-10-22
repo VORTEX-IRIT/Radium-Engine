@@ -59,6 +59,9 @@ These dependencies are shipped with radium, fetching external git sources.
     * with options `-DOPTION_BUILD_TESTS=OFF -DOPTION_BUILD_DOCS=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>`
   * nlohmann_json: https://github.com/nlohmann/json.git, [tags/v3.10.5],
     * with options `-DJSON_Install=ON -DJSON_BuildTests=OFF`
+* [Dataflow]
+  * RadiumNodeEditor: https://github.com/MathiasPaulin/RadiumQtNodeEditor.git, [main],
+    * with options `-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>`
 <!--  (end script copy) -->
 
 ## TL;DR; command line version

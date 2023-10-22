@@ -1,0 +1,44 @@
+# -------------- Configuration of the Radium Dataflow targets and definitions -----------------------
+# Setup Dataflow and check for dependencies
+if (Dataflow_FOUND AND NOT TARGET Dataflow)
+    set(Configure_Dataflow ON)
+    # verify dependencies
+    if(NOT DataflowCore_FOUND)
+        if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../DataflowCore/RadiumDataflowCoreConfig.cmake")
+            set(DataflowCore_FOUND TRUE)
+            include(${CMAKE_CURRENT_LIST_DIR}/../DataflowCore/RadiumDataflowCoreConfig.cmake)
+        else()
+            set(Radium_FOUND False)
+            set(Radium_NOT_FOUND_MESSAGE "Radium::Dataflow: dependency DataflowCore not found")
+            set(Configure_Dataflow OFF)
+        endif()
+    endif()
+
+    if(NOT DataflowQtGui_FOUND)
+        if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../DataflowQtGui/RadiumDataflowQtGuiConfig.cmake")
+            set(DataflowQtGui_FOUND TRUE)
+            include(${CMAKE_CURRENT_LIST_DIR}/../DataflowQtGui/RadiumDataflowQtGuiConfig.cmake)
+        else()
+            set(Radium_FOUND False)
+            set(Radium_NOT_FOUND_MESSAGE "Radium::Dataflow: dependency DataflowQtGui not found")
+            set(Configure_Dataflow OFF)
+        endif()
+    endif()
+
+# to be uncommented when dataflow rendering subpackage will be available
+#    if(NOT DataflowRendering_FOUND)
+#        if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../DataflowRendering/RadiumDataflowRenderingConfig.cmake")
+#            set(DataflowRendering_FOUND TRUE)
+#            include(${CMAKE_CURRENT_LIST_DIR}/../DataflowRendering/RadiumDataflowRenderingConfig.cmake)
+#        else()
+#            set(Radium_FOUND False)
+#            set(Radium_NOT_FOUND_MESSAGE "Radium::Dataflow: dependency DataflowRendering not found")
+#            set(Configure_Dataflow OFF)
+#        endif()
+#    endif()
+endif()
+
+# configure Dataflow component
+if(Configure_Dataflow)
+    include("${CMAKE_CURRENT_LIST_DIR}/DataflowTargets.cmake")
+endif()

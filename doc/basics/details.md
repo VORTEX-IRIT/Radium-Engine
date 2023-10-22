@@ -70,6 +70,7 @@ Currently supported (note that these paths must refer to the installation direct
 * `OpenMesh_DIR`
 * `cpplocate_DIR`
 * `nlohmann_json_DIR`
+* `RadiumNodeEditor_DIR`
 
 <!--  (end script copy) -->
 
