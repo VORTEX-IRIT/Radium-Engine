@@ -20,6 +20,7 @@ in vec4 vPosition[2];
 out vec4 gColor;
 out float pixelWidthDiv2;
 uniform vec2 viewport;
+uniform float pixelWidth;
 vec4 vColor[2];
 
 void main() {
@@ -34,7 +35,6 @@ void main() {
     vec4 scss1 = css1 * css0.w;
 
     vec3 dir           = ( scss1 - scss0 ).xyz;
-    float pixelWidth   = 1.8;
     const float border = 4.;
     vec3 slope         = normalize( vec3( -dir.y, dir.x, 0 ) );
     vec4 n             = vec4( vec3( pixelWidth + border ) / vp * slope, 0 );

@@ -13,7 +13,7 @@ namespace Ra {
 namespace Core {
 namespace Geometry {
 
-/// \brief This class represents vertex + attributes per vertex. Toplogy is handled in
+/// \brief This class represents vertex + attributes per vertex. Topology is handled in
 /// MultiIndexedGeometry subclass.
 ///
 /// Attributes are unique per vertex, so that same position with different

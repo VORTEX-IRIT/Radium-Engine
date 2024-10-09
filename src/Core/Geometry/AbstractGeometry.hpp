@@ -13,8 +13,9 @@ namespace Geometry {
 /// \warning: Part of the current proposal for a modular implementation of
 /// displayable objects.
 ///
-/// \note We use a struct because all members are public anyway
-struct RA_CORE_API AbstractGeometry {
+class RA_CORE_API AbstractGeometry
+{
+  public:
     /*
      * Note: Explicitly defaulted virtual destructor, copy/move constructors,
      * copy/move assignment operators

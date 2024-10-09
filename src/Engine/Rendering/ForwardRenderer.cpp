@@ -1,15 +1,22 @@
+#include <Core/Geometry/IndexedGeometry.hpp>
+#include <Core/Utils/TypesUtils.hpp>
+#include <Engine/Data/Mesh.hpp>
 #include <Engine/Data/ShaderConfigFactory.hpp>
 #include <Engine/Data/ShaderConfiguration.hpp>
 #include <Engine/Rendering/ForwardRenderer.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
+#include <Core/Geometry/IndexedGeometry.hpp>
 #include <Core/Geometry/TopologicalMesh.hpp>
+#include <Core/RaCore.hpp>
 #include <Core/Utils/Color.hpp>
 #include <Core/Utils/Log.hpp>
-
+#include <Core/Utils/TypesUtils.hpp>
 #include <Engine/Data/LambertianMaterial.hpp>
 #include <Engine/Data/Material.hpp>
+#include <Engine/Data/Mesh.hpp>
 #include <Engine/Data/RenderParameters.hpp>
+#include <Engine/Data/ShaderProgram.hpp>
 #include <Engine/Data/ShaderProgramManager.hpp>
 #include <Engine/Data/Texture.hpp>
 #include <Engine/Data/ViewingParameters.hpp>
@@ -17,6 +24,7 @@
 #include <Engine/Rendering/DebugRender.hpp>
 #include <Engine/Rendering/RenderObject.hpp>
 #include <Engine/Scene/DefaultLightManager.hpp>
+#include <Engine/Scene/GeometryComponent.hpp>
 #include <Engine/Scene/Light.hpp>
 #include <globjects/Framebuffer.h>
 
@@ -27,6 +35,8 @@
 
 #include <Engine/Scene/SystemDisplay.hpp>
 
+#include <globjects/Framebuffer.h>
+#include <globjects/Texture.h>
 #include <map>
 
 #include <globjects/Texture.h>
@@ -180,6 +190,29 @@ void computeIndices( Core::Geometry::LineMesh::IndexContainerType& indices,
     indices.erase( std::unique( indices.begin(), indices.end() ), indices.end() );
 }
 
+template <typename IndexContainerType>
+void computeIndices2( Core::Geometry::LineIndexLayer::IndexContainerType& indices,
+                      const IndexContainerType& other ) {
+
+    for ( const auto& index : other ) {
+        auto s = index.size();
+        for ( unsigned int i = 0; i < s; ++i ) {
+            int i1 = index[i];
+            int i2 = index[( i + 1 ) % s];
+            if ( i1 > i2 ) std::swap( i1, i2 );
+            indices.emplace_back( i1, i2 );
+        }
+    }
+
+    std::sort( indices.begin(),
+               indices.end(),
+               []( const Core::Geometry::LineMesh::IndexType& a,
+                   const Core::Geometry::LineMesh::IndexType& b ) {
+                   return a[0] < b[0] || ( a[0] == b[0] && a[1] < b[1] );
+               } );
+    indices.erase( std::unique( indices.begin(), indices.end() ), indices.end() );
+}
+
 // store LineMesh and Core, define the observer functor to update data one core update for wireframe
 // linemesh
 template <typename CoreGeometry>
@@ -232,6 +265,30 @@ void setupLineMesh( std::shared_ptr<Data::LineMesh>& disp, CoreGeometry& core ) 
         core.attach( IndicesUpdater( disp, core ) );
     }
     else { disp.reset(); }
+}
+
+// create a linemesh to draw wireframe given a core mesh
+template <typename IndexLayer>
+void setupLineMesh( Data::GeometryDisplayable& displayable, const std::string& name ) {
+    auto lineLayer     = std::make_unique<Core::Geometry::LineIndexLayer>();
+    auto& indices      = lineLayer->collection();
+    auto& coreGeometry = displayable.getCoreGeometry();
+
+    if ( coreGeometry.containsLayer( IndexLayer::staticSemanticName ) ) {
+        auto layerOccurence =
+            coreGeometry.getFirstLayerOccurrence( IndexLayer::staticSemanticName );
+        auto& layer = dynamic_cast<const IndexLayer&>( layerOccurence.second );
+        computeIndices2( indices, layer.collection() );
+
+        if ( indices.size() > 0 ) {
+
+            Geometry::MultiIndexedGeometry::LayerKeyType lineKey = {
+                { Core::Geometry::LineIndexLayer::staticSemanticName }, name };
+            auto layerAdded = coreGeometry.addLayer( std::move( lineLayer ), false, name );
+            if ( !layerAdded.first ) { LOG( logERROR ) << "failed to add wireframe"; }
+            else { displayable.addRenderLayer( lineKey, Data::AttribArrayDisplayable::RM_LINES ); }
+        }
+    }
 }
 
 void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData ) {
@@ -419,62 +476,81 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
         glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO );
         GL_ASSERT( glDrawBuffers( 1, buffers ) ); // Draw color texture
 
-        auto drawWireframe = [this, &renderData]( const auto& ro ) {
-            std::shared_ptr<Data::Displayable> wro;
+        auto drawWireframeNew = [this, &renderData]( const auto& ro ) {
+            auto displayable = ro->getMesh();
+            using dispmesh   = Ra::Engine::Data::GeometryDisplayable;
+            auto td          = std::dynamic_pointer_cast<dispmesh>( displayable );
+            if ( td ) {
+                using namespace Core::Geometry;
+                using LayerKeyType   = Core::Geometry::MultiIndexedGeometry::LayerKeyType;
+                using LineIndexLayer = Core::Geometry::LineIndexLayer;
 
-            WireMap::iterator it = m_wireframes.find( ro.get() );
-            if ( it == m_wireframes.end() ) {
-                std::shared_ptr<Data::LineMesh> disp;
+                auto& coreGeom = td->getCoreGeometry();
 
-                using trimesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::TriangleMesh>;
-                using polymesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::PolyMesh>;
-                using quadmesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::QuadMesh>;
+                LayerKeyType lineKey = { { LineIndexLayer::staticSemanticName },
+                                         "wireframe triangles" };
 
-                auto displayable = ro->getMesh();
-                auto tm          = std::dynamic_pointer_cast<trimesh>( displayable );
-                auto tp          = std::dynamic_pointer_cast<polymesh>( displayable );
-                auto tq          = std::dynamic_pointer_cast<quadmesh>( displayable );
+                LayerKeyType lineKey2 = { { LineIndexLayer::staticSemanticName },
+                                          "wireframe main" };
 
-                auto processLineMesh = []( auto cm, std::shared_ptr<Data::LineMesh>& lm ) {
-                    if ( cm->getRenderMode() ==
-                         Data::AttribArrayDisplayable::MeshRenderMode::RM_TRIANGLES ) {
-                        setupLineMesh( lm, cm->getCoreGeometry() );
-                    }
-                };
-                if ( tm ) { processLineMesh( tm, disp ); }
-                if ( tp ) { processLineMesh( tp, disp ); }
-                if ( tq ) { processLineMesh( tq, disp ); }
+                bool hasTriangleLayer =
+                    coreGeom.containsLayer( TriangleIndexLayer::staticSemanticName );
+                bool hasQuadLayer = coreGeom.containsLayer( QuadIndexLayer::staticSemanticName );
+                bool hasPolyLayer = coreGeom.containsLayer( PolyIndexLayer::staticSemanticName );
 
-                m_wireframes[ro.get()] = disp;
-                wro                    = disp;
-            }
-            else { wro = it->second; }
+                if ( hasTriangleLayer && !coreGeom.containsLayer( lineKey ) ) {
+                    setupLineMesh<TriangleIndexLayer>( *td, "wireframe triangles" );
+                }
 
-            const Data::ShaderProgram* shader =
-                m_shaderProgramManager->getShaderProgram( "Wireframe" );
+                if ( hasPolyLayer && !coreGeom.containsLayer( lineKey2 ) ) {
+                    setupLineMesh<PolyIndexLayer>( *td, "wireframe main" );
+                }
+                else if ( hasQuadLayer && !coreGeom.containsLayer( lineKey2 ) ) {
+                    setupLineMesh<QuadIndexLayer>( *td, "wireframe main" );
+                }
 
-            if ( shader && wro ) {
-                shader->bind();
-                if ( ro->isVisible() ) {
-                    wro->updateGL();
+                const Data::ShaderProgram* shader =
+                    m_shaderProgramManager->getShaderProgram( "Wireframe" );
+
+                if ( shader && ro->isVisible() ) {
+                    GL_CHECK_ERROR;
+                    td->updateGL();
+                    GL_CHECK_ERROR;
+                    shader->bind();
+                    GL_CHECK_ERROR;
 
                     Core::Matrix4 modelMatrix = ro->getTransformAsMatrix();
                     shader->setUniform( "transform.proj", renderData.projMatrix );
                     shader->setUniform( "transform.view", renderData.viewMatrix );
                     shader->setUniform( "transform.model", modelMatrix );
                     shader->setUniform( "viewport", Core::Vector2 { m_width, m_height } );
-                    wro->render( shader );
+                    if ( hasTriangleLayer && ( hasQuadLayer || hasPolyLayer ) )
+                        shader->setUniform( "pixelWidth", 1.2f );
+                    else
+                        shader->setUniform( "pixelWidth", 2.8f );
+
+                    GL_CHECK_ERROR;
+                    td->render( shader, lineKey );
+
+                    if ( ( hasQuadLayer || hasPolyLayer ) ) {
+                        shader->setUniform( "pixelWidth", 2.8f );
+                        GL_CHECK_ERROR;
+                        td->render( shader, lineKey2 );
+                    }
 
                     GL_CHECK_ERROR;
                 }
             }
+            else {
+                // skip
+            }
         };
 
         for ( const auto& ro : m_fancyRenderObjects ) {
-            drawWireframe( ro );
+            drawWireframeNew( ro );
         }
         for ( const auto& ro : m_transparentRenderObjects ) {
-            drawWireframe( ro );
+            drawWireframeNew( ro );
         }
     }
 

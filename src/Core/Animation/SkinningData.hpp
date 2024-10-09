@@ -13,7 +13,7 @@ namespace Animation {
 /// \brief Skinning data that get set at startup including the "reference state".
 struct SkinningRefData {
     /// The mesh in reference position.
-    Geometry::TriangleMesh m_referenceMesh;
+    Geometry::AttribArrayGeometry m_referenceMesh;
 
     /// The inverse of the mesh's transform.
     Transform m_meshTransformInverse;

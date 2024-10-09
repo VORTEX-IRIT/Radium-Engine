@@ -1,11 +1,11 @@
-﻿#include <Engine/Scene/SkinningComponent.hpp>
+﻿#include "Core/Geometry/TriangleMesh.hpp"
+#include <Engine/Scene/SkinningComponent.hpp>
 
 #include <Core/Animation/PoseOperation.hpp>
 
 #include <Core/Animation/DualQuaternionSkinning.hpp>
 #include <Core/Animation/HandleWeightOperation.hpp>
 #include <Core/Animation/LinearBlendSkinning.hpp>
-#include <Core/Animation/RotationCenterSkinning.hpp>
 #include <Core/Geometry/DistanceQueries.hpp>
 #include <Core/Utils/Color.hpp>
 #include <Core/Utils/Log.hpp>
@@ -22,9 +22,6 @@
 using namespace Ra::Core;
 
 using Geometry::AttribArrayGeometry;
-using Geometry::PolyMesh;
-using Geometry::QuadMesh;
-using Geometry::TriangleMesh;
 
 using namespace Animation;
 using SpaceType = HandleArray::SpaceType;
@@ -40,73 +37,21 @@ static const std::string tangentName =
 static const std::string bitangentName =
     Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::VERTEX_BITANGENT );
 
-TriangleMesh triangulate( const PolyMesh& polyMesh ) {
-    TriangleMesh res;
-    res.setVertices( polyMesh.vertices() );
-    res.setNormals( polyMesh.normals() );
-    res.copyAllAttributes( polyMesh );
-    VectorArray<Vector3ui> indices;
-    // using the same triangulation as in Ra::Engine::GeneralMesh::triangulate
-    for ( const auto& face : polyMesh.getIndices() ) {
-        if ( face.size() == 3 ) { indices.push_back( face ); }
-        else {
-            int minus { int( face.size() ) - 1 };
-            int plus { 0 };
-            while ( plus + 1 < minus ) {
-                if ( ( plus - minus ) % 2 ) {
-                    indices.emplace_back( face[plus], face[plus + 1], face[minus] );
-                    ++plus;
-                }
-                else {
-                    indices.emplace_back( face[minus], face[plus], face[minus - 1] );
-                    --minus;
-                }
-            }
-        }
-    }
-    res.setIndices( std::move( indices ) );
-    return res;
-}
-
-TriangleMesh triangulate( const QuadMesh& quadMesh ) {
-    TriangleMesh res;
-    res.setVertices( quadMesh.vertices() );
-    res.setNormals( quadMesh.normals() );
-    res.copyAllAttributes( quadMesh );
-    VectorArray<Vector3ui> indices;
-    // using the same triangulation as in Ra::Engine::GeneralMesh::triangulate
-    for ( const auto& face : quadMesh.getIndices() ) {
-        indices.emplace_back( face[0], face[1], face[2] );
-        indices.emplace_back( face[0], face[2], face[3] );
-    }
-    res.setIndices( std::move( indices ) );
-    return res;
-}
-
 void SkinningComponent::initialize() {
     auto compMsg = ComponentMessenger::getInstance();
     // get the current animation data.
     bool hasSkel    = compMsg->canGet<Skeleton>( getEntity(), m_skelName );
     bool hasRefPose = compMsg->canGet<RefPose>( getEntity(), m_skelName );
-    bool hasTriMesh = compMsg->canGet<TriangleMesh>( getEntity(), m_meshName );
-    m_meshIsPoly    = compMsg->canGet<PolyMesh>( getEntity(), m_meshName );
-    m_meshIsQuad    = compMsg->canGet<QuadMesh>( getEntity(), m_meshName );
-
-    if ( hasSkel && hasRefPose && ( hasTriMesh || m_meshIsPoly || m_meshIsQuad ) ) {
+    bool hasGeom    = compMsg->canGet<AttribArrayGeometry>( getEntity(), m_meshName );
+    if ( hasSkel && hasRefPose && hasGeom ) {
         m_renderObjectReader = compMsg->getterCallback<Index>( getEntity(), m_meshName );
         m_skeletonGetter     = compMsg->getterCallback<Skeleton>( getEntity(), m_skelName );
-        if ( hasTriMesh ) {
-            m_triMeshWriter = compMsg->rwCallback<TriangleMesh>( getEntity(), m_meshName );
-        }
-        else if ( m_meshIsQuad ) {
-            m_quadMeshWriter = compMsg->rwCallback<QuadMesh>( getEntity(), m_meshName );
-        }
-        else { m_polyMeshWriter = compMsg->rwCallback<PolyMesh>( getEntity(), m_meshName ); }
+
+        m_geomWriter = compMsg->rwCallback<AttribArrayGeometry>( getEntity(), m_meshName );
 
         // copy mesh triangles and find duplicates for normal computation.
-        if ( hasTriMesh ) { m_refData.m_referenceMesh = *m_triMeshWriter(); }
-        else if ( m_meshIsQuad ) { m_refData.m_referenceMesh = triangulate( *m_quadMeshWriter() ); }
-        else { m_refData.m_referenceMesh = triangulate( *m_polyMeshWriter() ); }
+        m_refData.m_referenceMesh = *m_geomWriter();
+
         /// TODO : use the tangent computation algorithms from Core as soon as it is available.
         if ( !m_refData.m_referenceMesh.hasAttrib( tangentName ) &&
              !m_refData.m_referenceMesh.hasAttrib( bitangentName ) ) {
@@ -143,8 +88,6 @@ void SkinningComponent::initialize() {
             m_refData.m_referenceMesh.addAttrib( bitangentName, std::move( bitangents ) );
         }
 
-        m_topoMesh = Ra::Core::Geometry::TopologicalMesh { m_refData.m_referenceMesh };
-
         auto ro = getRoMgr()->getRenderObject( *m_renderObjectReader() );
         // get other data
         m_refData.m_meshTransformInverse = ro->getLocalTransform().inverse();
@@ -171,13 +114,11 @@ void SkinningComponent::initialize() {
         m_baseMaterial = ro->getMaterial();
 
         // prepare UV
-        auto attrUV = Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::VERTEX_TEXCOORD );
+
         AttribArrayGeometry* geom;
-        if ( hasTriMesh ) { geom = const_cast<TriangleMesh*>( m_triMeshWriter() ); }
-        else {
-            if ( m_meshIsPoly ) { geom = const_cast<PolyMesh*>( m_polyMeshWriter() ); }
-            else { geom = const_cast<QuadMesh*>( m_quadMeshWriter() ); }
-        }
+        geom = m_geomWriter();
+
+        auto attrUV = Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::VERTEX_TEXCOORD );
         if ( geom->hasAttrib( attrUV ) ) {
             auto handle = geom->getAttribHandle<Vector3>( attrUV );
             m_baseUV    = geom->getAttrib( handle ).data();
@@ -231,7 +172,8 @@ void SkinningComponent::skin() {
             break;
         }
         case COR: {
-            centerOfRotationSkinning( m_refData, tangents, bitangents, m_frameData );
+            ///\todo            centerOfRotationSkinning( m_refData, tangents, bitangents,
+            /// m_frameData );
             break;
         }
         case LBS:
@@ -240,29 +182,13 @@ void SkinningComponent::skin() {
             break;
         }
         }
-
-        if ( m_normalSkinning == GEOMETRIC ) {
-            m_topoMesh.updatePositions( m_frameData.m_currentPosition );
-            m_topoMesh.updateWedgeNormals();
-            m_topoMesh.updateTriangleMeshNormals( m_frameData.m_currentNormal );
-#pragma omp parallel for
-            for ( int i = 0; i < int( m_frameData.m_currentNormal.size() ); ++i ) {
-                Core::Math::getOrthogonalVectors( m_frameData.m_currentNormal[i],
-                                                  m_frameData.m_currentTangent[i],
-                                                  m_frameData.m_currentBitangent[i] );
-            }
-        }
     }
 }
 
 void SkinningComponent::endSkinning() {
     if ( m_frameData.m_doSkinning ) {
         AttribArrayGeometry* geom;
-        if ( !m_meshIsPoly ) {
-            if ( !m_meshIsQuad ) { geom = const_cast<TriangleMesh*>( m_triMeshWriter() ); }
-            else { geom = const_cast<QuadMesh*>( m_quadMeshWriter() ); }
-        }
-        else { geom = const_cast<PolyMesh*>( m_polyMeshWriter() ); }
+        geom = m_geomWriter();
 
         geom->setVertices( m_frameData.m_currentPosition );
         geom->setNormals( m_frameData.m_currentNormal );
@@ -346,7 +272,8 @@ void SkinningComponent::setSkinningType( SkinningType type ) {
     if ( m_isReady ) {
         // compute the per-vertex center of rotation only if required.
         // FIXME: takes time, would be nice to store them in a file and reload.
-        if ( m_skinningType == COR && m_refData.m_CoR.empty() ) { computeCoR( m_refData ); }
+        ///\todo        if ( m_skinningType == COR && m_refData.m_CoR.empty() ) { computeCoR(
+        /// m_refData ); }
         m_forceUpdate = true;
     }
 }
@@ -370,12 +297,7 @@ void SkinningComponent::showWeights( bool on ) {
     auto attrUV      = Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::VERTEX_TEXCOORD );
     AttribHandle<Vector3> handle;
 
-    AttribArrayGeometry* geom;
-    if ( !m_meshIsPoly ) {
-        if ( !m_meshIsQuad ) { geom = const_cast<TriangleMesh*>( m_triMeshWriter() ); }
-        else { geom = const_cast<QuadMesh*>( m_quadMeshWriter() ); }
-    }
-    else { geom = const_cast<PolyMesh*>( m_polyMeshWriter() ); }
+    AttribArrayGeometry* geom = m_geomWriter();
 
     if ( m_showingWeights ) {
         // update the displayed weights

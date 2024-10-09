@@ -13,6 +13,44 @@ namespace Ra {
 namespace Core {
 namespace Geometry {
 
+template <typename T>
+VectorArray<Vector3ui> triangulate( const VectorArray<T>& in ) {
+    VectorArray<Vector3ui> out;
+
+    out.reserve( in.size() );
+    for ( const auto& face : in ) {
+        if ( face.size() == 3 ) { out.push_back( face ); }
+        else {
+            /// simple sew triangulation
+            int minus { int( face.size() ) - 1 };
+            int plus { 0 };
+            while ( plus + 1 < minus ) {
+                if ( ( plus - minus ) % 2 ) {
+                    out.emplace_back( face[plus], face[plus + 1], face[minus] );
+                    ++plus;
+                }
+                else {
+                    out.emplace_back( face[minus], face[plus], face[minus - 1] );
+                    --minus;
+                }
+            }
+        }
+    }
+    return out;
+}
+
+template <>
+inline VectorArray<Vector3ui> triangulate( const VectorArray<Vector4ui>& in ) {
+    VectorArray<Vector3ui> out;
+    out.reserve( 2 * in.size() );
+    // assume quads are convex
+    for ( const auto& face : in ) {
+        out.emplace_back( face[0], face[1], face[2] );
+        out.emplace_back( face[0], face[2], face[3] );
+    }
+    return out;
+}
+
 /// \brief Base class for index collections stored in MultiIndexedGeometry
 class RA_CORE_API GeometryIndexLayerBase : public Utils::ObservableVoid,
                                            public Utils::ObjectWithSemantic,
@@ -63,7 +101,7 @@ struct GeometryIndexLayer : public GeometryIndexLayerBase {
 
     inline size_t getSize() const override final;
 
-    inline std::unique_ptr<GeometryIndexLayerBase> clone() override final;
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() override;
 
     inline size_t getNumberOfComponents() const override final;
 
@@ -383,19 +421,30 @@ class RA_CORE_API MultiIndexedGeometry : public AttribArrayGeometry, public Util
     /// \brief Clear attributes stored as pointers
     void deepClear();
 
-    using EntryType = std::pair<bool, std::unique_ptr<GeometryIndexLayerBase>>;
+    /// bool -> locked, ptr -> actual data
+    using LayerEntryType = std::pair<bool, std::unique_ptr<GeometryIndexLayerBase>>;
 
-    struct RA_CORE_API KeyHash {
+  public:
+    /// Hash function for layer keys
+    struct RA_CORE_API LayerKeyHash {
         std::size_t operator()( const LayerKeyType& k ) const;
     };
 
+  private:
     /// Collection of pairs <lockStatus, Indices>
     /// \note There is no natural ordering for these elements, thus
     /// we need an unordered_map. In contrast to map, transparent hashing
     /// require c++20, so we need to implement them explicitely here
     /// https://en.cppreference.com/w/cpp/container/unordered_map/find
-    std::unordered_map<LayerKeyType, EntryType, KeyHash> m_indices;
+    std::unordered_map<LayerKeyType, LayerEntryType, LayerKeyHash> m_indices;
 };
+
+#define INDEX_LAYER_CLONE_IMPLEMENTATION( TYPE )                      \
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() override { \
+        auto copy          = std::make_unique<TYPE>( *this );         \
+        copy->collection() = collection();                            \
+        return copy;                                                  \
+    }
 
 /// \name Predefined index layers
 /// The use of these layers helps in generic management of geometries
@@ -414,6 +463,7 @@ struct RA_CORE_API PointCloudIndexLayer : public GeometryIndexLayer<Vector1ui> {
     void linearIndices( const AttribArrayGeometry& attr );
 
     static constexpr const char* staticSemanticName = "PointCloud";
+    INDEX_LAYER_CLONE_IMPLEMENTATION( PointCloudIndexLayer )
 
   protected:
     template <class... SemanticNames>
@@ -425,6 +475,7 @@ struct RA_CORE_API PointCloudIndexLayer : public GeometryIndexLayer<Vector1ui> {
 struct RA_CORE_API TriangleIndexLayer : public GeometryIndexLayer<Vector3ui> {
     inline TriangleIndexLayer();
     static constexpr const char* staticSemanticName = "TriangleMesh";
+    INDEX_LAYER_CLONE_IMPLEMENTATION( TriangleIndexLayer )
 
   protected:
     template <class... SemanticNames>
@@ -436,6 +487,7 @@ struct RA_CORE_API TriangleIndexLayer : public GeometryIndexLayer<Vector3ui> {
 struct RA_CORE_API QuadIndexLayer : public GeometryIndexLayer<Vector4ui> {
     inline QuadIndexLayer();
     static constexpr const char* staticSemanticName = "QuadMesh";
+    INDEX_LAYER_CLONE_IMPLEMENTATION( QuadIndexLayer )
 
   protected:
     template <class... SemanticNames>
@@ -448,6 +500,7 @@ struct RA_CORE_API QuadIndexLayer : public GeometryIndexLayer<Vector4ui> {
 struct RA_CORE_API PolyIndexLayer : public GeometryIndexLayer<VectorNui> {
     inline PolyIndexLayer();
     static constexpr const char* staticSemanticName = "PolyMesh";
+    INDEX_LAYER_CLONE_IMPLEMENTATION( PolyIndexLayer )
 
   protected:
     template <class... SemanticNames>
@@ -459,6 +512,7 @@ struct RA_CORE_API PolyIndexLayer : public GeometryIndexLayer<VectorNui> {
 struct RA_CORE_API LineIndexLayer : public GeometryIndexLayer<Vector2ui> {
     inline LineIndexLayer();
     static constexpr const char* staticSemanticName = "LineMesh";
+    INDEX_LAYER_CLONE_IMPLEMENTATION( LineIndexLayer )
 
   protected:
     template <class... SemanticNames>
@@ -466,6 +520,8 @@ struct RA_CORE_API LineIndexLayer : public GeometryIndexLayer<Vector2ui> {
 };
 
 /// \}
+
+#undef INDEX_LAYER_CLONE_IMPLEMENTATION
 
 /// Temporary class providing the old API for TriangleMesh, LineMesh and PolyMesh
 /// This class will be marked as deprecated soon.
@@ -762,6 +818,7 @@ inline void IndexedGeometry<T>::setIndices( IndexContainerType&& indices ) {
     auto& abstractLayer = getLayerWithLock( m_mainIndexLayerKey );
     static_cast<IndexedGeometry<T>::DefaultLayerType&>( abstractLayer ).collection() =
         std::move( indices );
+    indicesUnlock();
     notify();
 }
 
@@ -769,6 +826,7 @@ template <typename T>
 inline void IndexedGeometry<T>::setIndices( const IndexContainerType& indices ) {
     auto& abstractLayer = getLayerWithLock( m_mainIndexLayerKey );
     static_cast<IndexedGeometry<T>::DefaultLayerType&>( abstractLayer ).collection() = indices;
+    indicesUnlock();
     notify();
 }
 

@@ -30,16 +30,10 @@ void GeometrySystem::handleAssetLoading( Entity* entity,
             comp = new PointCloudComponent( componentName, entity, data );
             break;
         case Ra::Core::Asset::GeometryData::LINE_MESH:
-            //            comp = new LineMeshComponent( componentName, entity, data );
-            //            break;
-        case Ra::Core::Asset::GeometryData::TRI_MESH:
-            comp = new TriangleMeshComponent( componentName, entity, data );
-            break;
         case Ra::Core::Asset::GeometryData::QUAD_MESH:
-            comp = new QuadMeshComponent( componentName, entity, data );
-            break;
+        case Ra::Core::Asset::GeometryData::TRI_MESH:
         case Ra::Core::Asset::GeometryData::POLY_MESH:
-            comp = new PolyMeshComponent( componentName, entity, data );
+            comp = new GeometryDisplayableComponent( componentName, entity, data );
             break;
         case Ra::Core::Asset::GeometryData::TETRA_MESH:
         case Ra::Core::Asset::GeometryData::HEX_MESH:

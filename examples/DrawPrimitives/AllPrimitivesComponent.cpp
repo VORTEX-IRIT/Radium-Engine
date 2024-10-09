@@ -133,18 +133,18 @@ void AllPrimitivesComponent::initialize() {
 
     //// CUBES ////
     if ( ENABLE_CUBES ) {
-        std::shared_ptr<Mesh> cube1( new Mesh( "Cube" ) );
+        std::shared_ptr<GeometryDisplayable> cube1( new GeometryDisplayable( "Cube" ) );
         auto coord = cellSize / 16_ra;
         cube1->loadGeometry(
-            Geometry::makeSharpBox( Vector3 { coord, coord, coord }, Color::Green() ) );
+            Geometry::makeSharpBox2( Vector3 { coord, coord, coord }, Color::Green() ) );
         auto renderObject1 = RenderObject::createRenderObject(
             "Cube1", this, RenderObjectType::Geometry, cube1, {} );
         renderObject1->setLocalTransform( Transform { Translation( cellCorner ) } );
         renderObject1->setMaterial( blinnPhongMaterial );
         addRenderObject( renderObject1 );
 
-        std::shared_ptr<Mesh> texCube( new Mesh( "Cube" ) );
-        texCube->loadGeometry( Geometry::makeSharpBox(
+        std::shared_ptr<GeometryDisplayable> texCube( new GeometryDisplayable( "Cube" ) );
+        texCube->loadGeometry( Geometry::makeSharpBox2(
             Vector3 { 1.2_ra * coord, 1.2_ra * coord, 1.2_ra * coord }, Color::White(), true ) );
         auto renderObjectTexCube = RenderObject::createRenderObject(
             "TexCube", this, RenderObjectType::Geometry, texCube, {} );
@@ -155,14 +155,15 @@ void AllPrimitivesComponent::initialize() {
         addRenderObject( renderObjectTexCube );
 
         // another cube
-        std::shared_ptr<Mesh> cube2( new Mesh( "Cube" ) );
+        std::shared_ptr<GeometryDisplayable> cube2( new GeometryDisplayable( "Cube" ) );
         coord = cellSize / 4_ra;
-        cube2->loadGeometry( Geometry::makeSharpBox( Vector3 { coord, coord, coord } ) );
+        cube2->loadGeometry( Geometry::makeSharpBox2( Vector3 { coord, coord, coord } ) );
+
         const std::string myColourName { "colour" };
         cube2->getCoreGeometry().addAttrib(
             myColourName, Vector4Array { cube2->getNumVertices(), Color::Red() } );
 
-        cube2->setAttribNameCorrespondance(
+        cube2->setAttribNameMatching(
             myColourName, Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::VERTEX_COLOR ) );
         auto renderObject2 = RenderObject::createRenderObject(
             "CubeRO_2", this, RenderObjectType::Geometry, cube2, {} );

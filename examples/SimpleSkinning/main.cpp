@@ -5,12 +5,15 @@
 #include <Engine/FrameInfo.hpp>
 #include <Engine/RadiumEngine.hpp>
 #include <Engine/Scene/CameraManager.hpp>
+#include <Engine/Scene/DefaultLightManager.hpp>
+#include <Engine/Scene/DirLight.hpp>
 #include <Engine/Scene/EntityManager.hpp>
 #include <Engine/Scene/GeometryComponent.hpp>
 #include <Engine/Scene/SkeletonBasedAnimationSystem.hpp>
 #include <Engine/Scene/SkeletonComponent.hpp>
 #include <Engine/Scene/SkinningComponent.hpp>
 #include <Engine/Scene/System.hpp>
+#include <Engine/Scene/SystemDisplay.hpp>
 #include <Gui/BaseApplication.hpp>
 #include <Gui/RadiumWindow/SimpleWindowFactory.hpp>
 #include <Gui/Viewer/Viewer.hpp>
@@ -71,6 +74,13 @@ class SkinningSystem : public Scene::System
 };
 
 void setupScene( Ra::Engine::RadiumEngine* engine ) {
+
+    DefaultLightManager* lightManager =
+        static_cast<DefaultLightManager*>( engine->getSystem( "DefaultLightManager" ) );
+    auto light = new Engine::Scene::DirectionalLight(
+        Ra::Engine::Scene::SystemEntity::getInstance(), "light" );
+    lightManager->addLight( light );
+
     auto animationSystem = new SkinningSystem;
     engine->registerSystem( "Simple animation system", animationSystem );
 

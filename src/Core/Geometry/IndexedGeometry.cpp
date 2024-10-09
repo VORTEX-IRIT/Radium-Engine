@@ -1,4 +1,5 @@
 #include <Core/Geometry/IndexedGeometry.hpp>
+
 #include <iterator>
 
 namespace Ra {
@@ -215,7 +216,7 @@ MultiIndexedGeometry::addLayer( std::unique_ptr<GeometryIndexLayerBase>&& layer,
                                 const bool withLock,
                                 const std::string& layerName ) {
     LayerKeyType key { layer->semantics(), layerName };
-    std::pair<LayerKeyType, EntryType> elt { key, std::make_pair( false, std::move( layer ) ) };
+    auto elt             = std::make_pair( key, std::make_pair( false, std::move( layer ) ) );
     auto [pos, inserted] = m_indices.insert( std::move( elt ) );
     notify();
 
@@ -223,8 +224,8 @@ MultiIndexedGeometry::addLayer( std::unique_ptr<GeometryIndexLayerBase>&& layer,
         CORE_ASSERT( !pos->second.first, "try to get already locked layer" );
         pos->second.first = true;
     }
-    /// If not inserted, the pointer is deleted. So the caller must ensure this possible deletion
-    /// is safe before calling this method.
+    /// If not inserted, the pointer is deleted. So the caller must ensure this possible
+    /// deletion is safe before calling this method.
 
     return { inserted, *( pos->second.second ) };
 }
@@ -245,7 +246,7 @@ void MultiIndexedGeometry::deepClear() {
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-std::size_t MultiIndexedGeometry::KeyHash::operator()( const LayerKeyType& k ) const {
+std::size_t MultiIndexedGeometry::LayerKeyHash::operator()( const LayerKeyType& k ) const {
     // Mix semantic collection into a single identifier string
     std::ostringstream stream;
     std::copy( k.first.begin(), k.first.end(), std::ostream_iterator<std::string>( stream, "" ) );

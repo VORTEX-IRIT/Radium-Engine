@@ -197,23 +197,8 @@ class RA_ENGINE_API SkinningComponent : public Component
     /// Read FMC's RO idx.
     Getter<Core::Utils::Index> m_renderObjectReader;
 
-    /// Whether the skinned mesh is a TriangleMesh or a PolyMesh.
-    bool m_meshIsPoly { false };
-
-    /// Whether the skinned mesh is a TriangleMesh or a PolyMesh.
-    bool m_meshIsQuad { false };
-
-    /// Getter/Setter to the skinned mesh, in case it is a TriangleMesh.
-    ReadWrite<Core::Geometry::TriangleMesh> m_triMeshWriter;
-
-    /// Getter/Setter to the skinned mesh, in case it is a PolyMesh.
-    ReadWrite<Core::Geometry::PolyMesh> m_polyMeshWriter;
-
-    /// Getter/Setter to the skinned mesh, in case it is a QuadMesh.
-    ReadWrite<Core::Geometry::QuadMesh> m_quadMeshWriter;
-
-    /// The Topological mesh used to geometrically recompute the normals.
-    Core::Geometry::TopologicalMesh m_topoMesh;
+    /// Getter/Setter to the skinned geom
+    ReadWrite<Core::Geometry::AttribArrayGeometry> m_geomWriter;
 
     /// The per-bone skinning weights.
     /// \note These are stored this way because we cannot build the weight matrix
