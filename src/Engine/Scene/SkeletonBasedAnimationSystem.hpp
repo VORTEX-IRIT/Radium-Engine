@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/Data/TextureManager.hpp"
 #include <Engine/Scene/ItemEntry.hpp>
 #include <Engine/Scene/System.hpp>
 
@@ -54,6 +55,8 @@ class RA_ENGINE_API SkeletonBasedAnimationSystem : public System
 
     /// The current animation time.
     Scalar m_time { 0_ra };
+
+    Data::TextureManager::TextureHandle m_heatMapTextureHandle;
 };
 
 } // namespace Scene

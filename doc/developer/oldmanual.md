@@ -1,4 +1,4 @@
-\page develoldmanual [deprecated] Radium Engine programmer manual
+\page develoldmanual _deprecated_ Radium Engine programmer manual
 \todo pick relevant part, update and move to corresponding page
 [TOC]
 
@@ -116,7 +116,7 @@ Render objects are stored together by the _render object manager_ for efficiency
 The Render Objects are drawn by the _Renderer_ which may live in a separated thread. Each frame it grabs all
 the drawable (which should be double-buffered in case we are mid-VBO update) and calls `draw()` on them.
 
-(TODO : a nice class schema).
+\todo a nice class schema
 
 ## ItemEntry : Handles to engine objects
 

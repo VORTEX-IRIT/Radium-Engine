@@ -5,8 +5,15 @@
 namespace Ra {
 namespace Engine {
 namespace Data {
-/**
- * Implementation of the Lambertian Material BSDF.
+
+namespace TextureSemantics {
+/** \brief  LambertianMaterial's textures are the same than SimpleMaterial ones, just alias.
+ */
+using LambertianMaterial = SimpleMaterial;
+} // namespace TextureSemantics
+
+/** \brief Implementation of the Lambertian Material BSDF.
+ *
  * This material implements a lambertian diffuse BSDF.
  * This material could not be loaded from a file and must be defined and associated to
  * renderobjects programatically.
@@ -19,39 +26,29 @@ namespace Data {
 class RA_ENGINE_API LambertianMaterial final : public SimpleMaterial
 {
   public:
-    /**
-     * Construct a named Lambertian material
-     * @param instanceName The name of the material
+    /** \brief Construct a named Lambertian material.
+     *
+     * \param instanceName The name of the material
      */
     explicit LambertianMaterial( const std::string& instanceName );
 
-    /**
-     * Destructor.
-     * @note The material does not have ownership on its texture nor its shaders.
-     * This destructor do not delete the associated textures and the corresponding shaders.
-     */
-    ~LambertianMaterial() override;
+    ~LambertianMaterial() override = default;
 
-    /**
-     * Register the material in the material library.
+    /** \brief Register the material in the material library.
+     *
      * After registration, the material could be instantiated by any Radium system, renderer,
      * plugin, ...
      */
     static void registerMaterial();
 
-    /**
-     * Remove the material from the material library.
+    /** \brief Remove the material from the material library.
+     *
      * After removal, the material is no more available, ...
      */
     static void unregisterMaterial();
 
     void updateFromParameters() override;
 
-    /**
-     * Get a json containing metadata about the parameters of the material.
-     *
-     * @return the metadata in json format
-     */
     nlohmann::json getParametersMetadata() const override;
 
   private:

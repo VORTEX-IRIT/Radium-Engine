@@ -1,11 +1,11 @@
 ---
 BasedOnStyle: LLVM
 Language: Cpp
-Standard: Cpp11
+Standard: c++17
 AllowShortFunctionsOnASingleLine: Inline
 AllowShortBlocksOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: true
-AlwaysBreakTemplateDeclarations: true
+AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass: true

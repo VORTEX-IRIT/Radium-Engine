@@ -13,7 +13,7 @@ namespace Headless {
  * Once the parser is populated, derived application should call the inherited init() method
  * which only parse the command line and return the result of this parsing.
  *
- * @see https://cliutils.github.io/CLI11/book/ for a description of the wrapped commandline parser.
+ * \see https://cliutils.github.io/CLI11/book/ for a description of the wrapped commandline parser.
  */
 class HEADLESS_API CLIBaseApplication
 {
@@ -49,9 +49,9 @@ class HEADLESS_API CLIBaseApplication
      * Overriden method should use the command line parsing result to initialize their internal
      * state and return 0 if initialization succeeded or an application dependant error code if not.
      *
-     * @param argc number of parameter
-     * @param argv array of string representing the parameters
-     * @return 0 if the command line parsing success or the parsing error code if something went
+     * \param argc number of parameter
+     * \param argv array of string representing the parameters
+     * \return 0 if the command line parsing success or the parsing error code if something went
      * wrong (see
      * https://cliutils.github.io/CLI11/class_c_l_i_1_1_app.html#aac000657ef11647125ba91af38fd7d9c).
      */

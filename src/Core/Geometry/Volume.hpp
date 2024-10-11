@@ -66,7 +66,7 @@ class RA_CORE_API AbstractVolume : public AbstractGeometry
     virtual Utils::optional<ValueType> getValue( Eigen::Ref<const Vector3> p ) const = 0;
 
     /// \name Status queries
-    ///@{
+    ///\{
     /// Return true if the volume is parametric
     bool isParametric() const;
     /// Return true if the volume is discrete. Can be cast as AbstractDiscreteVolume
@@ -75,7 +75,7 @@ class RA_CORE_API AbstractVolume : public AbstractGeometry
     bool isDense() const;
     /// Return true if the volume is sparse (implies #isDiscrete to be true)
     bool isSparse() const;
-    ///@}
+    ///\}
 
     /// Print info to the Debug output. Need to be extended by child classes
     void displayInfo() const;

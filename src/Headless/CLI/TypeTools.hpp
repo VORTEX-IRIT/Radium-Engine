@@ -1341,7 +1341,7 @@ bool lexical_conversion( const std::vector<std ::string>& strings, AssignTo& out
     if ( strings.size() > 1 ) {
         retval = retval && lexical_assign<decltype( v2 ), decltype( v2 )>( strings[1], v2 );
     }
-    if ( retval ) { output = AssignTo { v1, v2 }; }
+    if ( retval ) { output = AssignTo { { v1, v2 } }; }
     return retval;
 }
 

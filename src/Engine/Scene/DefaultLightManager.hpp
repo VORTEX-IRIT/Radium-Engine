@@ -31,7 +31,7 @@ class RA_ENGINE_API DefaultLightStorage : public LightStorage
 };
 
 /**
- * @brief DefaultLightManager. A simple Light Manager with a list of lights.
+ * \brief DefaultLightManager. A simple Light Manager with a list of lights.
  */
 class RA_ENGINE_API DefaultLightManager : public LightManager
 {

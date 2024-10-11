@@ -6,9 +6,8 @@ Mainly inspired by <https://google-styleguide.googlecode.com/svn/trunk/cppguide.
 
 # Code style
 
-Please follow the scripts/clang-format coding style (tested `with clang-format 9.0`).
-We also provide a pre commit hook that checks the committed files are correctly formatted.
-To install both hooks and clang-format, simply run `./scripts/install-scripts-linux.sh` on linux, or adapt to your OS.
+Please follow the scripts/clang-format coding style.
+We also provide a pre-commit hook that checks the committed files are correctly formatted (see \ref pre_commit).
 
 * Indentation style : 4-spaces
 * Brace style : keep it consistent across files.
@@ -22,7 +21,8 @@ To install both hooks and clang-format, simply run `./scripts/install-scripts-li
 * use prefix increments (`++i` and not `i++`)
 * use `const` everywhere possible. use `constexpr` for const values.
 * line length should be kept at 80 (soft limit) and not exceed 120 (hard limit)
-* no need for () for a return statement.
+* no need for () for a return statement
+* document using doxygen convention, special commands with backslash \\ (e.g. `\brief` rather than `@brief`).
 
 # Headers
 

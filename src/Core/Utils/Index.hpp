@@ -32,6 +32,8 @@ class RA_CORE_API Index
     /// INVALID
     constexpr bool isInvalid() const;
     constexpr void setInvalid();
+
+    /// \brief return an invalid Index
     static constexpr Index Invalid();
     static constexpr Index Max();
 

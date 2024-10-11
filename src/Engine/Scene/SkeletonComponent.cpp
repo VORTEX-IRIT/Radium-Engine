@@ -299,8 +299,8 @@ void SkeletonComponent::setupSkeletonDisplay() {
         s_boneMesh = std::make_shared<Data::Mesh>( "Bone Mesh" );
         s_boneMesh->loadGeometry( makeBoneShape() );
         s_boneMaterial.reset( new Data::BlinnPhongMaterial( "Bone Material" ) );
-        s_boneMaterial->m_kd = Color::Grey( 0.4_ra );
-        s_boneMaterial->m_ks = Color::Black();
+        s_boneMaterial->setDiffuseColor( Color::Grey( 0.4_ra ) );
+        s_boneMaterial->setSpecularColor( Color::Black() );
         s_boneRenderTechnique.reset( new Rendering::RenderTechnique );
         s_boneRenderTechnique->setConfiguration(
             *Data::ShaderConfigurationFactory::getConfiguration( "BlinnPhong" ) );

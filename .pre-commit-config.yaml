@@ -5,7 +5,7 @@
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v5.0.0
   hooks:
     - id: trailing-whitespace
       exclude: ^tests/.*/data/.*$
@@ -26,12 +26,12 @@ repos:
 #      - id: cppcheck
 #        args: [--enable=all]
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.33.0
+  rev: v0.42.0
   hooks:
   - id: markdownlint
     args: [-f]
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v15.0.6
+  rev: v19.1.1
   hooks:
   - id: clang-format
     types_or: [c++, c, cuda]

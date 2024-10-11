@@ -2,6 +2,7 @@
 
 #include <Engine/RaEngine.hpp>
 
+/// \file SystemDisplay.hpp
 /// This file's main purpose is to declare a set of macros to allow drawing
 /// primitives from everywhere in the code, for debug purposes.
 /// These macros can be completely disabled by #defining the following constant :
@@ -24,7 +25,7 @@ namespace Scene {
 
 #ifndef RA_DISABLE_DEBUG_DISPLAY
 
-/// Component for debug drawing. @see SystemEntity.
+/// Component for debug drawing. \see SystemEntity.
 class RA_ENGINE_API DebugComponent : public Component
 {
   public:
@@ -38,7 +39,7 @@ class RA_ENGINE_API DebugComponent : public Component
 
 #endif
 
-/// Component for UI drawing. @see SystemEntity.
+/// Component for UI drawing. \see SystemEntity.
 class RA_ENGINE_API UiComponent : public Component
 {
   public:

@@ -16,12 +16,7 @@ TEST_CASE( "Core/Utils/TypesUtils", "[Core][Core/Utils][TypesUtils]" ) {
         REQUIRE( std::string( demangleType<int>() ) == "int" );
         REQUIRE( std::string( demangleType<float>() ) == "float" );
         REQUIRE( std::string( demangleType<uint>() ) == "unsigned int" );
-        // TODO, verify type demangling on windows
-#ifndef _WIN32
         REQUIRE( std::string( demangleType<size_t>() ) == "unsigned long" );
-#else
-        REQUIRE( std::string( demangleType<size_t>() ) == "unsigned __int64" );
-#endif
         auto demangledName = std::string( demangleType<std::vector<int>>() );
         REQUIRE( demangledName == "std::vector<int, std::allocator<int>>" );
 
@@ -40,12 +35,7 @@ TEST_CASE( "Core/Utils/TypesUtils", "[Core][Core/Utils][TypesUtils]" ) {
         REQUIRE( std::string( demangleType( i ) ) == "int" );
         REQUIRE( std::string( demangleType( f ) ) == "float" );
         REQUIRE( std::string( demangleType( u ) ) == "unsigned int" );
-        // TODO, verify type demangling on windows
-#ifndef _WIN32
         REQUIRE( std::string( demangleType( s ) ) == "unsigned long" );
-#else
-        REQUIRE( std::string( demangleType( s ) ) == "unsigned __int64" );
-#endif
         std::vector<int> v;
         auto demangledName = std::string( demangleType( v ) );
         REQUIRE( demangledName == "std::vector<int, std::allocator<int>>" );

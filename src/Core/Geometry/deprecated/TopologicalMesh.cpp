@@ -90,8 +90,6 @@ TriangleMesh TopologicalMesh::toTriangleMesh() {
         HandleAndValueVector<Vector3> _vec3;
         HandleAndValueVector<Vector4> _vec4;
 
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
         bool operator==( const VertexDataInternal& lhs ) const {
             return _vertex == lhs._vertex && _normal == lhs._normal && _float == lhs._float &&
                    _vec2 == lhs._vec2 && _vec3 == lhs._vec3 && _vec4 == lhs._vec4;

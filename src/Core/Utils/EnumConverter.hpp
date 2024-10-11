@@ -1,9 +1,11 @@
 #pragma once
+
 #include <Core/CoreMacros.hpp>
 
-#include <initializer_list>
-
 #include <Core/Utils/BijectiveAssociation.hpp>
+
+#include <initializer_list>
+#include <vector>
 
 namespace Ra {
 namespace Core {
@@ -17,9 +19,14 @@ namespace Utils {
  * of the enumeration to manage.
  *
  */
+
 template <typename EnumBaseType>
 class EnumConverter
 {
+    /// \todo think of manage both EnumType and EnumUnderlyingType
+    /// Eg using EnumUnderlyingType = std::underling_type_t<Enum>;
+    /// getEnumeratorUnderlying ->EnumUnderlyingType
+    /// getEnumerator -> Enum
   public:
     explicit EnumConverter( std::initializer_list<std::pair<EnumBaseType, std::string>> pairs );
 

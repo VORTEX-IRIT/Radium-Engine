@@ -84,7 +84,7 @@ class RA_GUI_API BaseApplication : public QApplication
      * \param factory : a functor that instanciate the mainWindow
      * \param glVersion : glbinding::Version of the requested OpenGL Version.
      * If no version is given, the default recommended version for Radium (4.1) will be requested.
-     * @note The initialize method call virtual methods on the object being initialized to
+     * \note The initialize method call virtual methods on the object being initialized to
      * configure the engine and application services.
      * When redefining those methods, it is recommended to call the inherited one to have
      * consistent initialization wrt the BaseApplication ancestor.
@@ -128,6 +128,7 @@ class RA_GUI_API BaseApplication : public QApplication
     bool isRunning() const { return !m_isAboutToQuit; }
 
     const Engine::RadiumEngine* getEngine() const { return m_engine; }
+    Viewer* getViewer() { return m_viewer; }
 
     uint getFrameCount() const { return m_frameCounter; }
 

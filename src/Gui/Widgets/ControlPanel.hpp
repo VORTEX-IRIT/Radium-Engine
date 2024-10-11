@@ -5,6 +5,7 @@
 #include <Gui/Widgets/ConstrainedNumericSpinBox.hpp>
 #include <Gui/Widgets/VectorEditor.hpp>
 
+#include <QBoxLayout>
 #include <QFrame>
 #include <QVBoxLayout>
 
@@ -19,56 +20,23 @@ namespace Gui {
 namespace Widgets {
 /**
  * Simple panel for Qt gui.
- * A control panel will expose all configurable options the bject its decorate to allow the user to
+ * A control panel will expose all configurable options the object its decorate to allow the user to
  * interact with it.
  */
 class RA_GUI_API ControlPanel : public QFrame
 {
     Q_OBJECT
   public:
-    /** Constructors and destructor.
-     *  https://en.cppreference.com/w/cpp/language/rule_of_three
-     */
-    /** @{ */
     explicit ControlPanel( const std::string& name, bool hline = true, QWidget* parent = nullptr );
     ControlPanel( const ControlPanel& )            = delete;
     ControlPanel& operator=( const ControlPanel& ) = delete;
     ControlPanel( ControlPanel&& )                 = delete;
     ControlPanel& operator=( ControlPanel&& )      = delete;
     ~ControlPanel() override                       = default;
-    /**@}*/
 
     /**Methods to populate the panel with dedicated ui elements.
      */
-    /** @{ */
-
-    /**
-     * Open a box layout to organise the widgets
-     * \param dir the direction of the layout
-     * direction could be :
-     *      - QBoxLayout::LeftToRight
-     *      - QBoxLayout::RightToLeft
-     *      - QBoxLayout::TopToBottom
-     *      - QBoxLayout::BottomToTop
-     */
-    void beginLayout( QBoxLayout::Direction dir = QBoxLayout::LeftToRight );
-
-    /**
-     * Close the current layout.
-     * When no layout is opened, widgets are arranged vertically into the panel
-     */
-    void endLayout( bool separator = false );
-
-    /**
-     * Add a separator
-     */
-    void addSeparator();
-
-    /**
-     * Adds a stretchable space to the current layout
-     * \param stretch factor
-     */
-    void addStretch( int stretch = 0 );
+    /** \{ */
 
     /** Add an option to the panel
      *  An option is an on/off checkbox to activate a state of the renderer.
@@ -158,7 +126,6 @@ class RA_GUI_API ControlPanel : public QFrame
      * \param initial The initial value of the scalar
      * \param min The min bound of the value
      * \param max The max bound of the value
-     * \param dec The display precision (decimals) of the value
      * \param tooltip The tooltip text
      */
     void addSliderInput( const std::string& name,
@@ -175,7 +142,6 @@ class RA_GUI_API ControlPanel : public QFrame
      * \param initial The initial value of the color
      * \param min The min bound of the value
      * \param max The max bound of the value
-     * \param dec The display precision (decimals) of the value
      * \param tooltip The tooltip text
      */
     void addPowerSliderInput( const std::string& name,
@@ -190,7 +156,6 @@ class RA_GUI_API ControlPanel : public QFrame
      * \param name The name of the vector
      * \param callback The function to call when the state changed
      * \param initial The initial value of the vector
-     * \param dec The display precision (decimals) of the value
      * \param tooltip The tooltip text
      */
     template <typename T = Scalar>
@@ -265,17 +230,21 @@ class RA_GUI_API ControlPanel : public QFrame
      */
     void addWidget( QWidget* newWidget );
 
-    /**@}*/
+    /**\}*/
+
+    void addSeparator();
+    void addStretch( int stretch );
+
+    void newLayout() {
+        m_contentLayout = new QGridLayout();
+        m_contentLayout->setObjectName( "new layout" );
+        m_mainLayout->addLayout( m_contentLayout );
+    }
 
   private:
     /// The layout to organise the ui elements
-    QVBoxLayout* m_contentLayout;
-
-    /// The current layout where UI element will be added
-    QBoxLayout* m_currentLayout;
-
-    /// The stack of layouts
-    std::stack<QBoxLayout*> m_layouts;
+    QVBoxLayout* m_mainLayout;
+    QGridLayout* m_contentLayout;
 };
 
 template <typename T>
@@ -285,10 +254,9 @@ void ControlPanel::addConstrainedNumberInput( const std::string& name,
                                               std::function<bool( T )> predicate,
                                               const std::string& tooltip,
                                               int dec ) {
-    auto inputLayout = new QHBoxLayout();
-    auto inputLabel  = new QLabel( tr( name.c_str() ), this );
+    auto inputLabel = new QLabel( tr( name.c_str() ) );
 
-    auto inputField = new ConstrainedNumericSpinBox<T>( this );
+    auto inputField = new ConstrainedNumericSpinBox<T>();
     inputField->setValue( initial );
     inputField->setMinimum( std::numeric_limits<T>::lowest() );
     inputField->setMaximum( std::numeric_limits<T>::max() );
@@ -301,15 +269,14 @@ void ControlPanel::addConstrainedNumberInput( const std::string& name,
     if constexpr ( std::is_floating_point_v<T> ) { inputField->setDecimals( dec ); }
 
     if ( !tooltip.empty() ) {
-        inputLabel->setToolTip(
-            QString( "<qt>%1</qt>" ).arg( QString( tooltip.c_str() ).toHtmlEscaped() ) );
+        auto tooltipString =
+            QString( "<qt>%1</qt>" ).arg( QString( tooltip.c_str() ).toHtmlEscaped() );
+        inputLabel->setToolTip( tooltipString );
+        inputField->setToolTip( tooltipString );
     }
-
-    inputLayout->addWidget( inputLabel );
-    // inputLayout->addStretch();
-    inputLayout->addWidget( inputField );
-
-    m_currentLayout->addLayout( inputLayout );
+    auto index = m_contentLayout->rowCount();
+    m_contentLayout->addWidget( inputLabel, index, 0 );
+    m_contentLayout->addWidget( inputField, index, 1 );
 }
 
 template <typename T>
@@ -320,12 +287,14 @@ void ControlPanel::addNumberInput( const std::string& name,
                                    T max,
                                    const std::string& tooltip,
                                    int dec ) {
-    auto inputLayout = new QHBoxLayout();
 
-    auto inputLabel = new QLabel( tr( name.c_str() ), this );
+    auto inputLabel = new QLabel( tr( name.c_str() ) );
 
     using WidgetType = typename QtSpinBox::getType<T>::Type;
-    auto inputField  = new WidgetType( this );
+    auto inputField  = new WidgetType();
+    auto inputLayout = new QHBoxLayout();
+    inputLayout->addStretch();
+    inputLayout->addWidget( inputField );
     // to prevent overflow
     inputField->setRange(
         min,
@@ -338,13 +307,14 @@ void ControlPanel::addNumberInput( const std::string& name,
     if constexpr ( std::is_floating_point_v<T> ) { inputField->setDecimals( dec ); }
 
     if ( !tooltip.empty() ) {
-        inputLabel->setToolTip(
-            QString( "<qt>%1</qt>" ).arg( QString( tooltip.c_str() ).toHtmlEscaped() ) );
+        auto tooltipString =
+            QString( "<qt>%1</qt>" ).arg( QString( tooltip.c_str() ).toHtmlEscaped() );
+        inputLabel->setToolTip( tooltipString );
+        inputField->setToolTip( tooltipString );
     }
-    inputLayout->addWidget( inputLabel );
-    // inputLayout->addStretch();
-    inputLayout->addWidget( inputField );
-    m_currentLayout->addLayout( inputLayout );
+    auto index = m_contentLayout->rowCount();
+    m_contentLayout->addWidget( inputLabel, index, 0 );
+    m_contentLayout->addLayout( inputLayout, index, 1 );
 }
 
 template <typename T>
@@ -352,21 +322,23 @@ void ControlPanel::addVectorInput( const std::string& name,
                                    std::function<void( const std::vector<T>& )> callback,
                                    const std::vector<T>& initial,
                                    const std::string& tooltip ) {
-    auto inputLayout = new QHBoxLayout();
 
-    auto inputLabel = new QLabel( tr( name.c_str() ), this );
-    auto inputField = new VectorEditor<T>( initial, this );
+    auto inputLabel = new QLabel( tr( name.c_str() ) );
+    auto inputField = new VectorEditor<T>( initial );
 
     if ( !tooltip.empty() ) {
-        inputLabel->setToolTip(
-            QString( "<qt>%1</qt>" ).arg( QString( tooltip.c_str() ).toHtmlEscaped() ) );
+        auto tooltipString =
+            QString( "<qt>%1</qt>" ).arg( QString( tooltip.c_str() ).toHtmlEscaped() );
+        inputLabel->setToolTip( tooltipString );
+        inputField->setToolTip( tooltipString );
     }
-    inputLayout->addWidget( inputLabel );
-    inputLayout->addWidget( inputField );
     connect( inputField,
              QOverload<const std::vector<T>&>::of( &VectorEditorSignals::valueChanged ),
              std::move( callback ) );
-    m_currentLayout->addLayout( inputLayout );
+
+    auto index = m_contentLayout->rowCount();
+    m_contentLayout->addWidget( inputLabel, index, 0 );
+    m_contentLayout->addWidget( inputField, index, 1 );
 }
 
 } // namespace Widgets

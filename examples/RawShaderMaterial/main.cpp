@@ -12,7 +12,7 @@
 // include the custom material definition
 #include <Engine/Data/RawShaderMaterial.hpp>
 
-// include the Viewer to demonstrate dynamic edition of materials
+// include the Viewer to demonstrate dynamic editing of materials
 #include <Gui/Viewer/Viewer.hpp>
 
 // Qt
@@ -71,8 +71,8 @@ class MyParameterProvider : public Ra::Engine::Data::ShaderParameterProvider
         // Method called before drawing each frame in Renderer::updateRenderObjectsInternal.
         // The name of the parameter corresponds to the shader's uniform name.
         auto& renderParameters = getParameters();
-        renderParameters.addParameter( "aColorUniform", m_colorParameter );
-        renderParameters.addParameter( "aScalarUniform", m_scalarParameter );
+        renderParameters.setVariable( "aColorUniform", m_colorParameter );
+        renderParameters.setVariable( "aScalarUniform", m_scalarParameter );
     }
     void setOrComputeTheParameterValues() {
         // client side computation of the parameters, e.g.
@@ -87,8 +87,8 @@ class MyParameterProvider : public Ra::Engine::Data::ShaderParameterProvider
 
 /**
  * Generate a quad with a ShaderMaterial attached
- * @param app
- * @return The renderObject associated to the created component.
+ * \param app
+ * \return The renderObject associated to the created component.
  */
 std::shared_ptr<Ra::Engine::Rendering::RenderObject> initQuad( Ra::Gui::BaseApplication& app ) {
     //! [Creating the quad]
@@ -112,7 +112,7 @@ std::shared_ptr<Ra::Engine::Rendering::RenderObject> initQuad( Ra::Gui::BaseAppl
     auto system = app.m_engine->getSystem( "GeometrySystem" );
     system->addComponent( e, c );
 
-    //![get the renderobject for further edition]
+    //![get the renderobject for further editing]
     auto ro = Ra::Engine::RadiumEngine::getInstance()->getRenderObjectManager()->getRenderObject(
         c->m_renderObjects[0] );
 

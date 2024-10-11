@@ -37,7 +37,6 @@ jobs:
       macos: "false"
       build-release: "false"
       coverage: "true"
-      qt6: "false"
   call-notify:
     needs: [increase-version-number]
     uses: ./.github/workflows/notify-radium-releases.yml

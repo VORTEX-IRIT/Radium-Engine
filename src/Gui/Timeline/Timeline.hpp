@@ -26,7 +26,7 @@ namespace Ra::Gui {
  * such as play, pause and reset animations or simulations, but also going to
  * a given point in time.
  *
- * Regarding KeyFramedValues, the Timeline provides their edition / manipulation.
+ * Regarding KeyFramedValues, the Timeline provides their editing / manipulation.
  * To do so, KeyFramedValues must be registered into the Timeline, which can be
  * done using the registerKeyFramedValue methods (see the related Documentation page ).
  *
@@ -85,7 +85,7 @@ class RA_GUI_API Timeline : public QDialog
     void unregisterKeyFramedValue( Ra::Core::Utils::Index roIdx, const std::string& name );
 
     /**
-     * @returns the current time.
+     * \returns the current time.
      */
     Scalar getTime() const;
 
@@ -272,11 +272,11 @@ class RA_GUI_API Timeline : public QDialog
     Ra::Core::Animation::KeyFramedValueController m_current;
 
     /// Observers id for engine event
-    ///@{
+    ///\{
     int m_entityAddObserverId { -1 };
     int m_entityRemoveObserverId { -1 };
     int m_roAddObserverId { -1 };
-    ///@}
+    ///\}
 };
 
 } // namespace Ra::Gui

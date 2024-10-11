@@ -95,6 +95,9 @@ void Skeleton::setTransform( const uint i, const Transform& T, const SpaceType M
         // update bone transform and also children's transform
         setLocalTransform( i, m_pose[i] * m_modelSpace[i].inverse() * modelT );
     } break;
+    default:
+        // nothing can be done, error
+        break;
     }
 }
 

@@ -182,11 +182,8 @@ glbinding::ProcAddress WindowQt::getProcAddress( const char* name ) {
 
     const auto symbol = std::string( name );
 
-#if ( QT_VERSION >= QT_VERSION_CHECK( 5, 4, 0 ) )
     const auto qtSymbol = QByteArray::fromStdString( symbol );
-#else
-    const auto qtSymbol = QByteArray::fromRawData( symbol.c_str(), symbol.size() );
-#endif
+
     return s_getProcAddressHelper->m_context->getProcAddress( qtSymbol );
 }
 

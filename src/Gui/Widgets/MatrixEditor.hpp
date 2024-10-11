@@ -20,25 +20,25 @@ class RA_GUI_API MatrixEditor : public QWidget
   public:
     /** Constructors
      */
-    /** @{ */
+    /** \{ */
     explicit MatrixEditor( const Ra::Core::MatrixN& matrix, int dec, QWidget* parent = nullptr );
     MatrixEditor( const MatrixEditor& )            = delete;
     MatrixEditor& operator=( const MatrixEditor& ) = delete;
     MatrixEditor( MatrixEditor&& )                 = delete;
     MatrixEditor&& operator=( MatrixEditor&& )     = delete;
-    /**@}*/
+    /**\}*/
 
     /// Get the edited matrix
     const Ra::Core::MatrixN& matrix() const;
 
     /**
-     * @return the number of decimal of the input
+     * \return the number of decimal of the input
      */
     int decimals() const;
 
     /**
      * Set the precision of the input, in decimals
-     * @param prec the precision in decimals
+     * \param prec the precision in decimals
      */
     void setDecimals( int prec );
 

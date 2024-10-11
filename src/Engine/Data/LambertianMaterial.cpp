@@ -18,8 +18,6 @@ nlohmann::json LambertianMaterial::s_parametersMetadata = {};
 LambertianMaterial::LambertianMaterial( const std::string& instanceName ) :
     SimpleMaterial( instanceName, materialName, Material::MaterialAspect::MAT_OPAQUE ) {}
 
-LambertianMaterial::~LambertianMaterial() {}
-
 void LambertianMaterial::registerMaterial() {
     // Get the Radium Resource location on the filesystem
     auto resourcesRootDir { RadiumEngine::getInstance()->getResourcesDir() };
@@ -63,8 +61,8 @@ void LambertianMaterial::unregisterMaterial() {
 
 void LambertianMaterial::updateFromParameters() {
     auto& renderParameters = getParameters();
-    m_color                = renderParameters.getParameter<Core::Utils::Color>( "material.color" );
-    m_perVertexColor       = renderParameters.getParameter<bool>( "material.perVertexColor" );
+    setColor( renderParameters.getVariable<Core::Utils::Color>( "material.color" ) );
+    setColoredByVertexAttrib( renderParameters.getVariable<bool>( "material.perVertexColor" ) );
 }
 
 nlohmann::json LambertianMaterial::getParametersMetadata() const {

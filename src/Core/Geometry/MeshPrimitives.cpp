@@ -277,7 +277,7 @@ makeGeodesicSphere( Scalar radius, uint numSubdiv, const Utils::optional<Utils::
         for ( uint i = 0; i < indices.size(); ++i ) {
             const Vector3ui& tri               = indices[i];
             std::array<Vector3, 3> triVertices = {
-                vertices[tri[0]], vertices[tri[1]], vertices[tri[2]] };
+                { vertices[tri[0]], vertices[tri[1]], vertices[tri[2]] } };
             std::array<uint, 3> middles;
 
             for ( uint v = 0; v < 3; ++v ) {

@@ -39,9 +39,9 @@ int main( int argc, const char* argv[] ) {
     //! [Configuring the viewer : initialize OpenGL and the Engine]
 
     //! [Verifying the OpenGL version available to the engine]
-    if ( glVersion != viewer.m_engine->getOpenGLVersion() ) {
+    if ( glVersion != viewer.getEngine()->getOpenGLVersion() ) {
         std::cout << "OpenGL version mismatch : requested " << glVersion.toString()
-                  << " -- available " << viewer.m_engine->getOpenGLVersion().toString()
+                  << " -- available " << viewer.getEngine()->getOpenGLVersion().toString()
                   << std::endl;
     }
     //! [Verifying the OpenGL version available to the engine]

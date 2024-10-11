@@ -7,11 +7,17 @@ on:
   workflow_call:
     secrets:
        REPO_ACCESS_TOKEN:
-         required: true
+         required: false
+    inputs:
+      deploy-on-gh-pages:
+        required: false
+        type: string
+        default: "true"
 
 jobs:
   deploy-doc-index:
-    runs-on: ubuntu-20.04
+    if: ${{ inputs.deploy-on-gh-pages == 'true' }}
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout remote head
         uses: actions/checkout@master
@@ -22,28 +28,30 @@ jobs:
           publish_dir: 'doc/index'
           keep_files: true
 
-  deploy-doc:
-    runs-on: ubuntu-20.04
+  build-and-deploy-doc:
+    runs-on: ubuntu-24.04
     steps:
       - name: Prepare directories
         run: |
           mkdir -p src/Radium-Engine
           mkdir -p build/Radium-Engine
+          mkdir doxygen
       - name: Checkout remote head
         uses: actions/checkout@master
         with:
           path: src/Radium-Engine
           submodules: recursive
       - name: pull updated repo (e.g. with new VERSION)
+        if: ${{ inputs.deploy-on-gh-pages == 'true' }}
         run: git -C src/Radium-Engine pull origin ${{ github.event.ref }}
       - name: Install packages
         run : |
-          sudo apt-get install graphviz
-      - name: Fetch recent doxygen (1.9.1)
+          sudo apt-get install graphviz plantuml
+      - name: Fetch recent doxygen
         run: |
-          sudo apt-get install clang-9 libclang-9-dev
-          wget https://sourceforge.net/projects/doxygen/files/rel-1.9.1/doxygen-1.9.1.linux.bin.tar.gz
-          tar -xvzf doxygen-1.9.1.linux.bin.tar.gz
+          wget https://sourceforge.net/projects/doxygen/files/rel-1.12.0/doxygen-1.12.0.linux.bin.tar.gz -O doxygen.tar.gz
+          tar -zxvf doxygen.tar.gz -C doxygen --wildcards "*/bin"
+          mv doxygen/*/bin doxygen/
       - name: Extract ref for badges prefix
         if: always()
         shell: bash
@@ -51,24 +59,34 @@ jobs:
           GITHUB_REF=${{ github.ref }}
           echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: extract-branch
-      - name: Configure Doc
+      - name: Configure and build doc
         run: |
           cd build/Radium-Engine
-          cmake ../../src/Radium-Engine/doc -DCMAKE_EXECUTE_PROCESS_COMMAND_ECHO=STDOUT -DDOXYGEN_EXECUTABLE=../../doxygen-1.9.1/bin/doxygen
-      - name: Build Doc
-        run: |
+          ls -lh ../../doxygen/bin/doxygen
+          ../../doxygen/bin/doxygen -v
+          cmake ../../src/Radium-Engine/doc -DCMAKE_EXECUTE_PROCESS_COMMAND_ECHO=STDOUT -DDOXYGEN_EXECUTABLE=../../doxygen/bin/doxygen
           export GITHUB_REF="${{ steps.extract-branch.outputs.branch }}"
-          cd build/Radium-Engine
           cmake --build . --target RadiumDoc
+      # upload doc as artifact if not deployed
+      - name: Archive doc
+        if: ${{ inputs.deploy-on-gh-pages == 'false' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc
+          path: build/Radium-Engine/html/
+          retention-days: 5
       - name: Fix badges github ref
+        if: ${{ inputs.deploy-on-gh-pages == 'true' }}
         run: |
           export GITHUB_REF="${{ steps.extract-branch.outputs.branch }}"
           cd build/Radium-Engine
           sed -i "s/\$(GITHUB_REF)/${GITHUB_REF}/g" html/index.html
       - name: Git branch name
+        if: ${{ inputs.deploy-on-gh-pages == 'true' }}
         id: git-branch-name
         uses: EthanSK/git-branch-name-action@v1
       - name: Deploy Doc
+        if: ${{ inputs.deploy-on-gh-pages == 'true' }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.REPO_ACCESS_TOKEN }}

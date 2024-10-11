@@ -37,9 +37,9 @@ Rendering::RenderObject* Primitive( Scene::Component* component,
     Rendering::RenderTechnique rt;
     auto builder = Rendering::EngineRenderTechniques::getDefaultTechnique( "Plain" );
     builder.second( rt, false );
-    auto roMaterial              = Core::make_shared<PlainMaterial>( "Default material" );
-    roMaterial->m_perVertexColor = mesh->getAttribArrayGeometry().hasAttrib(
-        Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::MeshAttrib::VERTEX_COLOR ) );
+    auto roMaterial = Core::make_shared<PlainMaterial>( "Default material" );
+    roMaterial->setColoredByVertexAttrib( mesh->getAttribArrayGeometry().hasAttrib(
+        Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::MeshAttrib::VERTEX_COLOR ) ) );
     rt.setParametersProvider( roMaterial );
 
     auto ro = Rendering::RenderObject::createRenderObject(

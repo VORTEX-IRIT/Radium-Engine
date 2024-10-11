@@ -12,6 +12,7 @@ namespace Ra {
 namespace Core {
 
 TaskQueue::TaskQueue( uint numThreads ) : m_processingTasks( 0 ), m_shuttingDown( false ) {
+    wlock lock( m_mutex );
     m_workerThreads.reserve( numThreads );
     for ( uint i = 0; i < numThreads; ++i ) {
         m_workerThreads.emplace_back( &TaskQueue::runThread, this, i );
@@ -19,16 +20,18 @@ TaskQueue::TaskQueue( uint numThreads ) : m_processingTasks( 0 ), m_shuttingDown
 }
 
 TaskQueue::~TaskQueue() {
+    {
+        wlock lock( m_mutex );
+        m_shuttingDown = true;
+    }
     flushTaskQueue();
-    m_shuttingDown = true;
-    m_threadNotifier.notify_all();
     for ( auto& t : m_workerThreads ) {
         t.join();
     }
 }
 
 TaskQueue::TaskId TaskQueue::registerTask( std::unique_ptr<Task> task ) {
-    std::lock_guard<std::mutex> lock( m_taskMutex );
+    wlock lock( m_mutex );
     TimerData tdata;
     // init tdata with task name before moving ownership
     tdata.taskName = task->getName();
@@ -51,7 +54,7 @@ void TaskQueue::removeTask( TaskId taskId ) {
                                << m_tasks.size();
         return;
     }
-    std::lock_guard<std::mutex> lock( m_taskMutex );
+    wlock lock( m_mutex );
 
     // set task as dummy noop
     m_tasks[taskId] = std::make_unique<FunctionTask>( []() {}, m_timerData[taskId].taskName );
@@ -62,6 +65,7 @@ void TaskQueue::removeTask( TaskId taskId ) {
 }
 
 TaskQueue::TaskId TaskQueue::getTaskId( const std::string& taskName ) const {
+    rlock lock( m_mutex );
     auto itr = std::find_if( m_tasks.begin(), m_tasks.end(), [taskName]( const auto& task ) {
         return task->getName() == taskName;
     } );
@@ -71,7 +75,7 @@ TaskQueue::TaskId TaskQueue::getTaskId( const std::string& taskName ) const {
 }
 
 void TaskQueue::addDependency( TaskQueue::TaskId predecessor, TaskQueue::TaskId successor ) {
-    std::lock_guard<std::mutex> lock( m_taskMutex );
+    wlock lock( m_mutex );
 
     CORE_ASSERT( predecessor.isValid() && ( predecessor < m_tasks.size() ),
                  "Invalid predecessor task" );
@@ -112,12 +116,12 @@ bool TaskQueue::addDependency( TaskQueue::TaskId predecessor, const std::string&
 
 void TaskQueue::addPendingDependency( const std::string& predecessors,
                                       TaskQueue::TaskId successor ) {
-    std::lock_guard<std::mutex> lock( m_taskMutex );
+    wlock lock( m_mutex );
     m_pendingDepsSucc.emplace_back( predecessors, successor );
 }
 
 void TaskQueue::addPendingDependency( TaskId predecessor, const std::string& successors ) {
-    std::lock_guard<std::mutex> lock( m_taskMutex );
+    wlock lock( m_mutex );
     m_pendingDepsPre.emplace_back( predecessor, successors );
 }
 
@@ -134,9 +138,11 @@ void TaskQueue::resolveDependencies() {
                       "Pending dependency unresolved : (" << pre.first << ") -> "
                                                           << m_tasks[pre.second]->getName() );
     }
-    std::lock_guard<std::mutex> lock( m_taskMutex );
-    m_pendingDepsPre.clear();
-    m_pendingDepsSucc.clear();
+    {
+        wlock lock( m_mutex );
+        m_pendingDepsPre.clear();
+        m_pendingDepsSucc.clear();
+    }
 }
 
 // queueTask is always called with m_taskQueueMutex locked
@@ -152,7 +158,7 @@ void TaskQueue::detectCycles() {
     // Do a depth-first search of the nodes.
     std::vector<bool> visited( m_tasks.size(), false );
     std::stack<TaskId> pending;
-
+    rlock lock( m_mutex );
     for ( uint id = 0; id < m_tasks.size(); ++id ) {
         if ( m_dependencies[id].size() == 0 ) { pending.push( TaskId( id ) ); }
     }
@@ -178,12 +184,14 @@ void TaskQueue::detectCycles() {
 
 void TaskQueue::startTasks() {
     using namespace Ra::Core::Utils;
-    if ( m_workerThreads.empty() ) {
-        LOG( logERROR ) << "TaskQueue as 0 threads, could not start tasks in parallel. Either "
-                           "create a task queue with more threads, or use runTasksInThisThread";
-        return;
+    {
+        rlock lock( m_mutex );
+        if ( m_workerThreads.empty() ) {
+            LOG( logERROR ) << "TaskQueue as 0 threads, could not start tasks in parallel. Either "
+                               "create a task queue with more threads, or use runTasksInThisThread";
+            return;
+        }
     }
-
     // Add pending dependencies.
     resolveDependencies();
 
@@ -191,61 +199,67 @@ void TaskQueue::startTasks() {
     detectCycles();
 
     // Enqueue all tasks with no dependencies.
-    for ( uint t = 0; t < m_tasks.size(); ++t ) {
-        // only queue non null m_tasks
-        if ( m_tasks[t] && m_remainingDependencies[t] == 0 ) { queueTask( TaskId { t } ); }
-    }
+    {
+        wlock lock( m_mutex );
+        for ( uint t = 0; t < m_tasks.size(); ++t ) {
+            // only queue non null m_tasks
 
+            if ( m_tasks[t] && m_remainingDependencies[t] == 0 ) { queueTask( TaskId { t } ); }
+        }
+    }
     // Wake up all threads.
     m_threadNotifier.notify_all();
 }
 
 void TaskQueue::runTasksInThisThread() {
+    // this method should not be called between startTasks/waitForTasks, we do not lock anything
+    // here.
 
-    // lock task queue so no other worker can start working while this thread do the job.
-    std::lock_guard<std::mutex> lock( m_taskQueueMutex );
+    // use local task queue, preventing workers to pickup jobs.
+    std::deque<TaskId> taskQueue;
 
     // Add pending dependencies.
     resolveDependencies();
 
     // Do a debug check
     detectCycles();
-
-    // Enqueue all tasks with no dependencies.
-    for ( uint t = 0; t < m_tasks.size(); ++t ) {
-        // only queue non null m_tasks
-        if ( m_tasks[t] && m_remainingDependencies[t] == 0 ) { queueTask( TaskId { t } ); }
+    {
+        // Enqueue all tasks with no dependencies.
+        for ( uint t = 0; t < m_tasks.size(); ++t ) {
+            // only queue non null m_tasks
+            if ( m_tasks[t] && m_remainingDependencies[t] == 0 ) {
+                taskQueue.push_front( TaskId { t } );
+            }
+        }
     }
-    while ( !m_taskQueue.empty() ) {
-        TaskId task { m_taskQueue.back() };
-        m_taskQueue.pop_back();
+    {
+        while ( !taskQueue.empty() ) {
+            TaskId task;
+            {
+                task = taskQueue.back();
+                taskQueue.pop_back();
+            }
+            // Run task
+            m_timerData[task].start    = Utils::Clock::now();
+            m_timerData[task].threadId = 0;
+            m_tasks[task]->process();
+            m_timerData[task].end = Utils::Clock::now();
 
-        // Run task
-        m_timerData[task].start    = Utils::Clock::now();
-        m_timerData[task].threadId = 0;
-        m_tasks[task]->process();
-        m_timerData[task].end = Utils::Clock::now();
-
-        for ( auto t : m_dependencies[task] ) {
-            uint& nDepends = m_remainingDependencies[t];
-            CORE_ASSERT( nDepends > 0, "Inconsistency in dependencies" );
-            --nDepends;
-            if ( nDepends == 0 ) { queueTask( t ); }
+            for ( auto t : m_dependencies[task] ) {
+                uint& nDepends = m_remainingDependencies[t];
+                CORE_ASSERT( nDepends > 0, "Inconsistency in dependencies" );
+                --nDepends;
+                if ( nDepends == 0 ) { taskQueue.push_front( TaskId { t } ); }
+            }
         }
     }
     flushTaskQueue();
 }
 
 void TaskQueue::waitForTasks() {
-    bool isFinished = false;
-    while ( !isFinished ) {
-        // TODO : use a notifier for task queue empty.
-        {
-            std::lock_guard<std::mutex> lock( m_taskQueueMutex );
-            isFinished = ( m_taskQueue.empty() && m_processingTasks == 0 );
-        }
-        if ( !isFinished ) { std::this_thread::yield(); }
-    }
+    rlock lock( m_mutex );
+    m_waitForTasksNotifier.wait(
+        lock, [this]() { return ( m_taskQueue.empty() && m_processingTasks == 0 ); } );
 }
 
 const std::vector<TaskQueue::TimerData>& TaskQueue::getTimerData() {
@@ -253,7 +267,8 @@ const std::vector<TaskQueue::TimerData>& TaskQueue::getTimerData() {
 }
 
 void TaskQueue::flushTaskQueue() {
-    std::lock_guard<std::mutex> lock( m_taskMutex );
+    m_threadNotifier.notify_all();
+    wlock lock( m_mutex );
 
     CORE_ASSERT( m_processingTasks == 0, "You have tasks still in process" );
     CORE_ASSERT( m_taskQueue.empty(), " You have unprocessed tasks " );
@@ -270,8 +285,7 @@ void TaskQueue::runThread( uint id ) {
 
         // Acquire mutex.
         {
-            std::unique_lock<std::mutex> lock( m_taskQueueMutex );
-
+            wlock lock( m_mutex );
             // Wait for a new task
             m_threadNotifier.wait( lock,
                                    [this]() { return m_shuttingDown || !m_taskQueue.empty(); } );
@@ -288,15 +302,22 @@ void TaskQueue::runThread( uint id ) {
         // Release mutex.
 
         // Run task
-        m_timerData[task].start    = Utils::Clock::now();
-        m_timerData[task].threadId = id;
-        m_tasks[task]->process();
-        m_timerData[task].end = Utils::Clock::now();
-
+        {
+            {
+                rlock lock( m_mutex );
+                m_timerData[task].start    = Utils::Clock::now();
+                m_timerData[task].threadId = id;
+            }
+            m_tasks[task]->process();
+            {
+                rlock lock( m_mutex );
+                m_timerData[task].end = Utils::Clock::now();
+            }
+        }
         // Critical section : mark task as finished and en-queue dependencies.
         uint newTasks = 0;
         {
-            std::unique_lock<std::mutex> lock( m_taskQueueMutex );
+            wlock lock( m_mutex );
             for ( auto t : m_dependencies[task] ) {
                 uint& nDepends = m_remainingDependencies[t];
                 CORE_ASSERT( nDepends > 0, "Inconsistency in dependencies" );
@@ -305,12 +326,12 @@ void TaskQueue::runThread( uint id ) {
                     queueTask( t );
                     ++newTasks;
                 }
-                // TODO :Easy optimization : grab one of the new task and process it immediately.
             }
             --m_processingTasks;
+            if ( m_processingTasks == 0 ) { m_waitForTasksNotifier.notify_one(); }
         }
-        // If we added new tasks, we wake up one thread to execute it.
-        if ( newTasks > 0 ) { m_threadNotifier.notify_one(); }
+        // If we added new tasks, we wake up threads to execute thems.
+        if ( newTasks > 0 ) { m_threadNotifier.notify_all(); }
     } // End of while(true)
 }
 

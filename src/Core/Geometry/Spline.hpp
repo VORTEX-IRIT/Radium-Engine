@@ -11,13 +11,13 @@ namespace Ra {
 namespace Core {
 namespace Geometry {
 /**
- * @class Spline
+ * \class Spline
  *
- * @brief Handling spline curves of arbitrary dimensions
- * @note This class use the efficient blossom algorithm to compute a position on
+ * \brief Handling spline curves of arbitrary dimensions
+ * \note This class use the efficient blossom algorithm to compute a position on
  * the curve.
- * @tparam D : dimension of the curve.
- * @tparam K  :order of the curve (min 2)
+ * \tparam D : dimension of the curve.
+ * \tparam K  :order of the curve (min 2)
  */
 template <uint D, uint K = 2>
 class Spline
@@ -32,7 +32,7 @@ class Spline
 
   public:
     /// Type of the nodal vector
-    /// @param type : nodal vector type (uniform, open_uniform)
+    /// \param type : nodal vector type (uniform, open_uniform)
     /// This will define the behavior of the spline with its control points
     /// as well as its speed according to its parameter.
     explicit inline Spline( Type type = OPEN_UNIFORM );
@@ -47,7 +47,7 @@ class Spline
     inline void setType( Type type );
 
     /// Evaluate position of the spline
-    /// @param u : curve parameter ranging from [0; 1]
+    /// \param u : curve parameter ranging from [0; 1]
     inline Vector f( Scalar u ) const;
 
     /// Evaluate speed of the spline
@@ -55,7 +55,7 @@ class Spline
 
   private:
     // -------------------------------------------------------------------------
-    /// @name Class tools
+    /// \name Class tools
     // -------------------------------------------------------------------------
 
     inline void assertSplines() const;
@@ -71,14 +71,14 @@ class Spline
     inline void setNodeToOpenUniform();
 
     /// Evaluate the equation of a splines using the blossom algorithm
-    /// @param u : the curve parameter which range from the values
+    /// \param u : the curve parameter which range from the values
     /// [node[k-1]; node[point.size()]]
-    /// @param point : the control points which size must be at least equal to
+    /// \param point : the control points which size must be at least equal to
     /// the order of the spline (point.size() >= k)
-    /// @param k : the spline order (degree == k-1)
-    /// @param node : the nodal vector which defines the speed of the spline
+    /// \param k : the spline order (degree == k-1)
+    /// \param node : the nodal vector which defines the speed of the spline
     /// parameter u. The nodal vector size must be equal to (k + point.size())
-    /// @param off : offset to apply to the nodal vector 'node' before reading
+    /// \param off : offset to apply to the nodal vector 'node' before reading
     /// from it. this is useful to compute derivatives.
     static inline Vector eval( Scalar u,
                                const Core::VectorArray<Vector>& points,
@@ -92,7 +92,7 @@ class Spline
                                   uint k );
 
     // -------------------------------------------------------------------------
-    /// @name attributes
+    /// \name attributes
     // -------------------------------------------------------------------------
 
     Core::VectorArray<Vector> m_points; ///< Control points

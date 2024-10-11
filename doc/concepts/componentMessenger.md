@@ -1,4 +1,4 @@
-\page componentMessenger [deprecated] Component Messenger
+\page componentMessenger _deprecated_ Component Messenger
 \todo check and update
 [TOC]
 
@@ -8,8 +8,7 @@ a data.
 
 # Read #
 
-The **suscriber** must define and register some `ComponentMessenger::CallbackTypes<T>::Setter` that will
-be used by the `ComponentMessenger` to set the data to the
+The **suscriber** must define and register some `Ra::Engine::Scene::ComponentMessenger::CallbackTypes::Setter` that will be used by the `ComponentMessenger` to set the data to the
 former.
 
     // definition of callback
@@ -32,7 +31,7 @@ former.
     // registration
     ComponentMessenger::getInstance()->registerOutput<T>( entity, this, "name", data_out );
 
-The **publisher** will define and register a `ComponentMessenger::CallbackTypes<T>::Getter` that will be used
+The **publisher** will define and register a `Ra::Engine::Scene::ComponentMessenger::CallbackTypes::Getter` that will be used
 by the `ComponentMessenger` to fetch data from the former.
 
 # Read'n'Write #

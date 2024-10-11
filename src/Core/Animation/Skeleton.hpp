@@ -17,18 +17,18 @@ namespace Animation {
  * the former being the parent of the latter in the hierarchy.
  * For animation purposes, a bone transform refers to the proximal joint's tranform.
  *
- * During the edition of the transformation of a skeleton bone, the transformations
+ * During the editing of the transformation of a skeleton bone, the transformations
  * of all the bones are updated accroding to the Manipulation scheme
  * (cf Ra::Core:Animation::Skeleton::Manipulation).
  */
 class RA_CORE_API Skeleton : public HandleArray
 {
   public:
-    /// Edition scheme for the manipulation of the skeleton.
+    /// Editing scheme for the manipulation of the skeleton.
     /// \todo also implement Inverse Kynematics.
     enum Manipulation {
-        FORWARD = 0, ///< Standard edition scheme: rotation and / or translation of one bone.
-        PSEUDO_IK    ///< Advanced edition scheme: translation of a bone means parent's rotation.
+        FORWARD = 0, ///< Standard editing scheme: rotation and / or translation of one bone.
+        PSEUDO_IK    ///< Advanced editing scheme: translation of a bone means parent's rotation.
     };
 
     Skeleton();
@@ -51,19 +51,19 @@ class RA_CORE_API Skeleton : public HandleArray
 
     /**
      * Add a new root transform to the skeleton.
-     * @param T      the joint transform associated to the new bone
-     * @param label  the name for the new joint
-     * @return       the index of the new joint
+     * \param T      the joint transform associated to the new bone
+     * \param label  the name for the new joint
+     * \return       the index of the new joint
      */
     uint addRoot( const Transform& T = Transform::Identity(), const Label label = "" );
 
     /**
      * Add a new joint transform to the skeleton.
-     * @param parent the index of the joint's parent in the hierarchy
-     * @param T      the joint transform associated to the new bone
-     * @param MODE   SpaceType of T (either SpaceType::LOCAL or SpaceType::MODEL)
-     * @param label  the name for the new joint
-     * @return       the index of the new joint
+     * \param parent the index of the joint's parent in the hierarchy
+     * \param T      the joint transform associated to the new bone
+     * \param MODE   SpaceType of T (either SpaceType::LOCAL or SpaceType::MODEL)
+     * \param label  the name for the new joint
+     * \return       the index of the new joint
      */
     uint addBone( const uint parent,
                   const Transform& T   = Transform::Identity(),
@@ -72,9 +72,9 @@ class RA_CORE_API Skeleton : public HandleArray
 
     /**
      * Get the i-th bone endpoints in Model space.
-     * @param i             the bone index
-     * @param[out] startOut the bone's start point
-     * @param[out]  endOut   the bone's end point
+     * \param i             the bone index
+     * \param[out] startOut the bone's start point
+     * \param[out]  endOut   the bone's end point
      *
      * \note If the i-th bone is a leaf, then \p startOut == \p endOut.
      */

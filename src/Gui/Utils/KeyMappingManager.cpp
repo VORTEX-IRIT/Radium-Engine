@@ -4,7 +4,6 @@
 #include <Core/Utils/Log.hpp>
 
 #include <QMessageBox>
-#include <QtGlobal> //QT_VERSION, QT_VERSION_CHECK
 
 namespace Ra::Gui {
 

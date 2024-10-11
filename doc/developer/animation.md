@@ -74,7 +74,7 @@ handles local transformations to deform the mesh vertices.
 #### Skeleton-Based Character Animation in Radium
 
 The Radium Engine provides a system specific to the skeleton-based animation of a
-character, the `Ra::Engine::Scene::SkeletonBasedAnimationSystem.
+character, the `Ra::Engine::Scene::SkeletonBasedAnimationSystem`.
 This system is responsible for transmitting calls to/from animation-related processes
 to 2 specific`Ra::Engine::Scene::Component`:
 

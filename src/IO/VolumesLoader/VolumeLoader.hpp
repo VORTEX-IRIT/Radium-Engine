@@ -31,15 +31,15 @@ class RA_IO_API VolumeLoader : public Ra::Core::Asset::FileLoaderInterface
   private:
     /**
      * Load custom vol file format
-     * @param filename the file to load
-     * @return resulting file data, nullptr if the file was not loaded
+     * \param filename the file to load
+     * \return resulting file data, nullptr if the file was not loaded
      */
     Ra::Core::Asset::FileData* loadVolFile( const std::string& filename );
 
     /**
      * Load pvm file format
-     * @param filename the file to load
-     * @return resulting file data, nullptr if the file was not loaded
+     * \param filename the file to load
+     * \return resulting file data, nullptr if the file was not loaded
      */
     Ra::Core::Asset::FileData* loadPvmFile( const std::string& filename );
 };

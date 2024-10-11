@@ -64,6 +64,7 @@ set(engine_headers
     Data/LambertianMaterial.hpp
     Data/Material.hpp
     Data/MaterialConverters.hpp
+    Data/MaterialTextureSet.hpp
     Data/Mesh.hpp
     Data/PlainMaterial.hpp
     Data/RawShaderMaterial.hpp

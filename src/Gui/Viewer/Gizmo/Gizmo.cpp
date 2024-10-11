@@ -24,14 +24,14 @@ Gizmo::Gizmo( Engine::Scene::Component* c,
     m_worldTo( worldTo ), m_transform( t ), m_comp( c ), m_mode( mode ) {
     using namespace Core::Utils;
     if ( !s_material[0] ) {
-        auto mat      = Core::make_shared<Engine::Data::PlainMaterial>( "GizmoRedMaterial" );
-        mat->m_color  = Color::Red();
+        auto mat = Core::make_shared<Engine::Data::PlainMaterial>( "GizmoRedMaterial" );
+        mat->setColor( Color::Red() );
         s_material[0] = mat;
         mat           = Core::make_shared<Engine::Data::PlainMaterial>( "GizmoGreenMaterial" );
-        mat->m_color  = Color::Green();
+        mat->setColor( Color::Green() );
         s_material[1] = mat;
         mat           = Core::make_shared<Engine::Data::PlainMaterial>( "GizmoBlueMaterial" );
-        mat->m_color  = Color::Blue();
+        mat->setColor( Color::Blue() );
         s_material[2] = mat;
     }
 }
@@ -110,8 +110,8 @@ Gizmo::UiSelectionControler::UiSelectionControler(
 void Gizmo::UiSelectionControler::updateGL() {
     m_associatedMaterial->updateGL();
     auto& renderParameters = getParameters();
-    renderParameters.mergeReplaceParameters( m_associatedMaterial->getParameters() );
-    if ( m_selected ) { renderParameters.addParameter( "material.color", m_selectedColor ); }
+    renderParameters.mergeReplaceVariables( m_associatedMaterial->getParameters() );
+    if ( m_selected ) { renderParameters.setVariable( "material.color", m_selectedColor ); }
 }
 
 void Gizmo::UiSelectionControler::toggleState() {

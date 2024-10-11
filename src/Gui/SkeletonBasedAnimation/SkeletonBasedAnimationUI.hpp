@@ -73,7 +73,7 @@ class RA_GUI_API SkeletonBasedAnimationUI : public QFrame
     void on_m_autoRepeat_toggled( bool checked );
     /// \}
 
-    /// \name Animation Edition GUI
+    /// \name Animation Editing GUI
     /// \{
 
     /// Slot for the user changing the skeleton animation.

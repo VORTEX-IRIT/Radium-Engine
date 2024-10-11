@@ -23,7 +23,7 @@ class System;
 class Entity;
 
 /**
- * @brief A component is an element that can be updated by a system.
+ * \brief A component is an element that can be updated by a system.
  * It is also linked to some other components in an entity.
  * Each component share a transform through their entity.
  */
@@ -37,15 +37,15 @@ class RA_ENGINE_API Component
     virtual ~Component();
 
     /**
-     * @brief Pure virtual method to be overridden by any component.
+     * \brief Pure virtual method to be overridden by any component.
      * When this method is called you are guaranteed that all other startup systems
      * have been loaded.
      */
     virtual void initialize() = 0;
     /**
-     * @brief Set entity the component is part of.
+     * \brief Set entity the component is part of.
      * This method is called by the entity.
-     * @param entity The entity the component is part of.
+     * \param entity The entity the component is part of.
      */
     virtual void setEntity( Entity* entity ) { m_entity = entity; }
 

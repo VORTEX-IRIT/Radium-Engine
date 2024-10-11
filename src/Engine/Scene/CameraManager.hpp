@@ -66,7 +66,7 @@ class RA_ENGINE_API CameraManager : public System
     //
 
     /**
-     * @brief Number of managed Cameras.
+     * \brief Number of managed Cameras.
      */
     virtual size_t count() const;
 

@@ -36,40 +36,40 @@ class RA_ENGINE_API RenderObjectManager final
     std::shared_ptr<Rendering::RenderObject> getRenderObject( const Core::Utils::Index& index );
 
     /**
-     * @brief Get all render objects.
+     * \brief Get all render objects.
      */
     const Core::Utils::IndexMap<std::shared_ptr<Rendering::RenderObject>>& getRenderObjects() const;
 
     /**
      * Get all render objects of the given type, the vector is assumed to be empty whan called
-     * @param objectsOut
-     * @param type
+     * \param objectsOut
+     * \param type
      */
     void getRenderObjectsByType( std::vector<std::shared_ptr<Rendering::RenderObject>>& objectsOut,
                                  const Rendering::RenderObjectType& type ) const;
 
     /** Returns true if the index points to a valid render object.
      *
-     * @param index
-     * @return
+     * \param index
+     * \return
      */
     bool exists( const Core::Utils::Index& index ) const;
 
     /**
      * Removed the render object at the given index
-     * @param idx
+     * \param idx
      */
     void renderObjectExpired( const Ra::Core::Utils::Index& idx );
 
     /** Return the total number of faces drawn
      *
-     * @return
+     * \return
      */
     size_t getNumFaces() const;
 
     /** Return the total number of vertices drawn
      *
-     * @return
+     * \return
      */
     size_t getNumVertices() const;
 

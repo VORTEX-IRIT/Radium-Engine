@@ -84,8 +84,8 @@ class App
   protected:
     // This library follows the Google style guide for member names ending in underscores
 
-    /// @name Basics
-    ///@{
+    /// \name Basics
+    ///\{
 
     /// Subcommand name or program name (from parser if name is empty)
     std::string name_ {};
@@ -127,9 +127,9 @@ class App
     /// This is a function that runs when all processing has completed
     std::function<void()> final_callback_ {};
 
-    ///@}
-    /// @name Options
-    ///@{
+    ///\}
+    /// \name Options
+    ///\{
 
     /// The default values for options, customizable and changeable INHERITABLE
     OptionDefaults option_defaults_ {};
@@ -137,9 +137,9 @@ class App
     /// The list of options, stored locally
     std::vector<Option_p> options_ {};
 
-    ///@}
-    /// @name Help
-    ///@{
+    ///\}
+    /// \name Help
+    ///\{
 
     /// Footer to put after all options in the help output INHERITABLE
     std::string footer_ {};
@@ -163,9 +163,9 @@ class App
     std::function<std::string( const App*, const Error& e )> failure_message_ {
         FailureMessage::simple };
 
-    ///@}
-    /// @name Parsing
-    ///@{
+    ///\}
+    /// \name Parsing
+    ///\{
 
     using missing_t = std::vector<std::pair<detail::Classifier, std::string>>;
 
@@ -197,9 +197,9 @@ class App
     /// options do not need the subcommand not be
     std::set<Option*> need_options_ {};
 
-    ///@}
-    /// @name Subcommands
-    ///@{
+    ///\}
+    /// \name Subcommands
+    ///\{
 
     /// Storage for subcommand list
     std::vector<App_p> subcommands_ {};
@@ -266,9 +266,9 @@ class App
     /// Alias names for the subcommand
     std::vector<std::string> aliases_ {};
 
-    ///@}
-    /// @name Config
-    ///@{
+    ///\}
+    /// \name Config
+    ///\{
 
     /// Pointer to the config option
     Option* config_ptr_ { nullptr };
@@ -276,7 +276,7 @@ class App
     /// This is the formatter for help printing. Default provided. INHERITABLE (same pointer)
     std::shared_ptr<Config> config_formatter_ { new ConfigTOML() };
 
-    ///@}
+    ///\}
 
     /// Special private constructor for subcommand
     App( std::string app_description, std::string app_name, App* parent ) :
@@ -316,8 +316,8 @@ class App
     }
 
   public:
-    /// @name Basic
-    ///@{
+    /// \name Basic
+    ///\{
 
     /// Create a new program. Pass in the same arguments as main(), along with a help string.
     explicit App( std::string app_description = "", std::string app_name = "" ) :
@@ -565,9 +565,9 @@ class App
     /// Get the OptionDefault object, to set option defaults
     OptionDefaults* option_defaults() { return &option_defaults_; }
 
-    ///@}
-    /// @name Adding options
-    ///@{
+    ///\}
+    /// \name Adding options
+    ///\{
 
     /// Add an option, will automatically understand the type for common types.
     ///
@@ -1049,9 +1049,9 @@ class App
         return ptr;
     }
 
-    ///@}
-    /// @name Subcommands
-    ///@{
+    ///\}
+    /// \name Subcommands
+    ///\{
 
     /// Add a subcommand. Inherits INHERITABLE and OptionDefaults, and help flag
     App* add_subcommand( std::string subcommand_name        = "",
@@ -1251,18 +1251,18 @@ class App
     /// This allows the subcommand to be directly checked.
     explicit operator bool() const { return parsed_ > 0; }
 
-    ///@}
-    /// @name Extras for subclassing
-    ///@{
+    ///\}
+    /// \name Extras for subclassing
+    ///\{
 
     /// This allows subclasses to inject code before callbacks but after parse.
     ///
     /// This does not run if any errors or help is thrown.
     virtual void pre_callback() {}
 
-    ///@}
-    /// @name Parsing
-    ///@{
+    ///\}
+    /// \name Parsing
+    ///\{
     //
     /// Reset the parsed data
     void clear() {
@@ -1400,9 +1400,9 @@ class App
         return e.get_exit_code();
     }
 
-    ///@}
-    /// @name Post parsing
-    ///@{
+    ///\}
+    /// \name Post parsing
+    ///\{
 
     /// Counts the number of times the given option was passed.
     std::size_t count( std::string option_name ) const {
@@ -1531,9 +1531,9 @@ class App
         return true;
     }
 
-    ///@}
-    /// @name Help
-    ///@{
+    ///\}
+    /// \name Help
+    ///\{
 
     /// Set footer.
     App* footer( std::string footer_string ) {
@@ -1586,9 +1586,9 @@ class App
         }
         return val;
     }
-    ///@}
-    /// @name Getters
-    ///@{
+    ///\}
+    /// \name Getters
+    ///\{
 
     /// Access the formatter
     std::shared_ptr<FormatterBase> get_formatter() const { return formatter_; }
@@ -1918,7 +1918,7 @@ class App
         return remaining_options;
     }
 
-    ///@}
+    ///\}
 
   protected:
     /// Check the options to make sure there are no conflicts.
@@ -2503,7 +2503,7 @@ class App
     }
 
     /// Parse a positional, go up the tree to check
-    /// @param haltOnSubcommand if set to true the operation will not process subcommands merely
+    /// \param haltOnSubcommand if set to true the operation will not process subcommands merely
     /// return false Return true if the positional was used false otherwise
     bool _parse_positional( std::vector<std::string>& args, bool haltOnSubcommand ) {
 

@@ -31,7 +31,7 @@ class RA_ENGINE_API DefaultCameraStorage : public CameraStorage
 };
 
 /**
- * @brief DefaultCameraManager. A simple Camera Manager with a list of Cameras.
+ * \brief DefaultCameraManager. A simple Camera Manager with a list of Cameras.
  */
 class RA_ENGINE_API DefaultCameraManager : public CameraManager
 {

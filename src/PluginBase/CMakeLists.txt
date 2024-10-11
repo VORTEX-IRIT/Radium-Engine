@@ -1,5 +1,6 @@
 set(ra_pluginbase_target PluginBase)
-list(APPEND CMAKE_MESSAGE_INDENT "[${ra_pluginbase_target}] ")
+
+message_prefix_push("${ra_pluginbase_target}")
 
 project(${ra_pluginbase_target} LANGUAGES CXX VERSION ${Radium_VERSION})
 
@@ -13,6 +14,7 @@ find_qt_package(COMPONENTS Core REQUIRED)
 
 # Qt
 set(Qt_LIBRARIES Qt::Core)
+set(CMAKE_AUTOMOC_PATH_PREFIX ON)
 set(CMAKE_AUTOMOC ON)
 
 add_library(
@@ -38,3 +40,5 @@ set(RADIUM_COMPONENTS ${RADIUM_COMPONENTS} ${ra_pluginbase_target} PARENT_SCOPE)
 # install json configuration files
 install(FILES ${pluginbase_json} DESTINATION ${CONFIG_PACKAGE_LOCATION}/${ra_pluginbase_target})
 file(COPY ${pluginbase_json} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+message_prefix_pop()

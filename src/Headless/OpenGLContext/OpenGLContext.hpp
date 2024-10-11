@@ -22,12 +22,12 @@ namespace Headless {
 class HEADLESS_API OpenGLContext
 {
   public:
-    /** @defgroup context OpenGL context management
+    /** \name OpenGL context management
      *  These methods allow to create and manipulate an openGLContext.
      *  Using this function, the openGL context created is an offscreen context with no exposed
      *  window.
-     *  @{
      */
+    /**\{ */
     /**
      * Create an offscreen openGl context.
      * The created context has the following properties
@@ -38,8 +38,11 @@ class HEADLESS_API OpenGLContext
      *  be compatible with. If there is no compatible context, the application will stop
      * \param size
      */
-    explicit OpenGLContext( const glbinding::Version& /*glVersion*/ = { 4, 1 },
-                            const std::array<int, 2>& /*size*/      = { { 1, 1 } } ) {};
+    explicit OpenGLContext( const glbinding::Version& glVersion = { 4, 1 },
+                            const std::array<int, 2>& size      = { { 1, 1 } } ) {
+        CORE_UNUSED( glVersion );
+        CORE_UNUSED( size );
+    };
     /// destructor
     virtual ~OpenGLContext() = default;
     /// make the context active
@@ -54,16 +57,14 @@ class HEADLESS_API OpenGLContext
 
     /// Return a string identifying the openGL Context and its supported versions
     [[nodiscard]] virtual std::string getInfo() const;
-    /** @} */
+    /** \} */
 
-    /** @defgroup window Window management from an openGL context
+    /** \name Window management from an openGL context
      *  These methods allow to display and interact with a simple window associated with the created
      *  OpenGL Context, if any.
-     *  @{
      */
-    /** Identify the event processing method when the window is exposed.
-     *
-     */
+    /** \{ */
+    /// Identify the event processing method when the window is exposed.
     enum class EventMode : int { POLL = 0, WAIT, TIMEOUT, NUM_MODES };
     /// Show the window
     virtual void show( EventMode /*mode*/, float /*delay*/ ) {};
@@ -79,7 +80,7 @@ class HEADLESS_API OpenGLContext
     ///
     /// The parameters sent to the resize listeners are in pixels and correspond to the OpenGL
     /// Framebuffer size (i.e. the size given to glViewport function)
-    /// @see https://www.glfw.org/docs/latest/window_guide.html#window_fbsize
+    /// \see https://www.glfw.org/docs/latest/window_guide.html#window_fbsize
     Ra::Core::Utils::Observable<int, int>& resizeListener() { return m_resizers; }
 
     // TODO : give access to the DPI ratio
@@ -90,7 +91,7 @@ class HEADLESS_API OpenGLContext
     ///
     /// The parameters sent to the keyboard listeners are
     /// the keyboard key, platform-specific scancode, key action and modifier bits.
-    /// @see https://www.glfw.org/docs/latest/input_guide.html#input_keyboard
+    /// \see https://www.glfw.org/docs/latest/input_guide.html#input_keyboard
     Ra::Core::Utils::Observable<int, int, int, int>& keyboardListener() {
         return m_keyboardObservers;
     }
@@ -102,7 +103,7 @@ class HEADLESS_API OpenGLContext
     /// the mouse button, button action and modifier bits as well as the mouse position
     /// in pixel unit and in the FrameBuffer space. The origin is at the top left of the
     /// framebuffer.
-    /// @see https://www.glfw.org/docs/latest/input_guide.html#input_mouse
+    /// \see https://www.glfw.org/docs/latest/input_guide.html#input_mouse
     Ra::Core::Utils::Observable<int, int, int, int, int>& mouseListener() {
         return m_mouseObservers;
     }
@@ -113,7 +114,7 @@ class HEADLESS_API OpenGLContext
     /// The parameters sent to the mouse move listeners are the mouse position
     /// in pixel unit and in the FrameBuffer space. The origin is at the top left of the
     /// framebuffer.
-    /// @see https://www.glfw.org/docs/latest/input_guide.html#cursor_pos
+    /// \see https://www.glfw.org/docs/latest/input_guide.html#cursor_pos
     Ra::Core::Utils::Observable<int, int>& mouseMoveListener() { return m_mouseMoveObservers; }
 
     /// Give access to the scroll event observable so that client can add Observer to this
@@ -121,14 +122,11 @@ class HEADLESS_API OpenGLContext
     ///
     /// The parameters sent to the scroll listeners are two-dimensional scroll offsets
     /// in pixel unit and in the FrameBuffer space.
-    /// @see https://www.glfw.org/docs/latest/input_guide.html#scrolling
+    /// \see https://www.glfw.org/docs/latest/input_guide.html#scrolling
     Ra::Core::Utils::Observable<int, int>& scrollListener() { return m_scrollObservers; }
 
-    /** @} */
+    /** \} */
   protected:
-    /** \addtogroup window
-     *  @{
-     */
     /// Process the pending events according to the window show mode
     virtual bool processEvents() { return true; };
 
@@ -161,7 +159,6 @@ class HEADLESS_API OpenGLContext
     EventMode m_mode { EventMode::POLL };
     /// Timeout delay for event processing
     float m_delay { 1.f / 60.f };
-    /** @} */
 };
 
 inline std::string OpenGLContext::getInfo() const {

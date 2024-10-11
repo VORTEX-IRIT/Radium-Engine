@@ -120,7 +120,6 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHE
         -Wmissing-braces
         -Wreturn-type
         -Wswitch
-        -Wswitch-default
         -Wuninitialized
         -Wmissing-field-initializers
         $<$<CXX_COMPILER_ID:GNU>:

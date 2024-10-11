@@ -57,7 +57,7 @@ class RA_ENGINE_API SignalManager
     using FrameObservable = Ra::Core::Utils::Observable<>;
 
     /// Access to the observable members
-    ///@{
+    ///\{
     ItemObservable& getEntityCreatedNotifier();
     ItemObservable& getEntityDestroyedNotifier();
     ItemObservable& getComponentCreatedNotifier();
@@ -65,7 +65,7 @@ class RA_ENGINE_API SignalManager
     ItemObservable& getRenderObjectCreatedNotifier();
     ItemObservable& getRenderObjectDestroyedNotifier();
     FrameObservable& getEndFrameNotifier();
-    ///@}
+    ///\}
 
   private:
     /// lock to prevent race conditions on observables
@@ -75,19 +75,19 @@ class RA_ENGINE_API SignalManager
     bool m_isOn { true };
 
     /// Item observables
-    ///@{
+    ///\{
     ItemObservable m_entityCreatedCallbacks;
     ItemObservable m_entityDestroyedCallbacks;
     ItemObservable m_componentAddedCallbacks;
     ItemObservable m_componentRemovedCallbacks;
     ItemObservable m_roAddedCallbacks;
     ItemObservable m_roRemovedCallbacks;
-    ///@}
+    ///\}
 
     /// Frame observable
-    ///@{
+    ///\{
     FrameObservable m_frameEndCallbacks;
-    ///@}
+    ///\}
 
     /// Helper function to notify observers
     template <typename... TArgs>

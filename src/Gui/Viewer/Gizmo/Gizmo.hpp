@@ -47,7 +47,6 @@ class Gizmo
     };
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Gizmo( Engine::Scene::Component* c,
            const Core::Transform& worldTo,
            const Core::Transform& t,

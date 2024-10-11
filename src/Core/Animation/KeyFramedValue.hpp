@@ -25,7 +25,7 @@ class RA_CORE_API KeyFramedValueBase
     virtual ~KeyFramedValueBase() {}
 
     /**
-     * @returns the number of keyframes.
+     * \returns the number of keyframes.
      */
     virtual inline size_t size() const = 0;
 
@@ -95,12 +95,12 @@ class KeyFramedValue : public KeyFramedValueBase
     /// \{
 
     /**
-     * @returns the number of keyframes.
+     * \returns the number of keyframes.
      */
     inline size_t size() const override { return m_keyframes.size(); }
 
     /**
-     * @returns the collection of keyframes.
+     * \returns the collection of keyframes.
      */
     const KeyFrames& getKeyFrames() const { return m_keyframes; }
 
@@ -213,7 +213,7 @@ class KeyFramedValue : public KeyFramedValueBase
     /// \{
 
     /**
-     * @returns true if *this and \p keyframe have the exact same keyframes,
+     * \returns true if *this and \p keyframe have the exact same keyframes,
      *          false otherwise.
      */
     inline bool operator==( const KeyFramedValue& keyframe ) const {
@@ -221,7 +221,7 @@ class KeyFramedValue : public KeyFramedValueBase
     }
 
     /**
-     * @returns true if *this and \p keyframe do not have the exact same keyframes,
+     * \returns true if *this and \p keyframe do not have the exact same keyframes,
      *          false otherwise.
      */
     inline bool operator!=( const KeyFramedValue& keyframe ) const {

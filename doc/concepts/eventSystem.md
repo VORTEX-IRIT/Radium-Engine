@@ -1,4 +1,4 @@
-\page eventSystem [deprecated] Event System
+\page eventSystem _deprecated_ Event System
 \todo check and update
 [TOC]
 

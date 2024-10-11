@@ -241,8 +241,8 @@ class Option : public OptionBase<Option>
     friend App;
 
   protected:
-    /// @name Names
-    ///@{
+    /// \name Names
+    ///\{
 
     /// A list of the short names (`-a`) without the leading dashes
     std::vector<std::string> snames_ {};
@@ -264,9 +264,9 @@ class Option : public OptionBase<Option>
     /// If given, check the environment for this option
     std::string envname_ {};
 
-    ///@}
-    /// @name Help
-    ///@{
+    ///\}
+    /// \name Help
+    ///\{
 
     /// The description for help strings
     std::string description_ {};
@@ -285,9 +285,9 @@ class Option : public OptionBase<Option>
     /// Run this function to capture a default (ignore if empty)
     std::function<std::string()> default_function_ {};
 
-    ///@}
-    /// @name Configuration
-    ///@{
+    ///\}
+    /// \name Configuration
+    ///\{
 
     /// The number of arguments that make up one option. max is the nominal type size, min is the
     /// minimum number of strings
@@ -309,9 +309,9 @@ class Option : public OptionBase<Option>
     /// A list of options that are excluded with this option
     std::set<Option*> excludes_ {};
 
-    ///@}
-    /// @name Other
-    ///@{
+    ///\}
+    /// \name Other
+    ///\{
 
     /// link back up to the parent App for fallthrough
     App* parent_ { nullptr };
@@ -319,9 +319,9 @@ class Option : public OptionBase<Option>
     /// Options store a callback to do all the work
     callback_t callback_ {};
 
-    ///@}
-    /// @name Parsing results
-    ///@{
+    ///\}
+    /// \name Parsing results
+    ///\{
 
     /// complete Results of parsing
     results_t results_ {};
@@ -344,7 +344,7 @@ class Option : public OptionBase<Option>
     bool run_callback_for_default_ { false };
     /// flag indicating a separator needs to be injected after each argument call
     bool inject_separator_ { false };
-    ///@}
+    ///\}
 
     /// Making an option by hand is not defined, it must be made by the App class
     Option( std::string option_name,
@@ -359,8 +359,8 @@ class Option : public OptionBase<Option>
     }
 
   public:
-    /// @name Basic
-    ///@{
+    /// \name Basic
+    ///\{
 
     Option( const Option& )            = delete;
     Option& operator=( const Option& ) = delete;
@@ -380,9 +380,9 @@ class Option : public OptionBase<Option>
         current_option_state_ = option_state::parsing;
     }
 
-    ///@}
-    /// @name Setting options
-    ///@{
+    ///\}
+    /// \name Setting options
+    ///\{
 
     /// Set the number of expected arguments
     Option* expected( int value ) {
@@ -657,9 +657,9 @@ class Option : public OptionBase<Option>
         disable_flag_override_ = value;
         return this;
     }
-    ///@}
-    /// @name Accessors
-    ///@{
+    ///\}
+    /// \name Accessors
+    ///\{
 
     /// The number of arguments the option expects
     int get_type_size() const { return type_size_min_; }
@@ -746,9 +746,9 @@ class Option : public OptionBase<Option>
 
     const std::string& get_option_text() const { return option_text_; }
 
-    ///@}
-    /// @name Help tools
-    ///@{
+    ///\}
+    /// \name Help tools
+    ///\{
 
     /// \brief Gets a comma separated list of names.
     /// Will include / prefer the positional name if positional is true.
@@ -806,9 +806,9 @@ class Option : public OptionBase<Option>
         return pname_;
     }
 
-    ///@}
-    /// @name Parser tools
-    ///@{
+    ///\}
+    /// \name Parser tools
+    ///\{
 
     /// Process the callback
     void run_callback() {
@@ -1032,9 +1032,9 @@ class Option : public OptionBase<Option>
         return ( current_option_state_ == option_state::callback_run );
     }
 
-    ///@}
-    /// @name Custom options
-    ///@{
+    ///\}
+    /// \name Custom options
+    ///\{
 
     /// Set the type function to run when displayed on this option
     Option* type_name_fn( std::function<std::string()> typefun ) {
@@ -1193,7 +1193,7 @@ class Option : public OptionBase<Option>
     }
 
     /** reduce the results in accordance with the MultiOptionPolicy
-    @param[out] res results are assigned to res if there if they are different
+    \param[out] res results are assigned to res if there if they are different
     */
     void _reduce_results( results_t& res, const results_t& original ) const {
 

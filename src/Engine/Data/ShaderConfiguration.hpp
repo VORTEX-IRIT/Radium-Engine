@@ -52,7 +52,7 @@ enum ShaderType : uint {
  *     shader->bind();
  *     ...
  *
- *     @todo : make configuration and program (in the OpenGL sense) be packed. A shader
+ *     \todo : make configuration and program (in the OpenGL sense) be packed. A shader
  * configuration might contains a ShaderProgram after compiling. This will remove the need for
  * ShaderConfigurationFactory as ShaderManager will offer the same services. Actually, there is
  * redundancy between ShaderConfigurationFactory and ShaderProgramManager
@@ -81,8 +81,8 @@ class RA_ENGINE_API ShaderConfiguration final
 
     /** Add a shader, from a file, given its type
      *
-     * @param type the Type of the shader
-     * @param name the file to load
+     * \param type the Type of the shader
+     * \param name the file to load
      */
     void addShader( ShaderType type, const std::string& name );
 
@@ -90,8 +90,8 @@ class RA_ENGINE_API ShaderConfiguration final
      * When a shader is added from a glsl source string, when reloading programs,
      * only the parts coming from files are reloaded.
      *
-     * @param type
-     * @param source the source code of the shader
+     * \param type
+     * \param source the source code of the shader
      */
     void addShaderSource( ShaderType type, const std::string& source );
 

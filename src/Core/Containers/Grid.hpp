@@ -164,16 +164,17 @@ class Grid
     };
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     //
     // Constructors
     //
 
     /// Construct a grid of a given size and fill it with the given value.
-    Grid( const IdxVector& size = IdxVector::Zero(), const T& val = T() );
+    Grid( const IdxVector& size = IdxVector::Zero(), const T& val = T() ) :
+        m_size( size ), m_data( size.prod(), val ) {}
+
     /// Construct a grid of a given size with values in ()-major format
-    Grid( const IdxVector& size, const T* values );
+    Grid( const IdxVector& size, const T* values ) :
+        m_size( size ), m_data( size.prod(), values ) {}
 
     /// Copy constructor and assignment operator.
     Grid( const Grid<T, D>& other )            = default;
@@ -265,18 +266,6 @@ inline uint idxVectorToLinear( const typename Grid<T, D>::IdxVector& vecIdx,
 }
 } // namespace
 
-//
-// Constructors
-//
-
-template <typename T, uint D>
-Grid<T, D>::Grid( const typename Grid<T, D>::IdxVector& size, const T& val ) :
-    m_size( size ), m_data( size.prod(), val ) {}
-
-template <typename T, uint D>
-Grid<T, D>::Grid( const typename Grid<T, D>::IdxVector& size, const T* values ) :
-    m_size( size ), m_data( size.prod(), values ) {}
-//
 // Vector size and data management.
 //
 

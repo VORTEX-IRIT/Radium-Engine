@@ -17,7 +17,7 @@ To compile and use a plugin, the Radium libraries must be configured, compiled a
 Example CMakeLists.txt setup to compile a Radium plugin:
 
 ```cmake
- cmake_minimum_required(VERSION 3.6)
+ cmake_minimum_required(VERSION 3.18)
  #------------------------------------------------------------------------------
  # Policies and global parameters for CMake
  if (POLICY CMP0077)
@@ -32,9 +32,7 @@ Example CMakeLists.txt setup to compile a Radium plugin:
  # Use installed Radium environment
  find_package(Radium REQUIRED Core Engine PluginBase)
 
- # Find and configure Qt environment using versionless targets (Radium requires Qt >= 5.15)
- # https://doc.qt.io/qt-6/cmake-qt5-and-qt6-compatibility.html
- # find_qt_package is provided by Radium
+# Find and configure Qt environment using find_qt_package is provided by Radium
  find_qt_package(COMPONENTS Core REQUIRED)
  set(Qt_LIBRARIES Qt::Core)
  set(CMAKE_AUTOMOC ON)

@@ -35,12 +35,12 @@ class ScaleGizmo : public Gizmo
 
   private:
     Ra::Core::Vector3 m_prevScale;  ///< The previously applied scale.
-    Ra::Core::Vector3 m_startPos;   ///< The position of the gizmo when edition starts.
+    Ra::Core::Vector3 m_startPos;   ///< The position of the gizmo when editing starts.
     Ra::Core::Vector3 m_startPoint; ///< The picked 3D point on the gizmo.
-    Core::Vector2 m_initialPix;     ///< The pixel position when edition starts.
+    Core::Vector2 m_initialPix;     ///< The pixel position when editing starts.
     int m_selectedAxis;             ///< The axis to scale in.
     int m_selectedPlane;            ///< The plane to scale in.
-    bool m_start { false };         ///< Did the edition start.
+    bool m_start { false };         ///< Did the editing start.
 };
 
 } // namespace Gui

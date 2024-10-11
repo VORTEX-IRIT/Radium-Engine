@@ -1,12 +1,11 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 
 # -------------------------------------------------------------------------------
 # exampleApp executables setup
 
 project(RadiumExamples)
 
-list(APPEND CMAKE_MESSAGE_INDENT "[Examples] ")
-
+message_prefix_push("Examples")
 # short convenience target
 add_custom_target(${PROJECT_NAME})
 add_custom_target(Install_${PROJECT_NAME})
@@ -20,8 +19,8 @@ foreach(
     EnvMap
     HelloRadium
     KeyEvent
-    MaterialEdition
-    ParameterEdition
+    MaterialEditing
+    ParameterEditing
     Picking
     RawShaderMaterial
     SimpleAnimation
@@ -63,4 +62,4 @@ add_dependencies(Install_${PROJECT_NAME} Install_PluginsWithLib)
 
 set(CMAKE_INSTALL_PREFIX "${OLD_CMAKE_INSTALL_PREFIX}")
 
-list(REMOVE_AT CMAKE_MESSAGE_INDENT -1)
+message_prefix_pop()

@@ -145,31 +145,31 @@ void Renderer::initialize( uint width, uint height ) {
     }
 
     Data::TextureParameters texparams;
-    texparams.width     = m_width;
-    texparams.height    = m_height;
-    texparams.target    = GL_TEXTURE_2D;
-    texparams.minFilter = GL_NEAREST;
-    texparams.magFilter = GL_NEAREST;
+    texparams.image.width       = m_width;
+    texparams.image.height      = m_height;
+    texparams.image.target      = GL_TEXTURE_2D;
+    texparams.sampler.minFilter = GL_NEAREST;
+    texparams.sampler.magFilter = GL_NEAREST;
 
-    texparams.name           = "Depth";
-    texparams.internalFormat = GL_DEPTH_COMPONENT24;
-    texparams.format         = GL_DEPTH_COMPONENT;
-    texparams.type           = GL_UNSIGNED_INT;
-    m_depthTexture           = std::make_unique<Data::Texture>( texparams );
+    texparams.name                 = "Depth";
+    texparams.image.internalFormat = GL_DEPTH_COMPONENT24;
+    texparams.image.format         = GL_DEPTH_COMPONENT;
+    texparams.image.type           = GL_UNSIGNED_INT;
+    m_depthTexture                 = std::make_unique<Data::Texture>( texparams );
 
-    m_pickingFbo             = std::make_unique<globjects::Framebuffer>();
-    texparams.name           = "Picking";
-    texparams.internalFormat = GL_RGBA32I;
-    texparams.format         = GL_RGBA_INTEGER;
-    texparams.type           = GL_INT;
-    m_pickingTexture         = std::make_unique<Data::Texture>( texparams );
+    m_pickingFbo                   = std::make_unique<globjects::Framebuffer>();
+    texparams.name                 = "Picking";
+    texparams.image.internalFormat = GL_RGBA32I;
+    texparams.image.format         = GL_RGBA_INTEGER;
+    texparams.image.type           = GL_INT;
+    m_pickingTexture               = std::make_unique<Data::Texture>( texparams );
 
     // Final texture
-    texparams.name           = "Final image";
-    texparams.internalFormat = GL_RGBA32F;
-    texparams.format         = GL_RGBA;
-    texparams.type           = GL_SCALAR;
-    m_fancyTexture           = std::make_unique<Data::Texture>( texparams );
+    texparams.name                 = "Final image";
+    texparams.image.internalFormat = GL_RGBA32F;
+    texparams.image.format         = GL_RGBA;
+    texparams.image.type           = GL_SCALAR;
+    m_fancyTexture                 = std::make_unique<Data::Texture>( texparams );
 
     m_displayedTexture                     = m_fancyTexture.get();
     m_secondaryTextures["Picking Texture"] = m_pickingTexture.get();
@@ -623,9 +623,9 @@ void Renderer::drawScreenInternal() {
     {
         GL_ASSERT( glDepthFunc( GL_ALWAYS ) );
 
-        auto shader = ( m_displayedTexture->getParameters().type == GL_INT ||
-                        m_displayedTexture->getParameters().type == GL_UNSIGNED_INT )
-                          ? ( m_displayedTexture->getParameters().format == GL_DEPTH_COMPONENT
+        auto shader = ( m_displayedTexture->getParameters().image.type == GL_INT ||
+                        m_displayedTexture->getParameters().image.type == GL_UNSIGNED_INT )
+                          ? ( m_displayedTexture->getParameters().image.format == GL_DEPTH_COMPONENT
                                   ? m_shaderProgramManager->getShaderProgram( "DisplayDepthBuffer" )
                                   : m_shaderProgramManager->getShaderProgram( "DrawScreenI" ) )
                           : m_shaderProgramManager->getShaderProgram( "DrawScreen" );
@@ -680,8 +680,8 @@ void Renderer::resize( uint w, uint h ) {
         m_fancyTexture->resize( m_width, m_height );
 
         m_pickingFbo->bind();
-        m_pickingFbo->attachTexture( GL_DEPTH_ATTACHMENT, m_depthTexture->texture() );
-        m_pickingFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_pickingTexture->texture() );
+        m_pickingFbo->attachTexture( GL_DEPTH_ATTACHMENT, m_depthTexture->getGpuTexture() );
+        m_pickingFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_pickingTexture->getGpuTexture() );
         if ( m_pickingFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE ) {
             LOG( logERROR ) << "File " << __FILE__ << "(" << __LINE__ << ") Picking FBO Error "
                             << m_pickingFbo->checkStatus();
@@ -719,17 +719,18 @@ std::unique_ptr<uchar[]> Renderer::grabFrame( size_t& w, size_t& h ) const {
     tex->bind();
 
     // Get a buffer to store the pixels of the OpenGL texture (in float format)
-    auto pixels = std::unique_ptr<float[]>( new float[tex->width() * tex->height() * 4] );
+    auto pixels = std::unique_ptr<float[]>( new float[tex->getWidth() * tex->getHeight() * 4] );
 
     // Grab the texture data
     GL_ASSERT( glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_SCALAR, pixels.get() ) );
 
     // Now we must convert the floats to RGB while flipping the image updisde down.
-    auto writtenPixels = std::unique_ptr<uchar[]>( new uchar[tex->width() * tex->height() * 4] );
-    for ( uint j = 0; j < tex->height(); ++j ) {
-        for ( uint i = 0; i < tex->width(); ++i ) {
-            auto in = 4 * ( j * tex->width() + i ); // Index in the texture buffer
-            auto ou = 4 * ( ( tex->height() - 1 - j ) * tex->width() +
+    auto writtenPixels =
+        std::unique_ptr<uchar[]>( new uchar[tex->getWidth() * tex->getHeight() * 4] );
+    for ( uint j = 0; j < tex->getHeight(); ++j ) {
+        for ( uint i = 0; i < tex->getWidth(); ++i ) {
+            auto in = 4 * ( j * tex->getWidth() + i ); // Index in the texture buffer
+            auto ou = 4 * ( ( tex->getHeight() - 1 - j ) * tex->getWidth() +
                             i ); // Index in the final image (note the j flipping).
 
             writtenPixels[ou + 0] =
@@ -742,8 +743,8 @@ std::unique_ptr<uchar[]> Renderer::grabFrame( size_t& w, size_t& h ) const {
                 (uchar)std::clamp( float( pixels[in + 3] * 255.f ), float( 0 ), float( 255 ) );
         }
     }
-    w = tex->width();
-    h = tex->height();
+    w = tex->getWidth();
+    h = tex->getHeight();
     return writtenPixels;
 }
 

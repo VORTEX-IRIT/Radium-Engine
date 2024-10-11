@@ -23,7 +23,10 @@ class FileData;
 } // namespace Asset
 } // namespace Core
 
+/// This namespace contains engine and ECS related stuff
 namespace Engine {
+
+/// Scene and how to communicate
 namespace Scene {
 class System;
 class Entity;
@@ -32,19 +35,21 @@ class EntityManager;
 class SignalManager;
 } // namespace Scene
 
+/// (GPU) Data representation, along with manager
 namespace Data {
 class ShaderProgramManager;
 class Displayable;
 class TextureManager;
 } // namespace Data
 
+/// Rendering engines.
 namespace Rendering {
 class RenderObjectManager;
 }
 
 /**
  * Engine main class : Manage all the systems and managers that are used by the engine module.
- * @see Documentation on Engine Object Model
+ * \see Documentation on Engine Object Model
  */
 class RA_ENGINE_API RadiumEngine
 {
@@ -62,7 +67,7 @@ class RA_ENGINE_API RadiumEngine
      *   Shader set : reusable shaders, materials and named strings
      *   Texture set : reusable textures
      *
-     *   @note When calling this function, caller must ensures that a valid openGL context is bound.
+     *   \note When calling this function, caller must ensures that a valid openGL context is bound.
      *   All initialisations will be done in the bound openGl context.
      */
     void initializeGL();
@@ -82,9 +87,9 @@ class RA_ENGINE_API RadiumEngine
     /**
      * Builds the set of task that must be executed for the current frame.
      *
-     * @see Documentation on Engine Object Model the what are tasks and what they can do
-     * @param taskQueue the task queue that will be executed for the current frame
-     * @param dt        the time elapsed since the last frame in seconds.
+     * \see Documentation on Engine Object Model the what are tasks and what they can do
+     * \param taskQueue the task queue that will be executed for the current frame
+     * \param dt        the time elapsed since the last frame in seconds.
      */
     void getTasks( Core::TaskQueue* taskQueue, Scalar dt );
 
@@ -93,16 +98,16 @@ class RA_ENGINE_API RadiumEngine
      * priority are ranked randomly.
      * Default priority is 1 for all systems;
      *
-     * @param name
-     * @param system
-     * @param priority Value used to rank the systems
+     * \param name
+     * \param system
+     * \param priority Value used to rank the systems
      */
     bool registerSystem( const std::string& name, Scene::System* system, int priority = 1 );
 
     /**
      * Get the named system
-     * @param system
-     * @return
+     * \param system
+     * \return
      */
     Scene::System* getSystem( const std::string& system ) const;
 
@@ -110,9 +115,9 @@ class RA_ENGINE_API RadiumEngine
      * component names.
      * When no RenderObject name is given, returns the mesh associated
      * to the first render object.
-     * @note : mark as deprecated as it must be either removed or reimplemented
-     * @warning will be deprecated
-     * @deprecated Will be removed from this class in the next release. A Mesh manager, that could
+     * \note : mark as deprecated as it must be either removed or reimplemented
+     * \warning will be deprecated
+     * \deprecated Will be removed from this class in the next release. A Mesh manager, that could
      * serve mesh by name will be implemented.
      */
     Data::Displayable* getMesh( const std::string& entityName,
@@ -124,9 +129,9 @@ class RA_ENGINE_API RadiumEngine
      * If no loader is able to process the input fileformat (determined on the file extension),
      * return false. If a loader is found, creates the root entity of the loaded scene and gives the
      * content of the file to all systems to add components and to this root entity.
-     * @note Calling this method set the engine in the "loading state".
-     * @param file
-     * @return true if file is loaded, false else.
+     * \note Calling this method set the engine in the "loading state".
+     * \param file
+     * \return true if file is loaded, false else.
      */
     bool loadFile( const std::string& file );
 
@@ -134,16 +139,16 @@ class RA_ENGINE_API RadiumEngine
      * Access to the content of the loaded file.
      * Access to the content is only available at loading time. As soon as the loaded file is
      * released, its content is no more available outside the Entity/Component architecture.
-     * @pre The Engine must be in "loading state".
-     * @return
+     * \pre The Engine must be in "loading state".
+     * \return
      */
     const Core::Asset::FileData& getFileData() const;
 
     /**
      * Release the content of the loaded file.
      * After calling this, the getFileData method must not be called for this file
-     * @param filename the name of the file to release. If empty, releases the last loaded file.
-     * @note Calling this method set the engine out of the "loading state".
+     * \param filename the name of the file to release. If empty, releases the last loaded file.
+     * \note Calling this method set the engine out of the "loading state".
      */
     void releaseFile();
 
@@ -154,47 +159,47 @@ class RA_ENGINE_API RadiumEngine
     /// Manager getters
     /**
      * Get the RenderObject manager attached to the engine.
-     * @note, the engine keep ownership on the pointer returned
-     * @return the object manager
+     * \note, the engine keep ownership on the pointer returned
+     * \return the object manager
      */
     Rendering::RenderObjectManager* getRenderObjectManager() const;
     /**
      * Get the entity manager attached to the engine.
-     * @note, the engine keep ownership on the pointer returned
-     * @return the entity manager
+     * \note, the engine keep ownership on the pointer returned
+     * \return the entity manager
      */
     Scene::EntityManager* getEntityManager() const;
 
     /**
      * Get the signal manager attached to the engine.
-     * @note, the engine keep ownership on the pointer returned
-     * @return the signal manager
+     * \note, the engine keep ownership on the pointer returned
+     * \return the signal manager
      */
     Scene::SignalManager* getSignalManager() const;
 
     /**
      * Get the texture manager attached to the engine.
-     * @note, the engine keep ownership on the pointer returned
-     * @return the texture manager
+     * \note, the engine keep ownership on the pointer returned
+     * \return the texture manager
      */
     Data::TextureManager* getTextureManager() const;
 
     /**
      * Get the shader program manager attached to the engine.
-     * @note, the engine keep ownership on the pointer returned
-     * @return the shader program manager
+     * \note, the engine keep ownership on the pointer returned
+     * \return the shader program manager
      */
     Data::ShaderProgramManager* getShaderProgramManager() const;
 
     /**
      * Register a new file loader to the engine.
-     * @param fileLoader
+     * \param fileLoader
      */
     void registerFileLoader( std::shared_ptr<Core::Asset::FileLoaderInterface> fileLoader );
 
     /**
      * Get the active file loaders from the engine
-     * @return
+     * \return
      */
     const std::vector<std::shared_ptr<Core::Asset::FileLoaderInterface>>& getFileLoaders() const;
 
@@ -393,7 +398,7 @@ class RA_ENGINE_API RadiumEngine
         std::array<int, 4> m_viewport;
     };
 
-    /// Stack of saved fbo and viewport values @see pushFboAndViewport popFboAndViewport
+    /// Stack of saved fbo and viewport values \see pushFboAndViewport popFboAndViewport
     std::stack<FboAndViewport> m_fboAndViewportStack;
 
     struct TimeData {

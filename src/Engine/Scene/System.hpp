@@ -39,7 +39,7 @@ class RA_ENGINE_API System
      * Factory method for component creation from file data.
      * From a given file and the corresponding entity, the system will create the
      * corresponding components, add them to the entity, and register the component.
-     * @note : Issue #325 - As this method register components and might also manage each component
+     * \note : Issue #325 - As this method register components and might also manage each component
      * outside the m_components vectors (e.g in a buffer on the GPU) the methods, the
      * registerComponent and unregister*Component must be virtual method that could be overriden.
      */
@@ -49,26 +49,26 @@ class RA_ENGINE_API System
     }
 
     /**
-     * @brief Pure virtual method to be overridden by any system.
+     * \brief Pure virtual method to be overridden by any system.
      * Must register in taskQueue the operations that must be done ate each frame
      *
-     * @param taskQueue The queue to fill
-     * @param frameInfo Information about the current frame (@see FrameInfo)
+     * \param taskQueue The queue to fill
+     * \param frameInfo Information about the current frame (\see FrameInfo)
      */
     virtual void generateTasks( Core::TaskQueue* taskQueue,
                                 const Engine::FrameInfo& frameInfo ) = 0;
 
     /** Returns the components stored for the given entity.
      *
-     * @param entity
-     * @return the vector of the entity's components
+     * \param entity
+     * \return the vector of the entity's components
      */
     std::vector<Component*> getEntityComponents( const Entity* entity );
 
     /** Register an already configured component to the system.
-     * @param entity The entity owning the component
-     * @param component The component to add to the system
-     * @note the component is added to the system without any compatibility check.
+     * \param entity The entity owning the component
+     * \param component The component to add to the system
+     * \note the component is added to the system without any compatibility check.
      */
     void addComponent( Entity* entity, Component* component ) {
         registerComponent( entity, component );
@@ -77,24 +77,24 @@ class RA_ENGINE_API System
   protected:
     /**
      * Registers a component belonging to an entity, making it active within the system.
-     * @note If a system overrides this function, it must call the inherited method.
-     * @param entity
-     * @param component
+     * \note If a system overrides this function, it must call the inherited method.
+     * \param entity
+     * \param component
      */
     virtual void registerComponent( const Entity* entity, Component* component );
 
     /**
      * Unregisters a component. The system will not update it.
-     * @note If a system overrides this function, it must call the inherited method.
-     * @param entity
-     * @param component
+     * \note If a system overrides this function, it must call the inherited method.
+     * \param entity
+     * \param component
      */
     virtual void unregisterComponent( const Entity* entity, Component* component );
 
     /**
      * Removes all components belonging to a given entity.
-     * @note If a system overrides this function, it must call the inherited method.
-     * @param entity
+     * \note If a system overrides this function, it must call the inherited method.
+     * \param entity
      */
     virtual void unregisterAllComponents( const Entity* entity );
 

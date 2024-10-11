@@ -17,12 +17,12 @@ class RA_GUI_API RotateAroundCameraManipulator
     explicit RotateAroundCameraManipulator( Ra::Gui::Viewer* viewer );
     explicit RotateAroundCameraManipulator( const CameraManipulator& cm, Ra::Gui::Viewer* viewer );
 
-    /// @copydoc TrackballCameraManipulator::handleMouseMoveEvent()
+    /// \copydoc TrackballCameraManipulator::handleMouseMoveEvent()
     bool handleMouseMoveEvent( QMouseEvent* event,
                                const Qt::MouseButtons& buttons,
                                const Qt::KeyboardModifiers& modifiers,
                                int key ) override;
-    /// @copydoc TrackballCameraManipulator::handleKeyPressEvent()
+    /// \copydoc TrackballCameraManipulator::handleKeyPressEvent()
     bool handleKeyPressEvent( QKeyEvent* event,
                               const Ra::Gui::KeyMappingManager::KeyMappingAction& action ) override;
 

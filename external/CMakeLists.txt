@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 set(RADIUM_DEPENDENCIES_PROJECT_NAME radium_externals)
 project(${RADIUM_DEPENDENCIES_PROJECT_NAME})
 

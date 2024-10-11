@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.18)
 
 project(radiumengine-external VERSION 1.0.0)
 

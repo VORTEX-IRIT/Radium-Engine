@@ -15,7 +15,7 @@ class MinimalApp : public QApplication
 
   public:
     /** IMPORTANT : the argc parameter must be a reference for calling the QApplication constructor
-        @see http://doc.qt.io/qt-5/qapplication.html#QApplication
+        \see http://doc.qt.io/qt-5/qapplication.html#QApplication
     */
     MinimalApp( int& argc, char** argv );
     ~MinimalApp();

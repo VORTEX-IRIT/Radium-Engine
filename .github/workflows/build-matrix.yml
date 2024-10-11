@@ -50,14 +50,6 @@ on:
         required: false
         type: string
         default: "false"
-      qt5:
-        required: false
-        type: string
-        default: "true"
-      qt6:
-        required: false
-        type: string
-        default: "true"
 
 env:
   ext-dir: $GITHUB_WORKSPACE/external/install/
@@ -78,7 +70,7 @@ jobs:
           [[ "true" == "${{ inputs.windows }}" && "true" == "${{inputs.linux}}" ]] && echo ','
           [[ "true" == "${{ inputs.linux }}" ]] && echo '{ "name": "Ubuntu gcc", "os": "ubuntu-latest", "cc": "gcc-10", "cxx": "g++-10", "icon": "Linux", "extra-flags": "-DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations -DRADIUM_ENABLE_GL_TESTING=ON" }'
           [[ "true" == "${{ inputs.windows }}" || "true" == "${{inputs.linux}}" ]] && [[ "true" == "${{inputs.macos}}" ]] && echo ','
-          [[ "true" == "${{ inputs.macos }}" ]] && echo '{ "name": "MacOS clang", "os": "macos-latest", "cc": "clang", "cxx": "clang++", "icon": "Apple", "extra-flags": "-DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations" }'
+          [[ "true" == "${{ inputs.macos }}" ]] && echo '{ "name": "MacOS clang", "os": "macos-13", "cc": "clang", "cxx": "clang++", "icon": "Apple", "extra-flags": "-DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations" }'
           echo '],'
           echo '"build-type" : ['
           [[ "true" == "${{ inputs.build-debug }}" ]] && echo '"Debug"'
@@ -89,11 +81,7 @@ jobs:
           echo '{ "name": "float", "value": "OFF"}'
           [[ "true" == "${{ inputs.use-double }}" ]] && echo ', { "name": "double", "value": "ON" }'
           echo '],'
-          echo '"qtversion" : ['
-          [[ "true" == "${{ inputs.qt5 }}" ]] && echo '{ "name" : "qt5", "value" : "5.15.1"}'
-          [[ "true" == "${{ inputs.qt5 }}" && "true" == "${{ inputs.qt6 }}" ]] && echo ','
-          [[ "true" == "${{ inputs.qt6 }}" ]] && echo '{ "name" : "qt6", "value" : "6.2.0"}'
-          echo '],'
+          echo '"qtversion" : [ { "name" : "qt6", "value" : "6.2.0"}],'
           echo '"coverage" : ['
           [[ "true" == "${{ inputs.coverage }}" ]] && echo '{ "value" : "ON", "extra-flags" : "-DRADIUM_ENABLE_GL_TESTING=ON" }' || echo '{ "value" : "OFF", "extra-flags" : "" }'
           echo "]"
@@ -124,7 +112,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.create-matrix.outputs.matrix) }}
     steps:
-      - uses: seanmiddleditch/gha-setup-ninja@master
+      - name: Install Ninja
+        shell: bash
+        run: ${{ runner.os == 'macOS' && 'brew install ninja' || runner.os == 'Windows' && 'choco install ninja' || 'sudo apt-get install ninja-build' }}
       - name: Add msbuild to PATH
         uses: seanmiddleditch/gha-setup-vsdevenv@master
         if: runner.os == 'Windows'
@@ -172,6 +162,7 @@ jobs:
           echo "${{ env.ext-dir }}/bin" >> $GITHUB_PATH
           echo "${{ env.ext-dir }}/glbinding" >> $GITHUB_PATH
           echo "${{ env.ext-dir }}/globjects" >> $GITHUB_PATH
+          echo "${{ env.ext-dir }}/cpplocate" >> $GITHUB_PATH
       - name: Prepare directories
         run: |
           mkdir -p install/
@@ -183,12 +174,15 @@ jobs:
         uses: actions/checkout@master
         with:
           path: src/Radium-Engine
+          submodules: 'recursive'
       - name: pull updated repo (e.g. with new VERSION)
         if: ${{ github.event_name == 'push' }}
-        run: git -C src/Radium-Engine pull origin ${{ github.event.ref }}
+        run: |
+          git -C src/Radium-Engine pull origin ${{ github.event.ref }}
+          git -C src/Radium-Engine submodule update --init --recursive
       - name: Cache externals
         id: cache-external
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: external
           key: ${{ matrix.config.name }}-${{ matrix.build-type }}-${{ matrix.qtversion.name }}-external-v1-${{ hashFiles('src/Radium-Engine/external/**/CMakeLists.txt') }}
@@ -259,11 +253,6 @@ jobs:
         if: ${{ inputs.coverage == 'true' }}
         run: |
           cd build/Radium-Engine
-          cmake --build . --config Debug --target lcov_init
-          cmake --build . --config Debug --target lcov_zerocounter
-          cmake --build . --config Debug --target check
-          cmake --build . --config Debug --target lcov_capture
-          # show report for debug
-          cmake --build . --config Debug --target lcov_list
+          cmake --build . --config Debug --target coverage
           # Uploading report to CodeCov
-          bash <(curl -s https://codecov.io/bash) -f total.info -R ../../src/Radium-Engine || echo "Codecov did not collect coverage reports"
+          bash <(curl -s https://codecov.io/bash) -f coverage.info -R ../../src/Radium-Engine || echo "Codecov did not collect coverage reports"

@@ -1,5 +1,6 @@
 #include <Engine/Scene/Light.hpp>
 
+#include <Core/Containers/VariableSetEnumManagement.hpp>
 #include <Engine/Data/RenderParameters.hpp>
 #include <Engine/RadiumEngine.hpp>
 
@@ -8,12 +9,12 @@ namespace Engine {
 namespace Scene {
 Light::Light( Scene::Entity* entity, const LightType& type, const std::string& name ) :
     Component( name, entity ), m_type( type ) {
-    m_params.addParameter( "light.type", m_type );
-    m_params.addParameter( "light.color", m_color );
+    Core::VariableSetEnumManagement::setEnumVariable( m_params, "light.type", m_type );
+    m_params.setVariable( "light.color", m_color );
 }
 
 void Light::getRenderParameters( Data::RenderParameters& params ) const {
-    params.mergeReplaceParameters( m_params );
+    params.mergeReplaceVariables( m_params );
 }
 
 void Light::initialize() {

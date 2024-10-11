@@ -21,7 +21,7 @@ class ShaderProgram;
 namespace Rendering {
 
 /** This allow to draw debug objects.
- * @todo : port this to a more Radium-style code
+ * \todo : port this to a more Radium-style code
  */
 class RA_ENGINE_API DebugRender final
 {

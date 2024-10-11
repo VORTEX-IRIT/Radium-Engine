@@ -13,7 +13,7 @@ TEST_CASE( "Engine/Data/EnvironmentTexture/Equirectangular",
         REQUIRE( tex.getImageType() == EnvironmentTexture::EnvMapType::ENVMAP_LATLON );
         REQUIRE( tex.isSkybox() );
 
-        auto redShCoefs            = tex.getShMatrix( 0 );
+        auto& redShCoefs           = tex.getShMatrix( 0 );
         Ra::Core::Matrix4 refCoefs = ( Ra::Core::Matrix4() << -0.514535,
                                        1.08883,
                                        -0.923322,
@@ -44,23 +44,23 @@ TEST_CASE( "Engine/Data/EnvironmentTexture/PFM",
         REQUIRE( tex.getImageType() == EnvironmentTexture::EnvMapType::ENVMAP_PFM );
         REQUIRE( !tex.isSkybox() );
 
-        auto greenShCoefs          = tex.getShMatrix( 1 );
-        Ra::Core::Matrix4 refCoefs = ( Ra::Core::Matrix4() << -1.53315,
-                                       0.036986,
-                                       0.0020611,
-                                       0.0118119,
-                                       0.036986,
-                                       1.53315,
-                                       0.0824425,
-                                       1.87627,
-                                       0.0020611,
-                                       0.0824425,
-                                       -0.524398,
-                                       0.0441319,
-                                       0.0118119,
-                                       1.87627,
-                                       0.0441319,
-                                       2.90152 )
+        auto& greenShCoefs         = tex.getShMatrix( 1 );
+        Ra::Core::Matrix4 refCoefs = ( Ra::Core::Matrix4() << -1.53315_ra,
+                                       0.036986_ra,
+                                       0.0020611_ra,
+                                       0.0118119_ra,
+                                       0.036986_ra,
+                                       1.53315_ra,
+                                       0.0824425_ra,
+                                       1.87627_ra,
+                                       0.0020611_ra,
+                                       0.0824425_ra,
+                                       -0.524398_ra,
+                                       0.0441319_ra,
+                                       0.0118119_ra,
+                                       1.87627_ra,
+                                       0.0441319_ra,
+                                       2.90152_ra )
                                          .finished();
         auto diff = greenShCoefs - refCoefs;
         REQUIRE( diff.norm() <= 1e-3 );
@@ -76,23 +76,23 @@ TEST_CASE( "Engine/Data/EnvironmentTexture/CubeMap",
         REQUIRE( tex.getImageType() == EnvironmentTexture::EnvMapType::ENVMAP_CUBE );
         REQUIRE( !tex.isSkybox() );
 
-        auto blueShCoefs           = tex.getShMatrix( 2 );
-        Ra::Core::Matrix4 refCoefs = ( Ra::Core::Matrix4() << -0.0150307,
-                                       -0.0389637,
-                                       -0.0589842,
-                                       -0.0352475,
-                                       -0.0389637,
-                                       0.0150307,
-                                       -0.014953,
-                                       0.30222,
-                                       -0.0589842,
-                                       -0.014953,
-                                       -0.0621052,
-                                       -0.0119704,
-                                       -0.0352475,
-                                       0.30222,
-                                       -0.0119704,
-                                       0.585438 )
+        auto& blueShCoefs          = tex.getShMatrix( 2 );
+        Ra::Core::Matrix4 refCoefs = ( Ra::Core::Matrix4() << -0.0150307_ra,
+                                       -0.0389637_ra,
+                                       -0.0589842_ra,
+                                       -0.0352475_ra,
+                                       -0.0389637_ra,
+                                       0.0150307_ra,
+                                       -0.014953_ra,
+                                       0.30222_ra,
+                                       -0.0589842_ra,
+                                       -0.014953_ra,
+                                       -0.0621052_ra,
+                                       -0.0119704_ra,
+                                       -0.0352475_ra,
+                                       0.30222_ra,
+                                       -0.0119704_ra,
+                                       0.585438_ra )
                                          .finished();
         auto diff = blueShCoefs - refCoefs;
         REQUIRE( diff.norm() <= 1e-3 );

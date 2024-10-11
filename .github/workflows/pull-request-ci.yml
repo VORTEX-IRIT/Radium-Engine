@@ -29,4 +29,3 @@ jobs:
       macos: "false"
       build-release: "false"
       coverage: "true"
-      qt6: "false"

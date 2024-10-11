@@ -64,14 +64,14 @@ namespace CLI {
 
 class Option;
 
-/// @defgroup validator_group Validators
+/// \defgroup validator_group Validators
 
-/// @brief Some validators that are provided
+/// \brief Some validators that are provided
 ///
 /// These are simple `std::string(const std::string&)` validators that are useful. They return
 /// a string if the validation fails. A custom struct is provided, as well, with the same user
 /// semantics, but with the ability to provide a new type name.
-/// @{
+/// \{
 
 ///
 class Validator
@@ -1167,7 +1167,7 @@ inline std::pair<std::string, std::string> split_program_name( std::string comma
 }
 
 } // namespace detail
-/// @}
+/// \}
 
 // [CLI11:validators_hpp:end]
 } // namespace CLI

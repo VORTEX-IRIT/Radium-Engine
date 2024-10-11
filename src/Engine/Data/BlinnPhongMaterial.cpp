@@ -19,65 +19,47 @@ nlohmann::json BlinnPhongMaterial::s_parametersMetadata = {};
 BlinnPhongMaterial::BlinnPhongMaterial( const std::string& instanceName ) :
     Material( instanceName, materialName, Material::MaterialAspect::MAT_OPAQUE ) {}
 
-BlinnPhongMaterial::~BlinnPhongMaterial() {
-    m_textures.clear();
-}
-
 void BlinnPhongMaterial::updateRenderingParameters() {
     // update the rendering parameters
     auto& renderParameters = getParameters();
-    renderParameters.addParameter( "material.kd", m_kd );
-    renderParameters.addParameter( "material.hasPerVertexKd", m_perVertexColor );
-    renderParameters.addParameter( "material.renderAsSplat", m_renderAsSplat );
-    renderParameters.addParameter( "material.ks", m_ks );
-    renderParameters.addParameter( "material.ns", m_ns );
-    renderParameters.addParameter( "material.alpha", std::min( m_alpha, m_kd[3] ) );
+    renderParameters.setVariable( "material.kd", m_kd );
+    renderParameters.setVariable( "material.hasPerVertexKd", m_perVertexColor );
+    renderParameters.setVariable( "material.renderAsSplat", m_renderAsSplat );
+    renderParameters.setVariable( "material.ks", m_ks );
+    renderParameters.setVariable( "material.ns", m_ns );
+    renderParameters.setVariable( "material.alpha", std::min( m_alpha, m_kd[3] ) );
     Texture* tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_DIFFUSE );
-    if ( tex != nullptr ) { renderParameters.addParameter( "material.tex.kd", tex ); }
-    renderParameters.addParameter( "material.tex.hasKd", tex != nullptr );
+    if ( tex != nullptr ) { renderParameters.setTexture( "material.tex.kd", tex ); }
+    renderParameters.setVariable( "material.tex.hasKd", tex != nullptr );
     tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_SPECULAR );
-    if ( tex != nullptr ) { renderParameters.addParameter( "material.tex.ks", tex ); }
-    renderParameters.addParameter( "material.tex.hasKs", tex != nullptr );
+    if ( tex != nullptr ) { renderParameters.setTexture( "material.tex.ks", tex ); }
+    renderParameters.setVariable( "material.tex.hasKs", tex != nullptr );
     tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_NORMAL );
-    if ( tex != nullptr ) { renderParameters.addParameter( "material.tex.normal", tex ); }
-    renderParameters.addParameter( "material.tex.hasNormal", tex != nullptr );
+    if ( tex != nullptr ) { renderParameters.setTexture( "material.tex.normal", tex ); }
+    renderParameters.setVariable( "material.tex.hasNormal", tex != nullptr );
     tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_SHININESS );
-    if ( tex != nullptr ) { renderParameters.addParameter( "material.tex.ns", tex ); }
-    renderParameters.addParameter( "material.tex.hasNs", tex != nullptr );
+    if ( tex != nullptr ) { renderParameters.setTexture( "material.tex.ns", tex ); }
+    renderParameters.setVariable( "material.tex.hasNs", tex != nullptr );
     tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_ALPHA );
-    if ( tex != nullptr ) { renderParameters.addParameter( "material.tex.alpha", tex ); }
-    renderParameters.addParameter( "material.tex.hasAlpha", tex != nullptr );
+    if ( tex != nullptr ) { renderParameters.setTexture( "material.tex.alpha", tex ); }
+    renderParameters.setVariable( "material.tex.hasAlpha", tex != nullptr );
 }
 
 void BlinnPhongMaterial::updateGL() {
-    if ( !m_isDirty ) { return; }
-
-    // Load textures
-    auto texManager = RadiumEngine::getInstance()->getTextureManager();
-    for ( const auto& tex : m_pendingTextures ) {
-        // ask to convert color textures from sRGB to Linear RGB
-        bool tolinear         = ( tex.first == TextureSemantic::TEX_DIFFUSE ||
-                          tex.first == TextureSemantic::TEX_SPECULAR );
-        auto texture          = texManager->getOrLoadTexture( tex.second, tolinear );
-        m_textures[tex.first] = texture;
-        // do not call addTexture since it invalidate m_pendingTextures itr
-        //       addTexture( tex.first, texture );
-    }
-
-    m_pendingTextures.clear();
-    m_isDirty = false;
+    if ( !isDirty() ) { return; }
 
     updateRenderingParameters();
+    setClean();
 }
 
 void BlinnPhongMaterial::updateFromParameters() {
     auto& renderParameters = getParameters();
-    m_kd                   = renderParameters.getParameter<Core::Utils::Color>( "material.kd" );
-    m_perVertexColor       = renderParameters.getParameter<bool>( "material.hasPerVertexKd" );
-    m_renderAsSplat        = renderParameters.getParameter<bool>( "material.renderAsSplat" );
-    m_ks                   = renderParameters.getParameter<Core::Utils::Color>( "material.ks" );
-    m_ns                   = renderParameters.getParameter<Scalar>( "material.ns" );
-    m_alpha                = renderParameters.getParameter<Scalar>( "material.alpha" );
+    m_kd                   = renderParameters.getVariable<Core::Utils::Color>( "material.kd" );
+    m_perVertexColor       = renderParameters.getVariable<bool>( "material.hasPerVertexKd" );
+    m_renderAsSplat        = renderParameters.getVariable<bool>( "material.renderAsSplat" );
+    m_ks                   = renderParameters.getVariable<Core::Utils::Color>( "material.ks" );
+    m_ns                   = renderParameters.getVariable<Scalar>( "material.ns" );
+    m_alpha                = renderParameters.getVariable<Scalar>( "material.alpha" );
 }
 
 bool BlinnPhongMaterial::isTransparent() const {
@@ -158,23 +140,39 @@ BlinnPhongMaterialConverter::operator()( const Ra::Core::Asset::MaterialData* to
     if ( source->hasSpecular() ) result->m_ks = source->m_specular;
     if ( source->hasShininess() ) result->m_ns = source->m_shininess;
     if ( source->hasOpacity() ) result->m_alpha = source->m_opacity;
-    if ( source->hasDiffuseTexture() )
-        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_DIFFUSE,
-                            source->m_texDiffuse );
-    if ( source->hasSpecularTexture() )
-        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_SPECULAR,
-                            source->m_texSpecular );
-    if ( source->hasShininessTexture() )
-        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_SHININESS,
-                            source->m_texShininess );
-    if ( source->hasOpacityTexture() )
-        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_ALPHA, source->m_texOpacity );
-    if ( source->hasNormalTexture() )
-        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_NORMAL, source->m_texNormal );
+    TextureParameters data;
+    data.sampler.wrapS     = GL_REPEAT;
+    data.sampler.wrapT     = GL_REPEAT;
+    data.sampler.minFilter = GL_LINEAR_MIPMAP_LINEAR;
+    auto texManager        = RadiumEngine::getInstance()->getTextureManager();
+    if ( source->hasDiffuseTexture() ) {
+        data.name  = "diffuse";
+        data.image = texManager->loadTextureImage( source->m_texDiffuse, true );
+        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_DIFFUSE, data );
+    }
+    if ( source->hasSpecularTexture() ) {
+        data.name  = "specular";
+        data.image = texManager->loadTextureImage( source->m_texSpecular, true );
+        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_SPECULAR, data );
+    }
+    if ( source->hasShininessTexture() ) {
+        data.name  = "shininess";
+        data.image = texManager->loadTextureImage( source->m_texShininess, false );
+        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_SHININESS, data );
+    }
 
+    if ( source->hasOpacityTexture() ) {
+        data.name  = "opacity";
+        data.image = texManager->loadTextureImage( source->m_texOpacity, false );
+        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_ALPHA, data );
+    }
+    if ( source->hasNormalTexture() ) {
+        data.name  = "normal";
+        data.image = texManager->loadTextureImage( source->m_texNormal, false );
+        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_NORMAL, data );
+    }
     return result;
 }
-
 } // namespace Data
 } // namespace Engine
 } // namespace Ra

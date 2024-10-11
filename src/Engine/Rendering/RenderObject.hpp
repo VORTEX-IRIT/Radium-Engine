@@ -36,15 +36,13 @@ namespace Rendering {
 class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     /**
      * Construct a renderObject
      *
-     * @param name the name of the renderObject
-     * @param comp The component that holds the RenderObject
-     * @param type The type (ui, debug, geometry) of the render object
-     * @param lifetime A -1 (or any other negative value) lifetime is considered infinite,
+     * \param name the name of the renderObject
+     * \param comp The component that holds the RenderObject
+     * \param type The type (ui, debug, geometry) of the render object
+     * \param lifetime A -1 (or any other negative value) lifetime is considered infinite,
      *        0 is an "invalid value" (would mean the render object has to die immediatly),
      *        hence it's considered as infinite,
      *        any other positive value will be taken into account.
@@ -74,13 +72,13 @@ class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
      *
      *     // createRenderObject can finally be called.
      *     RenderObject* ro = createRenderObject(name, component, type, config, material);
-     * @param name
-     * @param comp
-     * @param type
-     * @param mesh
-     * @param techniqueConfig
-     * @param material
-     * @return
+     * \param name
+     * \param comp
+     * \param type
+     * \param mesh
+     * \param techniqueConfig
+     * \param material
+     * \return
      */
     static RenderObject* createRenderObject(
         const std::string& name,
@@ -95,7 +93,7 @@ class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
     void updateGL();
 
     /// Getters and setters.
-    ///@{
+    ///\{
     const std::string& getName() const;
     const Scene::Component* getComponent() const;
     Scene::Component* getComponent();
@@ -149,7 +147,7 @@ class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
     void setLocalTransform( const Core::Matrix4& transform );
     const Core::Transform& getLocalTransform() const;
     const Core::Matrix4& getLocalTransformAsMatrix() const;
-    ///@}
+    ///\}
 
     /// Basically just decreases lifetime counter.
     /// If it goes to zero, then render object notifies the manager that it needs to be deleted.
@@ -165,9 +163,9 @@ class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
     /**
      * Render the object with the given rendering environment defined by the lighting parameters,
      * the viewing parameters and  the shader
-     * @param lightParams lighting parameters for this rendering
-     * @param viewParams  viewing parameters for this rendering
-     * @param shader shader to use for this rendering
+     * \param lightParams lighting parameters for this rendering
+     * \param viewParams  viewing parameters for this rendering
+     * \param shader shader to use for this rendering
      */
     void render( const Data::RenderParameters& lightParams,
                  const Data::ViewingParameters& viewParams,
@@ -177,9 +175,9 @@ class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
     /**
      * Render the object for the given rendering environment defined by the lighting parameters, the
      * viewing parameters and the RenderTechnique pass name
-     * @param lightParams lighting parameters for this rendering
-     * @param viewParams viewing parameters for this rendering
-     * @param passname RenderTechnique pass name
+     * \param lightParams lighting parameters for this rendering
+     * \param viewParams viewing parameters for this rendering
+     * \param passname RenderTechnique pass name
      */
     void render( const Data::RenderParameters& lightParams,
                  const Data::ViewingParameters& viewParams,

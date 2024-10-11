@@ -39,19 +39,19 @@ enum class AppFormatMode {
 class FormatterBase
 {
   protected:
-    /// @name Options
-    ///@{
+    /// \name Options
+    ///\{
 
     /// The width of the first column
     std::size_t column_width_ { 30 };
 
-    /// @brief The required help printout labels (user changeable)
+    /// \brief The required help printout labels (user changeable)
     /// Values are Needs, Excludes, etc.
     std::map<std::string, std::string> labels_ {};
 
-    ///@}
-    /// @name Basic
-    ///@{
+    ///\}
+    /// \name Basic
+    ///\{
 
   public:
     FormatterBase()                       = default;
@@ -64,9 +64,9 @@ class FormatterBase
     /// This is the key method that puts together help
     virtual std::string make_help( const App*, std::string, AppFormatMode ) const = 0;
 
-    ///@}
-    /// @name Setters
-    ///@{
+    ///\}
+    /// \name Setters
+    ///\{
 
     /// Set the "REQUIRED" label
     void label( std::string key, std::string val ) { labels_[key] = val; }
@@ -74,9 +74,9 @@ class FormatterBase
     /// Set the column width
     void column_width( std::size_t val ) { column_width_ = val; }
 
-    ///@}
-    /// @name Getters
-    ///@{
+    ///\}
+    /// \name Getters
+    ///\{
 
     /// Get the current value of a name (REQUIRED, etc.)
     std::string get_label( std::string key ) const {
@@ -89,7 +89,7 @@ class FormatterBase
     /// Get the current column width
     std::size_t get_column_width() const { return column_width_; }
 
-    ///@}
+    ///\}
 };
 
 /// This is a specialty override for lambda functions
@@ -122,8 +122,8 @@ class Formatter : public FormatterBase
     Formatter( const Formatter& ) = default;
     Formatter( Formatter&& )      = default;
 
-    /// @name Overridables
-    ///@{
+    /// \name Overridables
+    ///\{
 
     /// This prints out a group of options with title
     ///
@@ -157,9 +157,9 @@ class Formatter : public FormatterBase
     /// This puts everything together
     std::string make_help( const App* /*app*/, std::string, AppFormatMode ) const override;
 
-    ///@}
-    /// @name Options
-    ///@{
+    ///\}
+    /// \name Options
+    ///\{
 
     /// This prints out an option help line, either positional or optional form
     virtual std::string make_option( const Option* opt, bool is_positional ) const {
@@ -171,19 +171,19 @@ class Formatter : public FormatterBase
         return out.str();
     }
 
-    /// @brief This is the name part of an option, Default: left column
+    /// \brief This is the name part of an option, Default: left column
     virtual std::string make_option_name( const Option*, bool ) const;
 
-    /// @brief This is the options part of the name, Default: combined into left column
+    /// \brief This is the options part of the name, Default: combined into left column
     virtual std::string make_option_opts( const Option* ) const;
 
-    /// @brief This is the description. Default: Right column, on new line if left column too large
+    /// \brief This is the description. Default: Right column, on new line if left column too large
     virtual std::string make_option_desc( const Option* ) const;
 
-    /// @brief This is used to print the name on the USAGE line
+    /// \brief This is used to print the name on the USAGE line
     virtual std::string make_option_usage( const Option* opt ) const;
 
-    ///@}
+    ///\}
 };
 
 // [CLI11:formatter_fwd_hpp:end]

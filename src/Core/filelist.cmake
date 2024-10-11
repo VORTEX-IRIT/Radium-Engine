@@ -25,6 +25,7 @@ set(core_sources
     Asset/MaterialData.cpp
     Containers/AdjacencyList.cpp
     Containers/VariableSet.cpp
+    Containers/VariableSetEnumManagement.cpp
     Geometry/CatmullClarkSubdivider.cpp
     Geometry/IndexedGeometry.cpp
     Geometry/LoopSubdivider.cpp
@@ -42,6 +43,7 @@ set(core_sources
     Utils/Color.cpp
     Utils/StackTrace.cpp
     Utils/StringUtils.cpp
+    Utils/TypesUtils.cpp
 )
 
 set(core_headers
@@ -82,6 +84,7 @@ set(core_headers
     Containers/MakeShared.hpp
     Containers/Tex.hpp
     Containers/VariableSet.hpp
+    Containers/VariableSetEnumManagement.hpp
     Containers/VectorArray.hpp
     CoreMacros.hpp
     Geometry/AbstractGeometry.hpp

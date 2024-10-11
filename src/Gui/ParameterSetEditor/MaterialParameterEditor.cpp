@@ -48,7 +48,7 @@ MaterialParameterEditor::MaterialParameterEditor( QWidget* parent ) : QWidget( p
 
     verticalLayout->addWidget( matParamsGroup );
     m_matParamsLayout        = new QVBoxLayout( matParamsGroup );
-    m_parametersControlPanel = new ParameterSetEditor( "Material Parameters", this );
+    m_parametersControlPanel = new VariableSetEditor( "Material Parameters", this );
     m_matParamsLayout->addWidget( m_parametersControlPanel );
 
     verticalLayout->addStretch();
@@ -76,20 +76,20 @@ void MaterialParameterEditor::setupFromMaterial(
     // clear the old control panel
     m_matParamsLayout->removeWidget( m_parametersControlPanel );
     delete m_parametersControlPanel;
-    m_parametersControlPanel = new ParameterSetEditor( "Material Parameters", this );
-    m_parametersControlPanel->showUnspecified( m_showUnspecified );
+    m_parametersControlPanel = new VariableSetEditor( "Material Parameters", this );
+    m_parametersControlPanel->setShowUnspecified( m_showUnspecified );
     m_matParamsLayout->addWidget( m_parametersControlPanel );
 
-    m_parametersControlPanel->setupFromParameters( params, metadata );
+    m_parametersControlPanel->setupUi( params, metadata );
 
     connect( m_parametersControlPanel,
-             &ParameterSetEditor::parameterModified,
+             &VariableSetEditor::parameterModified,
              [this]( const std::string& nm ) { emit materialParametersModified( nm ); } );
     m_matInfoGroup->setVisible( true );
 }
 
 void MaterialParameterEditor::showUnspecified( bool enable ) {
     m_showUnspecified = enable;
-    m_parametersControlPanel->showUnspecified( m_showUnspecified );
+    m_parametersControlPanel->setShowUnspecified( m_showUnspecified );
 }
 } // namespace Ra::Gui

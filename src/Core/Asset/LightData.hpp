@@ -26,8 +26,6 @@ class RA_CORE_API LightData : public AssetData
 {
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     /** Supported light type
      *
      */
@@ -63,7 +61,7 @@ class RA_CORE_API LightData : public AssetData
      * Copy constructor.
      * As a Light a a union like object, no default copy constructor could be generated. This will
      * take care of copying the good members of the union.
-     * @param data
+     * \param data
      */
     LightData( const LightData& data );
 
@@ -79,13 +77,13 @@ class RA_CORE_API LightData : public AssetData
 
     /**
      * Acces to the local frame of the light.
-     * @return the local frame
+     * \return the local frame
      */
     inline const Eigen::Matrix<Scalar, 4, 4>& getFrame() const;
 
     /**
      * Set the local frame of the light.
-     * @param frame the local frame
+     * \param frame the local frame
      */
     inline void setFrame( const Eigen::Matrix<Scalar, 4, 4>& frame );
 

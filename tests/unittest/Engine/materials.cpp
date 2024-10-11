@@ -40,7 +40,7 @@ TEST_CASE( "Engine/Data/Materials", "[Engine][Engine/Data][Materials]" ) {
         BlinnPhongMaterial bp( "testBlinnPhong" );
 
         /* Testing default values */
-        REQUIRE( bp.m_alpha == 1.0 );
+        REQUIRE( bp.getAlpha() == 1.0 );
         REQUIRE( !bp.isColoredByVertexAttrib() );
 
         bp.setColoredByVertexAttrib( true );
@@ -48,29 +48,28 @@ TEST_CASE( "Engine/Data/Materials", "[Engine][Engine/Data][Materials]" ) {
         /* Setting GL Parameters */
         bp.updateGL();
         auto& bpParameters = bp.getParameters();
-        auto& bpstorage    = bpParameters.getStorage();
 
-        bpstorage.visit( PrintThemAll {} );
+        bpParameters.visit( PrintThemAll {} );
 
-        REQUIRE( bpParameters.containsParameter<bool>( "material.hasPerVertexKd" ) );
-        REQUIRE( bpParameters.containsParameter<Scalar>( "material.alpha" ) );
+        REQUIRE( bpParameters.existsVariable<bool>( "material.hasPerVertexKd" ) );
+        REQUIRE( bpParameters.existsVariable<Scalar>( "material.alpha" ) );
 
-        auto& pvc = bpParameters.getParameter<bool>( "material.hasPerVertexKd" );
+        auto& pvc = bpParameters.getVariable<bool>( "material.hasPerVertexKd" );
         REQUIRE( pvc == bp.isColoredByVertexAttrib() );
 
-        auto& alp = bpParameters.getParameter<Scalar>( "material.alpha" );
-        REQUIRE( alp == bp.m_alpha );
+        auto& alp = bpParameters.getVariable<Scalar>( "material.alpha" );
+        REQUIRE( alp == bp.getAlpha() );
 
         /* changing parameter values */
-        bpParameters.addParameter( "material.hasPerVertexKd", !pvc );
-        bpParameters.addParameter( "material.alpha", 0.5_ra );
+        bpParameters.setVariable( "material.hasPerVertexKd", !pvc );
+        bpParameters.setVariable( "material.alpha", 0.5_ra );
         REQUIRE( pvc != bp.isColoredByVertexAttrib() );
-        REQUIRE( alp != bp.m_alpha );
+        REQUIRE( alp != bp.getAlpha() );
 
         /* Updating material parameters from GL parameters */
         bp.updateFromParameters();
         REQUIRE( pvc == bp.isColoredByVertexAttrib() );
-        REQUIRE( alp == bp.m_alpha );
+        REQUIRE( alp == bp.getAlpha() );
         LOG( Ra::Core::Utils::logINFO ) << "Blinn-Phong material tested.\n";
     }
 
@@ -87,12 +86,12 @@ TEST_CASE( "Engine/Data/Materials", "[Engine][Engine/Data][Materials]" ) {
         mat.updateGL();
         auto& matParameters = mat.getParameters();
 
-        REQUIRE( matParameters.containsParameter<bool>( "material.perVertexColor" ) );
-        auto& pvc = matParameters.getParameter<bool>( "material.perVertexColor" );
+        REQUIRE( matParameters.existsVariable<bool>( "material.perVertexColor" ) );
+        auto& pvc = matParameters.getVariable<bool>( "material.perVertexColor" );
         REQUIRE( pvc == mat.isColoredByVertexAttrib() );
 
         /* changing parameter values */
-        matParameters.addParameter( "material.perVertexColor", !pvc );
+        matParameters.setVariable( "material.perVertexColor", !pvc );
         REQUIRE( pvc != mat.isColoredByVertexAttrib() );
 
         /* Updating material parameters from GL parameters */
@@ -114,12 +113,12 @@ TEST_CASE( "Engine/Data/Materials", "[Engine][Engine/Data][Materials]" ) {
         mat.updateGL();
         auto& matParameters = mat.getParameters();
 
-        REQUIRE( matParameters.containsParameter<bool>( "material.perVertexColor" ) );
-        auto& pvc = matParameters.getParameter<bool>( "material.perVertexColor" );
+        REQUIRE( matParameters.existsVariable<bool>( "material.perVertexColor" ) );
+        auto& pvc = matParameters.getVariable<bool>( "material.perVertexColor" );
         REQUIRE( pvc == mat.isColoredByVertexAttrib() );
 
         /* changing parameter values */
-        matParameters.addParameter( "material.perVertexColor", !pvc );
+        matParameters.setVariable( "material.perVertexColor", !pvc );
         REQUIRE( pvc != mat.isColoredByVertexAttrib() );
 
         /* Updating material parameters from GL parameters */
@@ -132,34 +131,30 @@ TEST_CASE( "Engine/Data/Materials", "[Engine][Engine/Data][Materials]" ) {
         LOG( Ra::Core::Utils::logINFO ) << "Testing Volumetric material";
         REQUIRE( code == 0 );
         VolumetricMaterial mat( "test VolumetricMaterial" );
-        float d = 1.f;
-        Texture density { { "simpleDensity",
-                            gl::GL_TEXTURE_3D,
-                            1,
-                            1,
-                            1,
-                            gl::GL_RED,
-                            gl::GL_RED,
-                            gl::GL_FLOAT,
-                            gl::GL_CLAMP_TO_EDGE,
-                            gl::GL_CLAMP_TO_EDGE,
-                            gl::GL_CLAMP_TO_EDGE,
-                            gl::GL_NEAREST,
-                            gl::GL_NEAREST,
-                            &d } };
+        auto d = std::shared_ptr<float[]>( new float[1] );
+        d[0]   = 1.f;
+        Texture density {
+            { "simpleDensity",
+              { gl::GL_CLAMP_TO_EDGE,
+                gl::GL_CLAMP_TO_EDGE,
+                gl::GL_CLAMP_TO_EDGE,
+                gl::GL_NEAREST,
+                gl::GL_NEAREST },
+              { gl::GL_TEXTURE_3D, 1, 1, 1, gl::GL_RED, gl::GL_RED, gl::GL_FLOAT, false, d } } };
+        density.initializeNow();
         mat.setTexture( &density );
 
         REQUIRE( mat.m_g == 0_ra );
 
         mat.updateGL();
         auto& matParameters = mat.getParameters();
-        REQUIRE( matParameters.containsParameter<Scalar>( "material.g" ) );
+        REQUIRE( matParameters.existsVariable<Scalar>( "material.g" ) );
 
-        auto& g = matParameters.getParameter<Scalar>( "material.g" );
+        auto& g = matParameters.getVariable<Scalar>( "material.g" );
         REQUIRE( g == 0_ra );
 
         /* changing parameter values */
-        matParameters.addParameter( "material.g", 0.5_ra );
+        matParameters.setVariable( "material.g", 0.5_ra );
         REQUIRE( g != mat.m_g );
 
         /* Updating material parameters from GL parameters */

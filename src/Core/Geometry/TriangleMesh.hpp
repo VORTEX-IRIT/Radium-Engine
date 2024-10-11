@@ -25,8 +25,6 @@ namespace Geometry {
 class RA_CORE_API AttribArrayGeometry : public AbstractGeometry
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     using Point  = Vector3;
     using Normal = Vector3;
 
@@ -92,8 +90,8 @@ class RA_CORE_API AttribArrayGeometry : public AbstractGeometry
     template <typename T>
     inline bool isValid( const Utils::AttribHandle<T>& h ) const;
 
-    /// @name Wrappers to Utils::AttribManager.
-    /// @{
+    /// \name Wrappers to Utils::AttribManager.
+    /// \{
 
     /// \see Utils::AttribManager::getAttrib
     template <typename T>
@@ -120,13 +118,13 @@ class RA_CORE_API AttribArrayGeometry : public AbstractGeometry
     inline Utils::AttribBase* getAttribBase( const std::string& name );
     /// \see Utils::AttribManager::getAttribBase
     inline const Utils::AttribBase* getAttribBase( const std::string& name ) const;
-    ///@}
+    ///\}
 
     /// Check if an attribute exists with the given name.
     /// \see AttribManager::contains for more info.
     inline bool hasAttrib( const std::string& name ) const;
 
-    ///@{
+    ///\{
     /// Add attribute with the given name.
     /// \see AttribManager::addAttrib() for more info.
     /// \param name: attrib name, uniquely identify the attrib
@@ -149,7 +147,7 @@ class RA_CORE_API AttribArrayGeometry : public AbstractGeometry
     template <typename T>
     inline Utils::AttribHandle<T> addAttrib( const std::string& name,
                                              const typename Utils::Attrib<T>::Container&& data );
-    ///@}
+    ///\}
 
     /// Remove attribute by handle.
     /// \see AttribManager::removeAttrib() for more info.

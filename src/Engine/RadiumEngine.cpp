@@ -105,7 +105,7 @@ void RadiumEngine::registerDefaultPrograms() {
         m_resourcesRootDir + "Shaders/Materials/VertexAttribInterface.frag.glsl" );
 
     // Engine support some built-in materials. Register here
-    /// @todo find a way to integrate "Line" material into Radium Material System
+    /// \todo find a way to integrate "Line" material into Radium Material System
     Data::ShaderConfiguration lConfig( "Lines" );
     lConfig.addShader( Data::ShaderType_VERTEX,
                        m_resourcesRootDir + "Shaders/Lines/Lines.vert.glsl" );

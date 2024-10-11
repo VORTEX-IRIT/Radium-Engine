@@ -1,10 +1,13 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
+
 if(APPLE)
     cmake_policy(SET CMP0042 NEW)
 endif(APPLE)
 
 set(ra_headless_target Headless)
-list(APPEND CMAKE_MESSAGE_INDENT "[${ra_headless_target}] ")
+
+message_prefix_push("${ra_headless_target}")
+
 project(${ra_headless_target} LANGUAGES CXX VERSION ${Radium_VERSION})
 # -----------------------------------------------------------------------------------
 # lib headless configuration
@@ -68,3 +71,5 @@ endif()
 if(RADIUM_ENABLE_PCH)
     target_precompile_headers(${ra_headless_target} PRIVATE pch.hpp)
 endif()
+
+message_prefix_pop()

@@ -10,6 +10,7 @@
 #include <Engine/Rendering/Renderer.hpp>
 #include <Engine/Scene/DefaultCameraManager.hpp>
 #include <Engine/Scene/DirLight.hpp>
+#include <Engine/Scene/EntityManager.hpp>
 #include <Engine/Scene/GeometrySystem.hpp>
 #include <Engine/Scene/SkeletonBasedAnimationSystem.hpp>
 #include <Engine/Scene/SystemDisplay.hpp>
@@ -20,8 +21,60 @@ using namespace Ra::Core::Utils;
 
 constexpr int defaultSystemPriority = 1000;
 
+CLIRadiumEngineApp::CLIRadiumEngineApp( std::unique_ptr<OpenGLContext> context ) :
+    CLIBaseApplication(), m_glContext { std::move( context ) } {}
+
+CLIRadiumEngineApp::~CLIRadiumEngineApp() {
+    if ( m_engineInitialized ) {
+        m_glContext->makeCurrent();
+        m_engine->cleanup();
+        Ra::Engine::RadiumEngine::destroyInstance();
+        m_glContext->doneCurrent();
+    }
+}
+
+int CLIRadiumEngineApp::init( int argc, const char* argv[] ) {
+    int parseResult = CLIBaseApplication::init( argc, argv );
+    if ( parseResult != 0 ) {
+        if ( parseResult != 1 ) {
+            LOG( logERROR ) << "Invalid command line argument, the application can't run";
+            return parseResult;
+        }
+        return 1;
+    };
+    // Do the Viewer init
+    if ( !m_glContext->isValid() ) {
+        LOG( logERROR ) << "Invalid openglContext, the application can't run";
+        return 1;
+    }
+
+    // Create engine
+    m_engine = Ra::Engine::RadiumEngine::createInstance();
+    m_engine->initialize();
+    m_engineInitialized = true;
+
+    // initialize OpenGL part of the Engine
+    m_glContext->makeCurrent();
+    m_engine->initializeGL();
+    m_glContext->doneCurrent();
+
+    // Init is OK
+    return 0;
+}
+
+void CLIRadiumEngineApp::openGlAddOns( std::function<void()> f ) {
+    m_glContext->makeCurrent();
+    f();
+    m_glContext->doneCurrent();
+}
+
+void CLIRadiumEngineApp::bindOpenGLContext( bool on ) {
+    if ( on ) { m_glContext->makeCurrent(); }
+    else { m_glContext->doneCurrent(); }
+}
+
 CLIViewer::CLIViewer( std::unique_ptr<OpenGLContext> context ) :
-    CLIBaseApplication(), m_glContext { std::move( context ) } {
+    CLIRadiumEngineApp( std::move( context ) ) {
     // add ->required() to force user to give a filename;
     addOption( "-f,--file", m_parameters.m_dataFile, "Data file to process." )
         ->check( CLI::ExistingFile );
@@ -33,8 +86,6 @@ CLIViewer::~CLIViewer() {
     if ( m_engineInitialized ) {
         m_glContext->makeCurrent();
         m_renderer.reset();
-        m_engine->cleanup();
-        Ra::Engine::RadiumEngine::destroyInstance();
         m_glContext->doneCurrent();
     }
 }
@@ -44,28 +95,14 @@ const CLIViewer::ViewerParameters& CLIViewer::getCommandLineParameters() const {
 }
 
 int CLIViewer::init( int argc, const char* argv[] ) {
-    int parseResult = CLIBaseApplication::init( argc, argv );
-    if ( parseResult != 0 ) {
-        if ( parseResult != 1 ) {
-            LOG( logERROR ) << "Invalid command line argument, the application can't run";
-        }
-        return 1;
-    };
-    // Do the Viewer init
-    if ( !m_glContext->isValid() ) {
-        LOG( logERROR ) << "Invalid openglContext, the application can't run";
-        return 1;
-    }
+
+    int parseResult = CLIRadiumEngineApp::init( argc, argv );
+    if ( parseResult != 0 ) { return parseResult; };
 
     m_glContext->resize( m_parameters.m_size );
     LOG( logINFO ) << "CLIViewer :\n" << m_glContext->getInfo();
 
     // Initialize the Radium engine environment
-
-    // Create engine
-    m_engine = Ra::Engine::RadiumEngine::createInstance();
-    m_engine->initialize();
-    m_engineInitialized = true;
 
     // Register the GeometrySystem converting loaded assets to meshes
     m_engine->registerSystem(
@@ -78,11 +115,6 @@ int CLIViewer::init( int argc, const char* argv[] ) {
                                   new Ra::Engine::Scene::SkeletonBasedAnimationSystem,
                                   defaultSystemPriority );
     }
-
-    // initialize OpenGL part of the Engine
-    m_glContext->makeCurrent();
-    m_engine->initializeGL();
-    m_glContext->doneCurrent();
 
     // register listeners on the OpenGL Context
     m_glContext->resizeListener().attach(
@@ -100,16 +132,18 @@ int CLIViewer::oneFrame( float timeStep ) {
         m_engine->step();
     }
 
-    Ra::Core::TaskQueue tasks( std::thread::hardware_concurrency() - 1 );
+    Core::TaskQueue tasks { std::max( std::thread::hardware_concurrency(), 2u ) - 1u };
+
     m_engine->getTasks( &tasks, Scalar( timeStep ) );
     tasks.startTasks();
     tasks.waitForTasks();
     tasks.flushTaskQueue();
 
+    m_engine->runGpuTasks();
+
     Ra::Engine::Data::ViewingParameters data {
         m_camera->getViewMatrix(), m_camera->getProjMatrix(), timeStep };
-    m_renderer->render( data );
-
+    if ( m_renderer ) m_renderer->render( data );
     return 0;
 }
 
@@ -146,47 +180,47 @@ void CLIViewer::compileScene() {
         }
     }
 }
-
-void CLIViewer::openGlAddOns( std::function<void()> f ) {
-    m_glContext->makeCurrent();
-    f();
-    m_glContext->doneCurrent();
-}
-
-void CLIViewer::bindOpenGLContext( bool on ) {
-    if ( on ) { m_glContext->makeCurrent(); }
-    else { m_glContext->doneCurrent(); }
-}
-
-void CLIViewer::setCamera( Ra::Core::Utils::Index camIdx ) {
+Ra::Core::Utils::Index CLIViewer::setCamera( Ra::Core::Utils::Index camIdx ) {
     auto cameraManager = static_cast<Ra::Engine::Scene::CameraManager*>(
         Ra::Engine::RadiumEngine::getInstance()->getSystem( "DefaultCameraManager" ) );
 
     if ( camIdx.isInvalid() || cameraManager->count() <= size_t( camIdx ) ) {
-        m_camera = new Ra::Core::Asset::Camera( m_parameters.m_size[0], m_parameters.m_size[1] );
-        m_camera->setFOV( 60.0_ra * Ra::Core::Math::toRad );
-        m_camera->setZNear( 0.1_ra );
-        m_camera->setZFar( 100_ra );
+        LOG( logDEBUG ) << "CLIViewer::setCamera : invalid camera index, using camera at index 0.";
+        camIdx = 0;
+    }
 
+    if ( cameraManager->count() == 0 ) {
+        LOG( logDEBUG )
+            << "CLIViewer::setCamera : no camera in the manager, creating default camera.";
+        // add camera to the manager
+        auto e      = m_engine->getEntityManager()->createEntity( "Default Camera" );
+        auto camera = new Ra::Engine::Scene::CameraComponent( e, "Camera" );
+        camera->initialize();
+        cameraManager->addCamera( camera );
+
+        // set camera properties
+        auto cam = camera->getCamera();
+        cam->setFOV( 60.0_ra * Ra::Core::Math::toRad );
+        cam->setZNear( 0.1_ra );
+        cam->setZFar( 100_ra );
         auto aabb      = Ra::Engine::RadiumEngine::getInstance()->computeSceneAabb();
-        Scalar f       = m_camera->getFOV();
-        Scalar a       = m_camera->getAspect();
+        Scalar f       = cam->getFOV();
+        Scalar a       = cam->getAspect();
         const Scalar r = ( aabb.max() - aabb.min() ).norm() / 2_ra;
         const Scalar x = r / std::sin( f / 2_ra );
         const Scalar y = r / std::sin( f * a / 2_ra );
         Scalar d       = std::max( std::max( x, y ), 0.001_ra );
-
-        m_camera->setPosition(
+        cam->setPosition(
             Ra::Core::Vector3( aabb.center().x(), aabb.center().y(), aabb.center().z() + d ) );
-        m_camera->setDirection( Ra::Core::Vector3( 0_ra, 0_ra, -1_ra ) );
-        Scalar zfar =
-            std::max( d + ( aabb.max().z() - aabb.min().z() ) * 2_ra, m_camera->getZFar() );
-        m_camera->setZFar( zfar );
+        cam->setDirection( Ra::Core::Vector3( 0_ra, 0_ra, -1_ra ) );
+        Scalar zfar = std::max( d + ( aabb.max().z() - aabb.min().z() ) * 2_ra, cam->getZFar() );
+        cam->setZFar( zfar );
     }
-    else {
-        cameraManager->activate( camIdx );
-        m_camera = cameraManager->getActiveCamera();
-    }
+
+    cameraManager->activate( camIdx );
+    m_camera = cameraManager->getActiveCamera();
+
+    return camIdx;
 }
 
 void CLIViewer::setImageNamePrefix( std::string s ) {

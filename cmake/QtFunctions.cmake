@@ -1,14 +1,13 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 
-# Find Qt5 or Qt6 packages Parameters: COMPONENTS <component_list>: optional parameter listing the
-# Qt packages (e.g. Core, Widgets REQUIRED: optional parameter propagated to find_package
+# Find Qt6 packages Parameters: COMPONENTS <component_list>: optional parameter listing the Qt
+# packages (e.g. Core, Widgets REQUIRED: optional parameter propagated to find_package
 #
 # Usage: find_qt_package(COMPONENTS Core Widgets OpenGL Xml REQUIRED) which is equivalent to:
-# find_package(Qt6 COMPONENTS Core Widgets OpenGL Xml REQUIRED) if Qt6 is available, or:
-# find_package(Qt5 COMPONENTS Core Widgets OpenGL Xml REQUIRED) otherwise.
+# find_package(Qt6 COMPONENTS Core Widgets OpenGL Xml REQUIRED)
 #
-# Qt5 and Qt6 can be retrieved using versionless targets introduced in Qt5.15:
 # https://doc.qt.io/qt-6/cmake-qt5-and-qt6-compatibility.html#versionless-targets
+
 macro(find_qt_package)
     set(options REQUIRED)
     set(oneValueArgs "")
@@ -26,16 +25,8 @@ macro(find_qt_package)
         set(QT_SEARCH_MODE QUIET)
     endif()
 
-    if(QT_DEFAULT_MAJOR_VERSION STREQUAL "6")
-        find_package(Qt6 COMPONENTS ${MY_OPTIONS_COMPONENTS} ${QT_SEARCH_MODE})
-    elseif(QT_DEFAULT_MAJOR_VERSION STREQUAL "5")
-        find_package(Qt5 5.15 COMPONENTS ${MY_OPTIONS_COMPONENTS} ${QT_SEARCH_MODE})
-    else() # QT_DEFAULT_MMAJOR_VERSION not set, first search 6, then 5.
-        find_package(Qt6 COMPONENTS ${MY_OPTIONS_COMPONENTS} QUIET)
-        if(NOT Qt6_FOUND)
-            find_package(Qt5 5.15 COMPONENTS ${MY_OPTIONS_COMPONENTS} ${QT_SEARCH_MODE})
-        endif()
-    endif()
+    find_package(Qt6 COMPONENTS ${MY_OPTIONS_COMPONENTS} ${QT_SEARCH_MODE})
+
 endmacro()
 
 # see find_qt_package

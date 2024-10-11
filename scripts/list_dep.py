@@ -15,6 +15,7 @@ tag = re.compile(r'[^\)]*GIT_TAG (.*)')
 option = re.compile(r'[^\)](-D\S*)')
 optionfilter = re.compile(r'indent')
 
+modules={}
 dep = {}
 debug = False
 
@@ -59,11 +60,20 @@ for filename in filenames:
                 match3 = regex.search(cmake_add_text, match3.end(1))
             start = match0.end(1)
             match0 = full.search(filetext, start)
+    if len(dep) >0 : modules[filename.parts[0]] = dep
+    dep={}
 
-for key in dep:
-    print(f" *  `{key}_DIR`")
+for module in {'Core', 'Engine', 'IO', 'Gui', 'Headless'}:
+    if module in modules:
+        dep = modules[module]
+        for key in dep:
+            print(f"* `{key}_DIR`")
 
 print("\n\nRadium is compiled and tested with specific version of dependencies, as given in the external's folder CMakeLists.txt and state here for the record\n\n")
 
-for key in dep:
-    print(f" *  {key}: {dep[key]['git']}, [{dep[key]['tag']}],\n    *  with options `{dep[key]['option'] if 'option' in dep[key] else None }`")
+for module in {'Core', 'Engine', 'IO', 'Gui', 'Headless'}:
+    if module in modules:
+        dep = modules[module]
+        print(f"* [{module}]")
+        for key in dep:
+            print(f" * {key}: {dep[key]['git']}, [{dep[key]['tag']}],\n    * with options `{dep[key]['option'] if 'option' in dep[key] else None }`")

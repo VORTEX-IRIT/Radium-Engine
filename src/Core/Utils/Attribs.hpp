@@ -104,20 +104,20 @@ class Attrib : public AttribBase
     /// lock the content, when done call unlock()
     inline Container& getDataWithLock();
 
-    /// @{
+    /// \{
     /// ContainerIntrosectionInterface implementation
     size_t getSize() const override;
     size_t getNumberOfComponents() const override;
     int getStride() const override;
     size_t getBufferSize() const override;
     const void* dataPtr() const override;
-    /// @}
+    /// \}
 
-    ///@{
+    ///\{
     /// setAttribData, attrib mustn't be locked (it's asserted).
     void setData( const Container& data );
     void setData( Container&& data );
-    ///@}
+    ///\}
 
     /// Read-only acccess to the attribute content.
     inline const Container& data() const;
@@ -280,12 +280,11 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
      * \brief Unlock the handle data
      * \tparam T
      * \param h
-     * \return
      */
     template <typename T>
     void unlock( const AttribHandle<T>& h );
 
-    ///@{
+    ///\{
     /// Get attribute by handle.
     /// \complexity \f$ O(1) \f$
     /// \warning There is no check on the handle validity. Attrib is statically cast to T without
@@ -299,9 +298,9 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
     inline Attrib<T>* getAttribPtr( const AttribHandle<T>& h );
     template <typename T>
     inline const Attrib<T>* getAttribPtr( const AttribHandle<T>& h ) const;
-    ///@}
+    ///\}
 
-    ///@{
+    ///\{
     /// Get attribute by name.
     /// First search name to index correpondance \complexity \f$ O(getNumAttribs()) \f$
     /// \warning There is no check on the name validity. Attrib is statically cast to T without
@@ -310,9 +309,9 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
     inline Attrib<T>& getAttrib( const std::string& name );
     template <typename T>
     inline const Attrib<T>& getAttrib( const std::string& name ) const;
-    ///@}
+    ///\}
 
-    ///@{
+    ///\{
     /// Return a AttribBase ptr to the attrib identified by name.
     /// to give access to AttribBase method, regardless of the type of element
     /// stored in the attrib.
@@ -320,9 +319,9 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
     inline const AttribBase* getAttribBase( const std::string& name ) const;
     inline AttribBase* getAttribBase( const Index& idx );
     inline const AttribBase* getAttribBase( const Index& idx ) const;
-    ///@}
+    ///\}
 
-    ///@{
+    ///\{
     /// Set the data of the attrib h.
     /// \warning \p h has to be a valid attrib handle, this is not checked.
     template <typename T>
@@ -332,7 +331,7 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
     /// \see #setAttrib
     template <typename T>
     inline void setAttrib( const AttribHandle<T>& h, typename AttribHandle<T>::Container&& data );
-    ///@}
+    ///\}
 
     /// Add attribute by name.
     /// notify(name) is called to trigger the observers
@@ -354,7 +353,7 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
     /// \warning There is no check on the attribute type nor data.
     bool hasSameAttribs( const AttribManager& other );
 
-    ///@{
+    ///\{
     /// Perform \p fun on each attribute.
     // This is needed by the user to avoid caring about removed attributes (nullptr)
     // \todo reimplement as range for
@@ -364,7 +363,7 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
     // \todo keep non const version private
     template <typename F>
     void for_each_attrib( const F& func );
-    ///@}
+    ///\}
 
     /// Return the number of attributes
     inline int getNumAttribs() const;
@@ -454,7 +453,7 @@ void AttribBase::setName( const std::string& name ) {
     m_name = name;
 }
 
-bool inline AttribBase::operator==( const AttribBase& rhs ) {
+bool inline AttribBase::operator==( const AttribBase & rhs ) {
     return m_name == rhs.getName();
 }
 

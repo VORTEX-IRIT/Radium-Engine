@@ -37,16 +37,16 @@ class VectorEditor : public VectorEditorSignals
     using SignalType = typename QtSpinBox::getType<T>::SignalType;
     /** Constructors
      */
-    /** @{ */
+    /** \{ */
     explicit VectorEditor( const std::vector<T>& vector, QWidget* parent = nullptr );
     VectorEditor( const VectorEditor& )            = delete;
     VectorEditor& operator=( const VectorEditor& ) = delete;
     VectorEditor( VectorEditor&& )                 = delete;
     VectorEditor&& operator=( VectorEditor&& )     = delete;
-    /**@}*/
+    /**\}*/
 
     /**
-     * @return the value of the vector
+     * \return the value of the vector
      */
     const std::vector<T>& vector() const;
 

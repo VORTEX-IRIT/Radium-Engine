@@ -1,5 +1,6 @@
 set(ra_gui_target Gui)
-list(APPEND CMAKE_MESSAGE_INDENT "[${ra_gui_target}] ")
+
+message_prefix_push("${ra_gui_target}")
 
 project(${ra_gui_target} LANGUAGES CXX VERSION ${Radium_VERSION})
 
@@ -17,6 +18,7 @@ find_package(PowerSlider REQUIRED)
 
 # Qt
 set(Qt_LIBRARIES Qt::Core Qt::Widgets Qt::OpenGL Qt::Xml)
+set(CMAKE_AUTOMOC_PATH_PREFIX ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -75,3 +77,5 @@ install_target_resources(
 if(RADIUM_ENABLE_PCH)
     target_precompile_headers(${ra_gui_target} PRIVATE pch.hpp)
 endif()
+
+message_prefix_pop()

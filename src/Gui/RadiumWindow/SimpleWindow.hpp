@@ -19,14 +19,14 @@ class RA_GUI_API SimpleWindow : public Ra::Gui::MainWindowInterface
     /** Constructors and destructor.
      *  https://en.cppreference.com/w/cpp/language/rule_of_three
      */
-    /** @{ */
+    /** \{ */
     explicit SimpleWindow( uint w = 800, uint h = 640, QWidget* parent = nullptr );
     SimpleWindow( const SimpleWindow& )            = delete;
     SimpleWindow& operator=( const SimpleWindow& ) = delete;
     SimpleWindow( SimpleWindow&& )                 = delete;
     SimpleWindow& operator=( SimpleWindow&& )      = delete;
     ~SimpleWindow() override;
-    /**@}*/
+    /**\}*/
 
     /// Access the viewer, i.e. the rendering widget.
     Ra::Gui::Viewer* getViewer() override;

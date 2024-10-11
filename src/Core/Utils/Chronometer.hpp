@@ -7,7 +7,7 @@ namespace Core {
 namespace Utils {
 
 /**!
- * @brief The Chrono class represents a chronometer for timing generic functions
+ * \brief The Chrono class represents a chronometer for timing generic functions
  * in an easy way.
  *
  * Example:

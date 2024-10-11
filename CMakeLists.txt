@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 # ------------------------------------------------------------------------------
 # Policies and global parameters for CMake
@@ -7,7 +7,8 @@ cmake_policy(SET CMP0092 NEW) # do not set /W3 for msvc
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
-
+include(${CMAKE_SOURCE_DIR}/cmake/cmake-message-helpers/MessageHelpers.cmake)
+message_prefix_push("Main")
 # Project setup, versioning stuff here, change when changing the version
 # ~~~
 # Note: keep the project name lower case only for easy linux packaging support
@@ -162,13 +163,8 @@ else()
     set(GIT_CHANGESET "")
 endif()
 
-set(ENABLE_COVERAGE "")
-mark_as_advanced(ENABLE_COVERAGE)
 if(RADIUM_ENABLE_COVERAGE)
-    include(CoverageFunc)
-    # sets ENABLE_COVERAGE to ON if ok
-    setup_coverage()
-
+    set(RADIUM_ENABLE_TESTING "ON")
     include(CodeCoverage)
     append_coverage_compiler_flags()
 endif(RADIUM_ENABLE_COVERAGE)
@@ -177,6 +173,7 @@ endif(RADIUM_ENABLE_COVERAGE)
 # Installation utilities
 include(RadiumSetupFunctions)
 
+message_prefix_pop()
 # Documentation build
 add_subdirectory(doc)
 
@@ -222,11 +219,39 @@ if(RADIUM_ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
 
-if(ENABLE_COVERAGE)
-    set(LCOV_REMOVES
-        "'/usr/*';'*examples*';'*external*';'*install*';'*/Catch2/*';'*_autogen/*';'*build*'"
+if(RADIUM_ENABLE_COVERAGE)
+    append_coverage_compiler_flags()
+    setup_target_for_coverage_lcov(
+        NAME
+        coverage
+        EXECUTABLE
+        ${CMAKE_CTEST_COMMAND}
+        --output-on-failure
+        -C
+        ${CMAKE_BUILD_TYPE}
+        -j
+        $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
+        BASE_DIRECTORY
+        "/"
+        DEPENDENCIES
+        RadiumLibs
+        unittests
+        integration
+        EXCLUDE
+        "/*external*/"
+        "/*/glbinding/*"
+        "/*/globjects/*"
+        "/*/OpenMesh/*"
+        "/*/assimp/*"
+        "/*/eigen3/*"
+        "/*/nlohmann/*"
+        "/*/stb/*"
+        "/usr/*"
+        "${CMAKE_SOURCE_DIR}/examples*"
+        "${CMAKE_SOURCE_DIR}/*/Catch2/*"
+        "${CMAKE_BINARY_DIR}/*_autogen/*"
+        "${CMAKE_BINARY_DIR}/*mocs*"
     )
-    setup_coverage_targets(${ENABLE_COVERAGE} "${LCOV_REMOVES}")
 
     # Fastcov is not supported with gcov llvm: disabling for MacOS Source:
     # https://github.com/RPGillespie6/fastcov/issues/36
@@ -235,16 +260,28 @@ if(ENABLE_COVERAGE)
             NAME
             coverage_fastcov
             EXECUTABLE
-            ctest
+            ${CMAKE_CTEST_COMMAND}
+            --output-on-failure
+            -C
+            ${CMAKE_BUILD_TYPE}
             -j
             $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
             DEPENDENCIES
             RadiumLibs
             unittests
             integration
+            BASE_DIRECTORY
+            "/"
             EXCLUDE
             "/usr/"
             "examples"
+            "glbinding"
+            "globjects"
+            "OpenMesh"
+            "assimp"
+            "eigen3"
+            "nlohmann"
+            "stb"
             "external"
             "install"
             "/Catch2/"
@@ -261,7 +298,7 @@ install(FILES LICENSE README.md TYPE DATA)
 
 # -------------------------------------------------------------------------------
 # Wrap up of settings printed on build
-include(MessageFunc)
+
 message(NOTICE "")
 message_title(" Final overview for ${PROJECT_NAME} ")
 message_info(" ")

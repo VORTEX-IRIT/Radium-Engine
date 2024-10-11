@@ -52,7 +52,7 @@ must be associated with a Ra::Engine::Rendering::RenderTechnique that links to t
 To do that, the following steps must be done :
 \todo update snippets that are not available anymore.
 
-1. Create the Ra::Engine::Data::Mesh (see the [documentation about Meshes](@ref develmeshes))
+1. Create the Ra::Engine::Data::Mesh (see the [documentation about Meshes](\ref develmeshes))
 
 2. Create the Ra::Engine::Data::Material
 
@@ -62,8 +62,8 @@ to the material
 4. Create the Ra::Engine::Rendering::RenderObject and add it to the Ra::Engine::Scene::Component
 
 Note that this way of using the _Radium Material Library_ is very related to the default Radium rendering capabilities
-exposed by the [Radium forward renderer](@ref forwardRenderer).
-See the [Render technique management](./rendertechnique) documentation to learn how to create your own
+exposed by the [Radium forward renderer](\ref forwardRenderer).
+See the [Render technique management](#render-technique) documentation to learn how to create your own
 Ra::Engine::Rendering::RenderTechnique, potentially without associated material.
 
 If one wants to render objects without BSDF computation but with a specific color computation for the fragment,
@@ -123,13 +123,34 @@ public:
 }
 ~~~
 
-See the [Render technique management](./rendertechnique) for documentation on how to build such an helper function.
+See the [Render technique management](#render-technique) for documentation on how to build such an helper function.
+
+## Textures {#material-textures}
+
+The MaterialTextureSet template ease a material's texture management.
+First define an enum with the managed texture semantic you want to have, by convention declare this enum in Ra::Engine::Data::TextureSemantics, named as your Material class. e.g. for BlinnPhongMaterial:
+
+\snippet Engine/Data/BlinnPhongMaterial.hpp TextureSemantics
+
+Then to set a texture according to the semantic:
+
+\snippet TexturedQuadDynamic/main.cpp Add texture to material
+
+\see
+
+- @ref develTextures
+- Ra::Engine::Data::MaterialTextureSet
+- Ra::Engine::Data::TextureManager
+- Ra::Engine::Data::Texture
+- Ra::Engine::Data::TextureParameters
+- Ra::Engine::Data::SamplerParameters
+- Ra::Engine::Data::ImageParameters
 
 ### Making a material editable {#editable-interface}
 
-Material which implement the Ra::Engine::Data::ParameterSetEditionInterface might be modified at runtime.
+Material which implement the Ra::Engine::Data::ParameterSetEditingInterface might be modified at runtime.
 
-This interface exposes the method Ra::Engine::Data::ParameterSetEditionInterface::getParametersMetadata
+This interface exposes the method Ra::Engine::Data::ParameterSetEditingInterface::getParametersMetadata
 which return a json-formatted parameter set informations containing type, constraints and documentation on each
 editable parameter.
 
@@ -152,7 +173,7 @@ The "editable" property specifies whether the boolean is editable, for instance 
 
 #### Enums
 
-When a parameter is referenced as an enum, the edition gui will present a combobox with the string representation of
+When a parameter is referenced as an enum, the editing gui will present a combobox with the string representation of
 the enumaration values.
 Enumeration strings, could be defined in two ways.
 Either by associating a RenderParameter::EnumConverter with the material's parameter set or by defining the strings
@@ -266,7 +287,7 @@ In order to keep the appearance computation agnostic on the way vertex attribs a
 propose an abstract interface. But, and this is particular to these attributes, one can access to the attributes
 himself, on the vertex, or to the attributes interpolated by the rasterizer, on the fragment.
 Accessing the Attribute directly on the vertex (i.e. on a vertex shader) does not necessitate an interface as
-each shader must define its attributes and as the [Mesh API](./mesh.md) allows to communicate between C++ and GLSL.
+each shader must define its attributes and as the [Mesh API](\ref develmeshes) allows to communicate between C++ and GLSL.
 
 Note that the attributes accessed through the Vertex attrib interface **must** be defined in world space.
 Even if not necessarily efficient (some transformations might be computed twice), this will ensure more simple
@@ -496,7 +517,7 @@ auto theConfig =
                 Ra::Engine::Data::ShaderConfigurationFactory::getConfiguration( "ConfigName" );
 ~~~
 
-### Registering a RenderTechnique
+### Registering a RenderTechnique {#render-technique}
 
 A Ra::Engine::Rendering::RenderTechnique describes which Ra::Engine::Data::ShaderConfiguration a renderer will use for each of its
 rendering passes. Such a render technique could encompass a Ra::Engine::Data::Material but its meaning is larger than just
@@ -583,8 +604,8 @@ public:
   void updateGL() override {
     // Method called before drawing each frame in Rendering::updateRenderObjectsInternal.
     // The name of the parameter corresponds to the shader's uniform name.
-    m_renderParameters.addParameter( "aColorUniform", m_colorParameter );
-    m_renderParameters.addParameter( "aScalarUniform", m_scalarParameter );
+    m_renderParameters.setVariable( "aColorUniform", m_colorParameter );
+    m_renderParameters.setVariable( "aScalarUniform", m_scalarParameter );
   }
 
   void setOrComputeTheParameterValues() {
@@ -631,7 +652,7 @@ renderTechnique.setConfiguration( myConfig, DefaultRenderingPasses::LIGHTING_OPA
 // 5. Create and associate the parameter provider with the RenderTechnique
 auto parameterProvider = std::make_shared<MyParameterProvider>();
 parameterProvider->setOrComputeTheParameterValues();
-renderTechnique.setParametersProvider(parameterProvider);
+renderTechnique.setVariablesProvider(parameterProvider);
 
 // 6. Associate the render technique with a geometry in a Ra::Engine::Rendering::RenderObject
 std::shared_ptr<Ra::Engine::Data::Mesh> mesh( new Ra::Engine::Data::Mesh( "my mesh" ) );
@@ -646,7 +667,9 @@ addRenderObject( renderObject );
 Then the draw call of ``renderObject`` uses the ``myConfig`` as shader configuration.
 Before rendering, the method ``updateGL`` on the ``parameterProvider`` instance is called so that the shader's uniforms values are updated according the one stored in ``parameterProvider``.
 
-# \todo TO UPDATE
+# TO UPDATE
+
+\todo TO UPDATE
 
 Shader programs are managed through their `ShaderConfiguration`, which contains the _shader objects_ (vertex, fragment, ... shader) and the _shader properties_ (not used for now though).
 

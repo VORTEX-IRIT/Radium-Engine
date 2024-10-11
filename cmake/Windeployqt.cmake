@@ -40,9 +40,6 @@ endif()
 function(windeployqt target directory)
 
     set(QT_OPTIONS "")
-    if(Qt5_FOUND)
-        set(QT_OPTIONS ${QT_OPTIONS} --no-angle)
-    endif()
 
     set(QT_BUILD_TYPE_OPTION --release)
     if(CMAKE_BUILD_TYPE MATCHES Debug)

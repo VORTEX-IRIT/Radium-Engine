@@ -155,6 +155,7 @@ Viewer::~Viewer() {
         delete m_gizmoManager;
         doneCurrent();
     }
+    delete m_pickingManager;
 }
 
 void Viewer::setCameraManipulator( CameraManipulator* ci ) {
@@ -480,6 +481,8 @@ bool Viewer::initializeGL() {
     // create default camera interface : trackball
     m_camera = std::make_unique<TrackballCameraManipulator>();
     m_camera->getCamera()->setViewport( deviceSize.x(), deviceSize.y() );
+
+    /// \todo who deletes this light ?
     auto headlight = new Engine::Scene::DirectionalLight(
         Ra::Engine::Scene::SystemEntity::getInstance(), "headlight" );
     headlight->setColor( Ra::Core::Utils::Color::Grey( 1.0_ra ) );

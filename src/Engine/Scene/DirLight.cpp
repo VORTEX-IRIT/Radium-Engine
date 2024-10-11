@@ -7,7 +7,7 @@ namespace Engine {
 namespace Scene {
 DirectionalLight::DirectionalLight( Entity* entity, const std::string& name ) :
     Light( entity, Light::DIRECTIONAL, name ) {
-    getRenderParameters().addParameter( "light.directional.direction", m_direction );
+    getRenderParameters().setVariable( "light.directional.direction", m_direction );
 }
 
 std::string DirectionalLight::getShaderInclude() const {

@@ -11,14 +11,6 @@ Material::Material( const std::string& instanceName,
     m_aspect { aspect },
     m_materialName { materialName } {}
 
-bool Material::isTransparent() const {
-    return m_aspect == MaterialAspect::MAT_TRANSPARENT;
-}
-
-std::list<std::string> Material::getPropertyList() const {
-    return ShaderParameterProvider::getPropertyList();
-}
-
 } // namespace Data
 } // namespace Engine
 } // namespace Ra

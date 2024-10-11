@@ -9,7 +9,7 @@ namespace Ra {
 namespace Core {
 namespace Asset {
 
-/** @brief represent material data loaded by a file loader.
+/** \brief represent material data loaded by a file loader.
  * Material data must be identified by a unique name.
  * Radium Engine reserves the following names
  *  "AbstractMaterial"  --> unknown material, might serve for error management

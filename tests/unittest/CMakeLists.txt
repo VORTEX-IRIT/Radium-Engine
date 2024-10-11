@@ -46,7 +46,7 @@ endif()
 
 if(RADIUM_ENABLE_GL_TESTING)
     message(STATUS "Add gl related unit tests (will use EGL on Linux, glfw on macos and windows")
-    list(APPEND test_src Engine/materials.cpp)
+    list(APPEND test_src Engine/materials.cpp Engine/texture.cpp)
 endif()
 
 add_executable(unittests ${test_src})
@@ -77,6 +77,7 @@ endif()
 
 include(../external/Catch2/src/Catch2_download/contrib/Catch.cmake)
 
+# adds catch tests to ctest
 catch_discover_tests(unittests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # convenience target for running only the unit tests

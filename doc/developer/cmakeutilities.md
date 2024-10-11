@@ -69,6 +69,7 @@ The Radium components are :
   - IO_HAS_TINYPLY : Identify if Radium::IO was compiled with tinyply support,
   - IO_HAS_VOLUMES : Identify if Radium::IO was compiled with pvm volume loader support.
   You might use these properties to define compilation macro in your code
+  -
 
   ~~~{.cmake}
   get_target_property(USE_ASSIMP Radium::IO IO_HAS_ASSIMP)
@@ -117,10 +118,8 @@ This function takes the following parameters:
 *Parameter name*                            | *Parameter description*
 --------------------------------------------|--------------------
 `<NAME> applicationName`                    | The name of the *executable* target to configure and install
-`<USE_PLUGINS>`                             | If this option is given, the plugins installed into the Radium bundle at
-the installation time will be copied into the application bundle.
-`<RESOURCES> ResourceDir1 ResourceDir2 ...` | Optional list of directories to be considered as application resources
-and installed into the application bundle.
+`<USE_PLUGINS>`                             | If this option is given, the plugins installed into the Radium bundle at the installation time will be copied into the application bundle.
+`<RESOURCES> ResourceDir1 ResourceDir2 ...` | Optional list of directories to be considered as application resources and installed into the application bundle.
 
 When installed into a directory `<prefix>`, the application bundle has the following structure on linux, windows or on
 MacOsX (if the executable is not configured as a `MACOSX_BUNDLE`):
@@ -364,7 +363,7 @@ install_target_resources(
 )
 ~~~
 
-### configure_radium_package {#configurePackage}
+### configure_radium_package {#configure_radium_package}
 
 ~~~{.cmake}
 configure_radium_package(
@@ -580,8 +579,8 @@ Note that these are only guidelines and that you can always write your cmake scr
 # -------------------------------------------------------
 # Recommended preamble for cmake configuration
 # -------------------------------------------------------
-# Radium package requires cmake minimum version 3.13
-cmake_minimum_required(3.13)
+# Radium package requires cmake minimum version 3.18
+cmake_minimum_required(3.18)
 # It is recommended to disable in-source build
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -716,7 +715,7 @@ When configuring a library, a cmake package configuration file should be written
 Meanwhile, when several libraries must be used as components in a single package (e.g. the Radium internal libraries are all gathered into the single Radium package), a more general configuration module has to be defined.
 
 For this, instead of defining a configuration package for each configured library, the parameter `PACKAGE_CONFIG` of the function [`configure_radium_library`](#configure_radium_library) should be omitted
-and the function [`configure_radium_package`](#configurePackage) should be used.
+and the function [`configure_radium_package`](#configure_radium_package) should be used.
 
 Standard usage of this function requires to have some libraries configured like the following:
 
@@ -802,15 +801,15 @@ endif()
 
 # component <secondLib>
 if (<secondLib>_FOUND)
-    # manage component dependencies (e.g. <firstLib> must be requested and <secondLib> depends also on Qt5)
+    # manage component dependencies (e.g. <firstLib> must be requested and <secondLib> depends also on Qt)
     if (NOT <firstLib>_FOUND)
         set(<secondLib>_FOUND False)
         set(<packageName>_FOUND False)
         set(<packageName>_NOT_FOUND_MESSAGE "Component <secondLib> requires the component <firstLib>")
         # Note that you can also explicitely configure first lib instead of raising an error
     else()
-        if (NOT Qt5_FOUND)
-            find_dependency(Qt5 COMPONENTS Core Widgets REQUIRED)
+        if (NOT Qt6_FOUND)
+            find_qt_dependency(COMPONENTS Core Widgets REQUIRED)
         endif()
         include("${CMAKE_CURRENT_LIST_DIR}/<secondLib>Targets.cmake" )
     endif()
@@ -854,4 +853,4 @@ where `<resourcesPrefix>` corresponds to the parameter `PREFIX` used when instal
 
 ## Configuring an application plugin
 
-See [How to write your own plugin](@ref develplugin).
+See [How to write your own plugin](\ref develplugin).

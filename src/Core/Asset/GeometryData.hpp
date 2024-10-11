@@ -31,8 +31,6 @@ class RA_CORE_API GeometryData : public AssetData
     using ColorArray = Vector4Array;
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     /**
      * The type of geometry.
      */

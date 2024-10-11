@@ -89,8 +89,6 @@ bool isSameMesh( const Ra::Core::Geometry::TriangleMesh& meshOne,
 class WedgeDataAndIdx
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     TopologicalMesh::WedgeData m_data;
 
     size_t m_idx;

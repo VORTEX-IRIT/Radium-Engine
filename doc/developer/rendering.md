@@ -109,7 +109,7 @@ Help wanted for this section.
 
 # Radium Engine default rendering information
 
-See [Material management](@ref develmaterials) documentation for a complete description of the
+See [Material management](\ref develmaterials) documentation for a complete description of the
 interactions geometry, material and shader._
 
 # Potential extensions for the renderer

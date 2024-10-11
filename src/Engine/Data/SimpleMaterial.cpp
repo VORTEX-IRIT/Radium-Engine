@@ -12,37 +12,24 @@ SimpleMaterial::SimpleMaterial( const std::string& instanceName,
                                 MaterialAspect aspect ) :
     Material( instanceName, materialName, aspect ) {}
 
-SimpleMaterial::~SimpleMaterial() {
-    m_textures.clear();
-}
-
 void SimpleMaterial::updateRenderingParameters() {
     auto& renderParameters = getParameters();
     // update the rendering paramaters
-    renderParameters.addParameter( "material.color", m_color );
-    renderParameters.addParameter( "material.perVertexColor", m_perVertexColor );
+    renderParameters.setVariable( "material.color", m_color );
+    renderParameters.setVariable( "material.perVertexColor", m_perVertexColor );
     Texture* tex = getTexture( SimpleMaterial::TextureSemantic::TEX_COLOR );
-    if ( tex != nullptr ) { renderParameters.addParameter( "material.tex.color", tex ); }
-    renderParameters.addParameter( "material.tex.hasColor", tex != nullptr );
+    if ( tex != nullptr ) { renderParameters.setTexture( "material.tex.color", tex ); }
+    renderParameters.setVariable( "material.tex.hasColor", tex != nullptr );
     tex = getTexture( SimpleMaterial::TextureSemantic::TEX_MASK );
-    if ( tex != nullptr ) { renderParameters.addParameter( "material.tex.mask", tex ); }
-    renderParameters.addParameter( "material.tex.hasMask", tex != nullptr );
+    if ( tex != nullptr ) { renderParameters.setTexture( "material.tex.mask", tex ); }
+    renderParameters.setVariable( "material.tex.hasMask", tex != nullptr );
 }
 
 void SimpleMaterial::updateGL() {
-    if ( !m_isDirty ) { return; }
-    // Load textures
-    Data::TextureManager* texManager = RadiumEngine::getInstance()->getTextureManager();
-    for ( const auto& tex : m_pendingTextures ) {
-        // ask to convert color textures from sRGB to Linear RGB
-        bool tolinear         = ( tex.first == TextureSemantic::TEX_COLOR );
-        auto texture          = texManager->getOrLoadTexture( tex.second, tolinear );
-        m_textures[tex.first] = texture;
-    }
-    // as all the pending textures where initialized, clear the pending textures list
-    m_pendingTextures.clear();
-    m_isDirty = false;
+    if ( !isDirty() ) { return; }
+
     updateRenderingParameters();
+    setClean();
 }
 
 void SimpleMaterial::loadMetaData( nlohmann::json& destination ) {

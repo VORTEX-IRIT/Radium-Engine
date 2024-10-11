@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 
 project(radiumgui-external VERSION 1.0.0)
 
@@ -28,20 +28,14 @@ add_custom_target(GuiExternals ALL)
 
 # ------------------------------------------------------------------------------
 
-# propagate the Qt version used to compile externals if none of Qt6_DIR or Qt5_DIR is defined,
-# assume the CMAKE_PREFIX_PATH allow to find the desired Qt package
+# Force the use of Qt6, assume dependencies uses either Qt6_DIR or QT_DEFAULT_MAJOR_VERSION
 set(Qt_CONFIGURATION "")
 if(DEFINED Qt6_DIR)
     set(Qt_CONFIGURATION "-DQt6_DIR=${Qt6_DIR}")
-elseif(DEFINED Qt5_DIR)
-    set(Qt_CONFIGURATION "-DQt5_DIR=${Qt5_DIR}")
 endif()
 
-if(DEFINED QT_DEFAULT_MAJOR_VERSION)
-    set(Qt_CONFIGURATION
-        "${Qt_CONFIGURATION} -DQT_DEFAULT_MAJOR_VERSION=${QT_DEFAULT_MAJOR_VERSION}"
-    )
-endif()
+set(QT_DEFAULT_MAJOUR_VERSION 6)
+set(Qt_CONFIGURATION "${Qt_CONFIGURATION};-DQT_DEFAULT_MAJOR_VERSION=${QT_DEFAULT_MAJOR_VERSION}")
 
 # configure RPATH as expected to be used under Radium
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
@@ -71,7 +65,7 @@ if(NOT DEFINED PowerSlider_DIR)
         INSTALL_DIR "${CMAKE_INSTALL_PREFIX}"
         CMAKE_ARGS ${RADIUM_EXTERNAL_CMAKE_OPTIONS} ${Qt_CONFIGURATION} -DBUILD_DESIGNER_PLUGIN=OFF
                    ${RPATH_CONFIG} -DBUILD_EXAMPLE_APP=OFF
-                   -DCMAKE_MESSAGE_INDENT=${indent_string}\;
+                   "-DCMAKE_MESSAGE_INDENT=${indent_string}\;"
     )
 
     set_external_dir(PowerSlider "lib/cmake/PowerSlider/")

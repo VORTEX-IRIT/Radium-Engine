@@ -35,7 +35,7 @@ namespace Data {
  *     - a function with bind parameters ....
  * The function is in charge of converting a concrete Ra::Core::Asset::MaterialData* to a concrete
  * Ra::Engine::Material* according to the type of material described by the string ...
- @see documentation on materials for instructions on how to extend the material system
+ \see documentation on materials for instructions on how to extend the material system
  */
 namespace EngineMaterialConverters {
 
@@ -54,20 +54,20 @@ using RadiumMaterialPtr = Ra::Engine::Data::Material*;
 using ConverterFunction = std::function<RadiumMaterialPtr( AssetMaterialPtr )>;
 
 /** register a new material converter
- *  @return true if converter added, false else (e.g, a converter with the same name exists)
+ *  \return true if converter added, false else (e.g, a converter with the same name exists)
  */
 RA_ENGINE_API bool registerMaterialConverter( const std::string& name,
                                               ConverterFunction converter );
 
 /** remove a material converter
- *  @return true if converter removed, false else (e.g, a converter with the same name does't
+ *  \return true if converter removed, false else (e.g, a converter with the same name does't
  * exists)
  */
 RA_ENGINE_API bool removeMaterialConverter( const std::string& name );
 
 /**
- * @param name name of the material to convert
- * @return a pair containing the search result and, if true, the functor to call to convert the
+ * \param name name of the material to convert
+ * \return a pair containing the search result and, if true, the functor to call to convert the
  * material
  */
 RA_ENGINE_API std::pair<bool, ConverterFunction> getMaterialConverter( const std::string& name );

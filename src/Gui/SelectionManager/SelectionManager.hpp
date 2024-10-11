@@ -19,33 +19,33 @@ class RA_GUI_API SelectionManager : public QItemSelectionModel
 
     /** Returns true if the selection contains the given item.
      *
-     * @param ent
-     * @return
+     * \param ent
+     * \return
      */
     bool isSelected( const Engine::Scene::ItemEntry& ent ) const;
 
-    /// Return the set of selected entries. @see selectedIndexes()
+    /// Return the set of selected entries. \see selectedIndexes()
     std::vector<Engine::Scene::ItemEntry> selectedEntries() const;
 
     /** Return the current selected item, or an invalid entry if there is no current item.
-     * @seeCurrentIndex;
+     * \seeCurrentIndex;
      *
-     * @return
+     * \return
      */
     const Engine::Scene::ItemEntry& currentItem() const;
 
-    /** Select an item through an item entry. @see QItemSelectionModel::Select
+    /** Select an item through an item entry. \see QItemSelectionModel::Select
      *
-     * @param ent
-     * @param command
+     * \param ent
+     * \param command
      */
     virtual void select( const Engine::Scene::ItemEntry& ent,
                          QItemSelectionModel::SelectionFlags command );
 
-    /** Set an item as current through an item entry. @see QItemSelectionModel::setCurrent
+    /** Set an item as current through an item entry. \see QItemSelectionModel::setCurrent
      *
-     * @param ent
-     * @param command
+     * \param ent
+     * \param command
      */
     void setCurrentEntry( const Engine::Scene::ItemEntry& ent,
                           QItemSelectionModel::SelectionFlags command );

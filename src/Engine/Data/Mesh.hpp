@@ -53,7 +53,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
   public:
     /// Render mode enum used when render()/
     /// values taken from OpenGL specification
-    /// @see https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h
+    /// \see https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h
     enum MeshRenderMode : uint {
         RM_POINTS                   = 0x0000,
         RM_LINES                    = 0x0001, // decimal value: 1
@@ -87,9 +87,9 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     /// Get the render mode.
     inline MeshRenderMode getRenderMode() const;
 
-    /// @name
+    /// \name
     /// Mark attrib data as dirty, forcing an update of the OpenGL buffer.
-    ///@{
+    ///\{
 
     /// Use g_attribName to find the corresponding name and call setDirty(const std::string& name).
     /// \param type: the data to set to MeshAttrib
@@ -101,18 +101,18 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     /// If index is greater than then number of buffer, this function as no effect.
     /// \param index: the data buffer index to set to dirty.
     void setDirty( unsigned int index );
-    ///@}
+    ///\}
 
     /// This function is called at the start of the rendering.
     /// It will update the necessary openGL buffers.
     void updateGL() override = 0;
 
-    /// @name
+    /// \name
     /// Core::Geometry getters.
-    ///@{
+    ///\{
     virtual const Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry() const = 0;
     virtual Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry()             = 0;
-    ///@}
+    ///\}
 
     /// \brief Get opengl's vbo handle (uint) corresponding to attrib \b name.
     ///
@@ -237,9 +237,9 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
     // no need to detach observer in dtor since CoreGeometry is owned by this, and CoreGeometry dtor
     // will detachAll observers.
 
-    /// @name
+    /// \name
     /// Core::Geometry getters
-    ///@{
+    ///\{
     inline const Core::Geometry::AbstractGeometry& getAbstractGeometry() const override;
     inline Core::Geometry::AbstractGeometry& getAbstractGeometry() override;
 
@@ -248,7 +248,7 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
 
     inline const CoreGeometry& getCoreGeometry() const;
     inline CoreGeometry& getCoreGeometry();
-    ///@}
+    ///\}
 
     /// Helper function that calls Ra::Core::CoreGeometry::addAttrib()
     template <typename A>
@@ -373,22 +373,19 @@ class MultiIndexedGeometry : public CoreGeometryDisplayable<T>
     using LayerKeyType            = std::pair<LayerSemanticCollection, std::string>;
 
     using EntryType = std::pair<bool, VaoIndices*>;
-    struct RA_CORE_API KeyHash {
-        std::size_t operator()( const LayerKeyType& k ) const {
-            // Mix semantic collection into a single identifier string
-            std::ostringstream stream;
-            std::copy(
-                k.first.begin(), k.first.end(), std::ostream_iterator<std::string>( stream, "" ) );
-            std::string result = stream.str();
-            std::sort( result.begin(), result.end() );
+    struct RA_CORE_API KeyHash { std::size_t operator()( const LayerKeyType& k ) const {
+        // Mix semantic collection into a single identifier string
+        std::ostringstream stream;
+    std::copy( k.first.begin(), k.first.end(), std::ostream_iterator<std::string>( stream, "" ) );
+    std::string result = stream.str();
+    std::sort( result.begin(), result.end() );
 
-            // Combine with layer name hash
-            return std::hash<std::string> {}( result ) ^
-                   ( std::hash<std::string> {}( k.second ) << 1 );
-        }
-    };
-    std::unordered_map<LayerKeyType, EntryType, KeyHash> m_indices;
-};
+    // Combine with layer name hash
+    return std::hash<std::string> {}( result ) ^ ( std::hash<std::string> {}( k.second ) << 1 );
+}
+}; // namespace Data
+std::unordered_map<LayerKeyType, EntryType, KeyHash> m_indices;
+}; // namespace Engine
 
 /// LineMesh, own a Core::Geometry::LineMesh
 class RA_ENGINE_API LineMesh : public IndexedGeometry<Core::Geometry::LineMesh>
@@ -587,8 +584,8 @@ template <typename I>
 void IndexedAttribArrayDisplayable<I>::updateGL() {
     if ( m_isDirty ) {
         // Check that our dirty bits are consistent.
-        ON_ASSERT( bool dirtyTest = false; for ( const auto& d
-                                                 : m_dataDirty ) { dirtyTest = dirtyTest || d; } );
+        ON_ASSERT( bool dirtyTest = false;
+                   for ( const auto& d : m_dataDirty ) { dirtyTest = dirtyTest || d; } );
         CORE_ASSERT( dirtyTest == m_isDirty, "Dirty flags inconsistency" );
 
         if ( !m_indices ) {
@@ -841,8 +838,8 @@ template <typename CoreGeometry>
 void CoreGeometryDisplayable<CoreGeometry>::updateGL() {
     if ( m_isDirty ) {
         // Check that our dirty bits are consistent.
-        ON_ASSERT( bool dirtyTest = false; for ( auto d
-                                                 : m_dataDirty ) { dirtyTest = dirtyTest || d; } );
+        ON_ASSERT( bool dirtyTest = false;
+                   for ( auto d : m_dataDirty ) { dirtyTest = dirtyTest || d; } );
         CORE_ASSERT( dirtyTest == m_isDirty, "Dirty flags inconsistency" );
         CORE_ASSERT( !( m_mesh.vertices().empty() ), "No vertex." );
 
@@ -1133,6 +1130,6 @@ inline void GeneralMesh<Core::Geometry::QuadMesh>::triangulate() {
     }
 }
 
-} // namespace Data
+} // namespace Ra
 } // namespace Engine
 } // namespace Ra

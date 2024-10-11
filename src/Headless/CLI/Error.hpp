@@ -61,11 +61,11 @@ enum class ExitCodes {
 
 // Error definitions
 
-/// @defgroup error_group Errors
-/// @brief Errors thrown by CLI11
+/// \defgroup error_group Errors
+/// \brief Errors thrown by CLI11
 ///
 /// These are the errors that can be thrown. Some of them, like CLI::Success, are not really errors.
-/// @{
+/// \{
 
 /// All errors derive from this one
 class Error : public std::runtime_error
@@ -396,7 +396,7 @@ class OptionNotFound : public Error
 #undef CLI11_ERROR_DEF
 #undef CLI11_ERROR_SIMPLE
 
-/// @}
+/// \}
 
 // [CLI11:error_hpp:end]
 } // namespace CLI

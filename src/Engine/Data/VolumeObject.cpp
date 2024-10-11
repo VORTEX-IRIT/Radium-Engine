@@ -11,7 +11,7 @@ namespace Ra {
 namespace Engine {
 namespace Data {
 VolumeObject::VolumeObject( const std::string& name ) :
-    Displayable( name ), m_tex( {} ), m_mesh( name + "_internal" ) {}
+    Displayable( name ), m_mesh( name + "_internal" ) {}
 
 VolumeObject::~VolumeObject() {}
 
@@ -52,20 +52,26 @@ void VolumeObject::loadGeometry( Core::Geometry::AbstractVolume* volume, const C
         m_volume = std::unique_ptr<Core::Geometry::AbstractVolume>( volume );
 
         auto dim = grid->size();
-        TextureParameters texparam { getName(),
-                                     GL_TEXTURE_3D,
-                                     size_t( dim( 0 ) ),
-                                     size_t( dim( 1 ) ),
-                                     size_t( dim( 2 ) ),
-                                     GL_RED,
-                                     GL_R32F,
-                                     GL_SCALAR,
-                                     GL_CLAMP_TO_BORDER,
-                                     GL_CLAMP_TO_BORDER,
-                                     GL_CLAMP_TO_BORDER,
-                                     GL_LINEAR,
-                                     GL_LINEAR,
-                                     grid->data().data() };
+
+        /// \todo clean tmp hack
+        // tmp hack create a shared ptr and copy to it.
+        std::shared_ptr<float[]> data( new float[grid->data().size()] );
+        auto itr = data.get();
+        for ( const auto& v : grid->data() ) {
+            *( itr++ ) = v;
+        }
+        TextureParameters texparam {
+            getName(),
+            { GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_LINEAR, GL_LINEAR },
+            { GL_TEXTURE_3D,
+              size_t( dim( 0 ) ),
+              size_t( dim( 1 ) ),
+              size_t( dim( 2 ) ),
+              GL_RED,
+              GL_R32F,
+              GL_SCALAR,
+              false,
+              data } };
         m_tex.setParameters( texparam );
 
         m_isDirty = true;
@@ -80,7 +86,7 @@ void VolumeObject::updateGL() {
     if ( m_isDirty ) {
         m_mesh.updateGL();
         GL_CHECK_ERROR;
-        m_tex.initializeGL();
+        m_tex.initialize();
         GL_CHECK_ERROR;
         m_isDirty = false;
     }

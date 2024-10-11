@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 # ------------------------------------------------------------------------------
 # Standard "Radium" cmake preamble Policies and global parameters for CMake
 if(POLICY CMP0077)

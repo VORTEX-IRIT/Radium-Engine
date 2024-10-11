@@ -32,8 +32,8 @@ class TimelineFrameSelector : public QFrame
 
     /**
      * Sets the start point of the Timeline's playzone to the given time.
-     * @param time the new start point.
-     * @param internal whether the call has been made internally by the Timeline,
+     * \param time the new start point.
+     * \param internal whether the call has been made internally by the Timeline,
      *        e.g. through the UI; or externally through Timeline::onChangeStart().
      * \note If \p internal is set to true, the signal startChanged() will be
      *       emitted.
@@ -42,8 +42,8 @@ class TimelineFrameSelector : public QFrame
 
     /**
      * Sets the end point of the Timeline's playzone to the given time.
-     * @param time the new end point.
-     * @param internal whether the call has been made internally by the Timeline,
+     * \param time the new end point.
+     * \param internal whether the call has been made internally by the Timeline,
      *        e.g. through the UI; or externally through Timeline::onChangeEnd().
      * \note If \p internal is set to true, the signal endChanged() will be
      *       emitted.

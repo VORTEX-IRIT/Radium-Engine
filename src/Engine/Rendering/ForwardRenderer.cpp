@@ -3,6 +3,7 @@
 #include <Engine/Rendering/ForwardRenderer.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
+#include <Core/Containers/VariableSetEnumManagement.hpp>
 #include <Core/Geometry/TopologicalMesh.hpp>
 #include <Core/Utils/Color.hpp>
 #include <Core/Utils/Log.hpp>
@@ -96,57 +97,35 @@ void ForwardRenderer::initBuffers() {
     // Forward renderer internal textures texture
 
     Data::TextureParameters texparams;
-    texparams.width  = m_width;
-    texparams.height = m_height;
-    texparams.target = GL_TEXTURE_2D;
+    texparams.image.width  = m_width;
+    texparams.image.height = m_height;
+    texparams.image.target = GL_TEXTURE_2D;
 
     // Depth texture
-    texparams.minFilter                = GL_NEAREST;
-    texparams.magFilter                = GL_NEAREST;
-    texparams.internalFormat           = GL_DEPTH_COMPONENT24;
-    texparams.format                   = GL_DEPTH_COMPONENT;
-    texparams.type                     = GL_UNSIGNED_INT;
-    texparams.name                     = "Depth (fw renderer)";
+    texparams.sampler.minFilter        = GL_NEAREST;
+    texparams.sampler.magFilter        = GL_NEAREST;
+    texparams.image.internalFormat     = GL_DEPTH_COMPONENT24;
+    texparams.image.format             = GL_DEPTH_COMPONENT;
+    texparams.image.type               = GL_UNSIGNED_INT;
+    texparams.name                     = m_textureNames[0];
     m_textures[RendererTextures_Depth] = std::make_unique<Data::Texture>( texparams );
 
+    m_secondaryTextures[m_textureNames[RendererTextures_Depth]] =
+        m_textures[RendererTextures_Depth].get();
+
     // Color texture
-    texparams.internalFormat = GL_RGBA32F;
-    texparams.format         = GL_RGBA;
-    texparams.type           = GL_SCALAR;
-    texparams.minFilter      = GL_LINEAR;
-    texparams.magFilter      = GL_LINEAR;
+    texparams.image.internalFormat = GL_RGBA32F;
+    texparams.image.format         = GL_RGBA;
+    texparams.image.type           = GL_SCALAR;
+    texparams.sampler.minFilter    = GL_LINEAR;
+    texparams.sampler.magFilter    = GL_LINEAR;
 
-    texparams.name                   = "HDR";
-    m_textures[RendererTextures_HDR] = std::make_unique<Data::Texture>( texparams );
-
-    texparams.name                      = "Normal";
-    m_textures[RendererTextures_Normal] = std::make_unique<Data::Texture>( texparams );
-
-    texparams.name                       = "Diffuse";
-    m_textures[RendererTextures_Diffuse] = std::make_unique<Data::Texture>( texparams );
-
-    texparams.name                        = "Specular";
-    m_textures[RendererTextures_Specular] = std::make_unique<Data::Texture>( texparams );
-
-    texparams.name                        = "OIT Accum";
-    m_textures[RendererTextures_OITAccum] = std::make_unique<Data::Texture>( texparams );
-
-    texparams.name                            = "OIT Revealage";
-    m_textures[RendererTextures_OITRevealage] = std::make_unique<Data::Texture>( texparams );
-
-    texparams.name                      = "Volume";
-    m_textures[RendererTextures_Volume] = std::make_unique<Data::Texture>( texparams );
-
-    m_secondaryTextures["Depth (fw)"]       = m_textures[RendererTextures_Depth].get();
-    m_secondaryTextures["HDR Texture"]      = m_textures[RendererTextures_HDR].get();
-    m_secondaryTextures["Normal Texture"]   = m_textures[RendererTextures_Normal].get();
-    m_secondaryTextures["Diffuse Texture"]  = m_textures[RendererTextures_Diffuse].get();
-    m_secondaryTextures["Specular Texture"] = m_textures[RendererTextures_Specular].get();
-    m_secondaryTextures["OIT Accum"]        = m_textures[RendererTextures_OITAccum].get();
-    m_secondaryTextures["OIT Revealage"]    = m_textures[RendererTextures_OITRevealage].get();
-
-    // Volume texture is not exposed ...
-    m_secondaryTextures["Volume"] = m_textures[RendererTextures_Volume].get();
+    // init textures other than depth (which is the first in the array, index 0)
+    for ( int i = RendererTextures_Depth + 1; i < RendererTexture_Count; ++i ) {
+        texparams.name                         = m_textureNames[i];
+        m_textures[i]                          = std::make_unique<Data::Texture>( texparams );
+        m_secondaryTextures[m_textureNames[i]] = m_textures[i].get();
+    }
 }
 
 void ForwardRenderer::updateStepInternal( const Data::ViewingParameters& renderData ) {
@@ -400,15 +379,15 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
             GL_ASSERT( glDisable( GL_BLEND ) );
 
             Data::RenderParameters composeParams;
-            composeParams.addParameter( "imageColor", m_textures[RendererTextures_HDR].get() );
-            composeParams.addParameter( "imageDepth", m_textures[RendererTextures_Depth].get() );
+            composeParams.setTexture( "imageColor", m_textures[RendererTextures_HDR].get() );
+            composeParams.setTexture( "imageDepth", m_textures[RendererTextures_Depth].get() );
             Data::RenderParameters passParams;
-            passParams.addParameter( "compose_data", composeParams );
+            passParams.setVariable( "compose_data", composeParams );
 
             for ( size_t i = 0; i < m_lightmanagers[0]->count(); ++i ) {
                 const auto l = m_lightmanagers[0]->getLight( i );
 
-                passParams.addParameter( "light_source", l->getRenderParameters() );
+                passParams.setVariable( "light_source", l->getRenderParameters() );
 
                 for ( const auto& ro : m_volumetricRenderObjects ) {
                     ro->render(
@@ -529,9 +508,10 @@ void ForwardRenderer::debugInternal( const Data::ViewingParameters& renderData )
         GL_ASSERT( glDepthMask( GL_TRUE ) );
         GL_ASSERT( glClear( GL_DEPTH_BUFFER_BIT ) );
         Data::RenderParameters xrayLightParams;
-        xrayLightParams.addParameter( "light.color", Ra::Core::Utils::Color::Grey( 5.0 ) );
-        xrayLightParams.addParameter( "light.type", Scene::Light::LightType::DIRECTIONAL );
-        xrayLightParams.addParameter( "light.directional.direction", Core::Vector3( 0, -1, 0 ) );
+        using namespace Core::VariableSetEnumManagement;
+        xrayLightParams.setVariable( "light.color", Ra::Core::Utils::Color::Grey( 5.0 ) );
+        setEnumVariable( xrayLightParams, "light.type", Scene::Light::LightType::DIRECTIONAL );
+        xrayLightParams.setVariable( "light.directional.direction", Core::Vector3( 0, -1, 0 ) );
         for ( const auto& ro : m_xrayRenderObjects ) {
             if ( ro->isVisible() ) { ro->render( xrayLightParams, renderData ); }
         }
@@ -610,49 +590,49 @@ void ForwardRenderer::postProcessInternal( const Data::ViewingParameters& render
 void ForwardRenderer::resizeInternal() {
     m_pingPongSize = std::pow( uint( 2 ), uint( std::log2( std::min( m_width, m_height ) ) ) );
 
-    m_textures[RendererTextures_Depth]->resize( m_width, m_height );
-    m_textures[RendererTextures_HDR]->resize( m_width, m_height );
-    m_textures[RendererTextures_Normal]->resize( m_width, m_height );
-    m_textures[RendererTextures_Diffuse]->resize( m_width, m_height );
-    m_textures[RendererTextures_Specular]->resize( m_width, m_height );
-    m_textures[RendererTextures_OITAccum]->resize( m_width, m_height );
-    m_textures[RendererTextures_OITRevealage]->resize( m_width, m_height );
-    m_textures[RendererTextures_Volume]->resize( m_width, m_height );
+    for ( auto& tex : m_textures ) {
+        tex->resize( m_width, m_height );
+    }
 
     m_fbo->bind();
-    m_fbo->attachTexture( GL_DEPTH_ATTACHMENT, m_textures[RendererTextures_Depth]->texture() );
-    m_fbo->attachTexture( GL_COLOR_ATTACHMENT0, m_textures[RendererTextures_HDR]->texture() );
-    m_fbo->attachTexture( GL_COLOR_ATTACHMENT1, m_textures[RendererTextures_Normal]->texture() );
-    m_fbo->attachTexture( GL_COLOR_ATTACHMENT2, m_textures[RendererTextures_Diffuse]->texture() );
-    m_fbo->attachTexture( GL_COLOR_ATTACHMENT3, m_textures[RendererTextures_Specular]->texture() );
+    m_fbo->attachTexture( GL_DEPTH_ATTACHMENT,
+                          m_textures[RendererTextures_Depth]->getGpuTexture() );
+    m_fbo->attachTexture( GL_COLOR_ATTACHMENT0, m_textures[RendererTextures_HDR]->getGpuTexture() );
+    m_fbo->attachTexture( GL_COLOR_ATTACHMENT1,
+                          m_textures[RendererTextures_Normal]->getGpuTexture() );
+    m_fbo->attachTexture( GL_COLOR_ATTACHMENT2,
+                          m_textures[RendererTextures_Diffuse]->getGpuTexture() );
+    m_fbo->attachTexture( GL_COLOR_ATTACHMENT3,
+                          m_textures[RendererTextures_Specular]->getGpuTexture() );
     if ( m_fbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE ) {
         LOG( logERROR ) << "FBO Error (ForwardRenderer::m_fbo): " << m_fbo->checkStatus();
     }
 
     m_volumeFbo->bind();
     m_volumeFbo->attachTexture( GL_DEPTH_ATTACHMENT,
-                                m_textures[RendererTextures_Depth]->texture() );
+                                m_textures[RendererTextures_Depth]->getGpuTexture() );
     m_volumeFbo->attachTexture( GL_COLOR_ATTACHMENT0,
-                                m_textures[RendererTextures_Volume]->texture() );
+                                m_textures[RendererTextures_Volume]->getGpuTexture() );
     if ( m_volumeFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE ) {
         LOG( logERROR ) << "FBO Error (ForwardRenderer::m_volumeFbo) : "
                         << m_volumeFbo->checkStatus();
     }
 
     m_oitFbo->bind();
-    m_oitFbo->attachTexture( GL_DEPTH_ATTACHMENT, m_textures[RendererTextures_Depth]->texture() );
+    m_oitFbo->attachTexture( GL_DEPTH_ATTACHMENT,
+                             m_textures[RendererTextures_Depth]->getGpuTexture() );
     m_oitFbo->attachTexture( GL_COLOR_ATTACHMENT0,
-                             m_textures[RendererTextures_OITAccum]->texture() );
+                             m_textures[RendererTextures_OITAccum]->getGpuTexture() );
     m_oitFbo->attachTexture( GL_COLOR_ATTACHMENT1,
-                             m_textures[RendererTextures_OITRevealage]->texture() );
+                             m_textures[RendererTextures_OITRevealage]->getGpuTexture() );
     if ( m_oitFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE ) {
         LOG( logERROR ) << "FBO Error (ForwardRenderer::m_oitFbo) : " << m_oitFbo->checkStatus();
     }
 
     m_postprocessFbo->bind();
     m_postprocessFbo->attachTexture( GL_DEPTH_ATTACHMENT,
-                                     m_textures[RendererTextures_Depth]->texture() );
-    m_postprocessFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_fancyTexture->texture() );
+                                     m_textures[RendererTextures_Depth]->getGpuTexture() );
+    m_postprocessFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_fancyTexture->getGpuTexture() );
     if ( m_postprocessFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE ) {
         LOG( logERROR ) << "FBO Error (ForwardRenderer::m_postprocessFbo) : "
                         << m_postprocessFbo->checkStatus();
@@ -663,8 +643,8 @@ void ForwardRenderer::resizeInternal() {
     // render eveything else than the scene. Create several FBO with ther own configuration
     // (uncomment Renderer::m_depthTexture->texture() to see the difference.)
     m_uiXrayFbo->bind();
-    m_uiXrayFbo->attachTexture( GL_DEPTH_ATTACHMENT, Renderer::m_depthTexture->texture() );
-    m_uiXrayFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_fancyTexture->texture() );
+    m_uiXrayFbo->attachTexture( GL_DEPTH_ATTACHMENT, Renderer::m_depthTexture->getGpuTexture() );
+    m_uiXrayFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_fancyTexture->getGpuTexture() );
     if ( m_uiXrayFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE ) {
         LOG( logERROR ) << "FBO Error (ForwardRenderer::m_uiXrayFbo) : "
                         << m_uiXrayFbo->checkStatus();
@@ -690,8 +670,8 @@ class PointCloudParameterProvider : public Data::ShaderParameterProvider
     void updateGL() override {
         m_displayMaterial->updateGL();
         auto& renderParameters = getParameters();
-        renderParameters.mergeReplaceParameters( m_displayMaterial->getParameters() );
-        renderParameters.addParameter( "pointCloudSplatRadius", m_component->getSplatSize() );
+        renderParameters.mergeReplaceVariables( m_displayMaterial->getParameters() );
+        renderParameters.setVariable( "pointCloudSplatRadius", m_component->getSplatSize() );
     }
 
   private:
@@ -708,8 +688,8 @@ bool ForwardRenderer::buildRenderTechnique( RenderObject* ro ) const {
     if ( !material ) {
         LOG( logWARNING ) << "ForwardRenderer : no material found when building RenderTechnique"
                           << " - adding red Lambertian material";
-        auto defMat     = new Data::LambertianMaterial( "ForwardRenderer::Default material" );
-        defMat->m_color = Ra::Core::Utils::Color::Red();
+        auto defMat = new Data::LambertianMaterial( "ForwardRenderer::Default material" );
+        defMat->setColor( Ra::Core::Utils::Color::Red() );
         material.reset( defMat );
     }
     auto builder = EngineRenderTechniques::getDefaultTechnique( material->getMaterialName() );

@@ -165,7 +165,9 @@ class RA_CORE_API VariableSet
     /// \pre The element \b name must exists with type \b T. If not verified (assert in debug mode)
     /// std::bad_any_cast exception could be thrown by the underlying management of type erasure
     template <typename T>
-    auto getVariable( const std::string& name ) const -> T&;
+    auto getVariable( const std::string& name ) const -> const T&;
+    template <typename T>
+    auto getVariable( const std::string& name ) -> T&;
 
     /// \brief get the handle on the variable with the given name
     /// \tparam T the type of the variable
@@ -173,7 +175,7 @@ class RA_CORE_API VariableSet
     /// \return an handle which can be de-referenced to obtain a std::pair<const std::string, T>
     /// representing the name and the value of the variable.
     template <typename T>
-    auto getVariableHandle( const std::string& name ) const -> VariableHandle<T>;
+    auto getVariableHandle( const std::string& name ) const -> const VariableHandle<T>;
 
     /// \brief Test the validity of a handle
     /// \tparam H Type of the handle. Expected to be VariableHandle<T> for some variable type T
@@ -186,7 +188,7 @@ class RA_CORE_API VariableSet
     /// \return a pair with the variable handle and a bool : true if the variable value was reset,
     /// false if the variable value was set.
     template <typename T>
-    auto insertOrAssignVariable( const std::string& name, const T& value )
+    auto setVariable( const std::string& name, const T& value )
         -> std::pair<VariableHandle<T>, bool>;
 
     /// \brief Remove a variable, i.e. a name->value association
@@ -613,13 +615,17 @@ auto VariableSet::insertVariable( const std::string& name, const T& value )
 }
 
 template <typename T>
-auto VariableSet::getVariable( const std::string& name ) const -> T& {
-    assert( existsVariable<T>( name ) );
+auto VariableSet::getVariable( const std::string& name ) -> T& {
+    return const_cast<T&>( const_cast<const VariableSet*>( this )->getVariable<T>( name ) );
+}
+
+template <typename T>
+auto VariableSet::getVariable( const std::string& name ) const -> const T& {
     return getVariableHandle<T>( name )->second;
 }
 
 template <typename T>
-auto VariableSet::getVariableHandle( const std::string& name ) const -> VariableHandle<T> {
+auto VariableSet::getVariableHandle( const std::string& name ) const -> const VariableHandle<T> {
     assert( existsVariableType<T>() );
     return getVariableStorage<T>().find( name );
 }
@@ -631,12 +637,13 @@ bool VariableSet::isHandleValid( const H& handle ) const {
 }
 
 template <typename T>
-auto VariableSet::insertOrAssignVariable( const std::string& name, const T& value )
+auto VariableSet::setVariable( const std::string& name, const T& value )
     -> std::pair<VariableHandle<T>, bool> {
     auto typeAccess = existsVariableType<T>();
     // If it is the first parameter of the given type, first register the type
     if ( !typeAccess ) { typeAccess = addVariableType<T>(); }
     // insert the parameter.
+
     return ( *typeAccess )->insert_or_assign( name, value );
 }
 
@@ -662,6 +669,7 @@ bool VariableSet::deleteVariable( H& handle ) {
 template <typename T>
 auto VariableSet::existsVariable( const std::string& name ) const
     -> Utils::optional<VariableHandle<T>> {
+
     if ( auto typeAccess = existsVariableType<T>(); typeAccess ) {
         auto itr = ( *typeAccess )->find( name );
         if ( itr != ( *typeAccess )->cend() ) { return itr; }
@@ -719,11 +727,11 @@ auto VariableSet::addVariableType() -> Utils::optional<VariableContainer<T>*> {
         // used to visit the variableSet with a dynamic visitor
         m_vtable->m_visitFunctions.emplace_back(
             []( const VariableSet& c, const DynamicVisitorBase& v )
-                -> std::pair<bool, std::function<void( DynamicVisitorBase&, std::any && )>> {
+                -> std::pair<bool, std::function<void( DynamicVisitorBase&, std::any&& )>> {
                 auto id = getVariableVisitTypeIndex<T>();
                 if ( v.accept( id ) ) {
-                    auto& storage = c.getVariableStorage<T>();
-                    auto coll     = std::ref( storage );
+                    auto& visitedStorage = c.getVariableStorage<T>();
+                    auto coll            = std::ref( visitedStorage );
                     return { true, [coll]( DynamicVisitorBase& visitor, std::any&& userParam ) {
                                 for ( auto&& t : coll.get() ) {
                                     visitor( { std::ref( t ) },
@@ -775,6 +783,8 @@ size_t VariableSet::numberOf() const {
     return 0;
 }
 
+/* --------------- Visitors */
+
 template <typename P>
 void VariableSet::visitDynamic( DynamicVisitorBase& visitor, P&& params ) const {
     for ( const auto& [type, index] : m_typeIndexToVtableIndex ) {
@@ -799,7 +809,7 @@ void VariableSet::visitImplHelper( F& visitor ) const {
                    "Static visitors must provide a function with profile "
                    "void( const std::string& name, [const ]T[&] value) for each "
                    "declared visitable type T" );
-    if ( auto variables = existsVariableType<T>(); variables ) {
+    if ( auto variables = existsVariableType<T>() ) {
         for ( auto& element : *( variables.value() ) ) {
             visitor( element.first, element.second );
         }

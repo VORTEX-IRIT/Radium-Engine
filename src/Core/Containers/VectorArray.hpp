@@ -26,7 +26,7 @@ struct VectorArrayTypeHelper : public VectorArrayTypeHelperInternal<
                                    std::is_base_of<typename Eigen::MatrixBase<V>, V>::value> {};
 
 /**
- * @brief This class implements ContainerIntrospectionInterface for AlignedStdVector.
+ * \brief This class implements ContainerIntrospectionInterface for AlignedStdVector.
  *
  * It provides Eigen::Map functionality if the underlying component allows it (i.e. fixed size).
  */
@@ -51,20 +51,20 @@ class VectorArray : public AlignedStdVector<V>, public Utils::ContainerIntrospec
     /** Inheriting constructors from std::vector */
     using AlignedStdVector<V>::AlignedStdVector;
 
-    /** @name Container Introsection implementation */
-    /// @{
+    /** \name Container Introsection implementation */
+    /// \{
     size_t getSize() const override { return this->size(); }
     size_t getNumberOfComponents() const override { return std::max( 0, NumberOfComponents ); }
     size_t getBufferSize() const override { return getSize() * sizeof( V ); }
     int getStride() const override { return sizeof( V ); }
     const void* dataPtr() const override { return this->data(); }
-    /// @}
+    /// \}
 
-    /** @name Eigen::Map getter
+    /** \name Eigen::Map getter
      * Map data to an Eigen::Matrix, only defined when NumberOfComponents > 0 (e.g. for arithmetic
      * types and fixed size eigen vectors).
      */
-    /// @{
+    /// \{
     /** Returns the array as an Eigen Matrix Map. */
     template <int N = NumberOfComponents>
     std::enable_if_t<( N > 0 ), MatrixMap> getMap() {
@@ -82,7 +82,7 @@ class VectorArray : public AlignedStdVector<V>, public Utils::ContainerIntrospec
                                TypeHelper::NumberOfComponents,
                                Eigen::Index( this->size() ) );
     }
-    /// @}
+    /// \}
 };
 
 template <typename V>

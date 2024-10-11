@@ -39,7 +39,7 @@ class RenderObjectManager;
 
 /**
  * Abstract renderer for the engine.
- * @see Radium Engine default rendering informations
+ * \see Radium Engine default rendering informations
  */
 class RA_ENGINE_API Renderer
 {
@@ -188,7 +188,7 @@ class RA_ENGINE_API Renderer
 
     /**
      * set the fill/wireframe rendering mode
-     * @param enabled true if rendering mode must be wireframe, false for fill render mode
+     * \param enabled true if rendering mode must be wireframe, false for fill render mode
      */
     inline void enableWireframe( bool enabled );
 
@@ -199,30 +199,30 @@ class RA_ENGINE_API Renderer
 
     /**
      * Set the debug rendering mode
-     * @param enabled true if rendering mode must include debug objects, false else
+     * \param enabled true if rendering mode must include debug objects, false else
      */
     inline void enableDebugDraw( bool enabled );
 
     /**
      * set the post-process mode
-     * @param enabled true if post processing must bve applied before display.
+     * \param enabled true if post processing must bve applied before display.
      */
     inline void enablePostProcess( bool enabled );
 
     /**
-     * @brief Tell the renderer it needs to render.
+     * \brief Tell the renderer it needs to render.
      * This method does the following steps :
      * <ol>
-     *   <li>call @see updateRenderObjectsInternal method</li>
-     *   <li>call @see renderInternal method</li>
-     *   <li>call @see postProcessInternal method</li>
+     *   <li>call \see updateRenderObjectsInternal method</li>
+     *   <li>call \see renderInternal method</li>
+     *   <li>call \see postProcessInternal method</li>
      *   <li>render the final texture in the right framebuffer*</li>
      * </ol>
      *
-     * @param renderData The basic data needed for the rendering :
+     * \param renderData The basic data needed for the rendering :
      * Time elapsed since last frame, camera view matrix, camera projection matrix.
      *
-     * @note * What "render in the right buffer" means, is that, for example,
+     * \note * What "render in the right buffer" means, is that, for example,
      * when using QOpenGLWidget, Qt binds its own framebuffer before calling
      * updateGL() method.
      * So, render() takes that into account by saving an eventual bound
@@ -232,24 +232,24 @@ class RA_ENGINE_API Renderer
     void render( const Data::ViewingParameters& renderData );
 
     /**
-     * @brief Initialize renderer
+     * \brief Initialize renderer
      */
     void initialize( uint width, uint height );
 
     /**
-     * @brief Resize the viewport and all the screen textures, fbos.
+     * \brief Resize the viewport and all the screen textures, fbos.
      * This function must be overrided as soon as some FBO or screensized
      * texture is used (since the default implementation just resizes its
      * own fbos / textures)
      *
-     * @param width The new viewport width
-     * @param height The new viewport height
+     * \param width The new viewport width
+     * \param height The new viewport height
      */
     void resize( uint width, uint height );
 
     /**
      * Add a new picking query for the next rendering
-     * @param query
+     * \param query
      */
     inline void addPickingRequest( const PickingQuery& query );
 
@@ -257,7 +257,7 @@ class RA_ENGINE_API Renderer
      * Get the vector of picking results.
      * Results in the returned vector correspond to queries in the return vector by the function
      * getPickingQueries().
-     * @return Queries results
+     * \return Queries results
      */
     inline const std::vector<PickingResult>& getPickingResults() const;
 
@@ -265,7 +265,7 @@ class RA_ENGINE_API Renderer
      * Get the vector of picking queries.
      * Queries in the returned vector correspond to results in the return vector by the function
      * getPickingResults().
-     * @return Queries results
+     * \return Queries results
      */
     inline const std::vector<PickingQuery>& getPickingQueries() const;
 
@@ -285,7 +285,7 @@ class RA_ENGINE_API Renderer
     /** Add a light to the renderer.
      * may be overridden to filter the light or to specialize the way ligths are added to the
      * renderer ...
-     * @param light
+     * \param light
      */
     virtual void addLight( const Scene::Light* light );
 
@@ -300,44 +300,44 @@ class RA_ENGINE_API Renderer
     //          "windowed" mode (that would show the debugged texture in
     //          its own viewport, without hiding the final texture.)
     /**
-     * @brief Change the texture that is displayed on screen.
+     * \brief Change the texture that is displayed on screen.
      * Set m_displayedIsDepth to true if depth linearization is wanted
      *
-     * @param texName The texture to display.
+     * \param texName The texture to display.
      */
     virtual void displayTexture( const std::string& texName );
 
     /**
-     * @brief Return the names of renderer available textures
-     * @return A vector of strings, containing the name of the different textures
+     * \brief Return the names of renderer available textures
+     * \return A vector of strings, containing the name of the different textures
      */
     virtual std::vector<std::string> getAvailableTextures() const;
 
     /**
-     * @brief Get the name of the renderer, e.g to be displayed in the UI
-     * @return
+     * \brief Get the name of the renderer, e.g to be displayed in the UI
+     * \return
      */
     virtual std::string getRendererName() const = 0;
 
     /**
      * Define, for the given render object, the render technique cooresponding to the renderer.
-     * @param ro the render object to modofy
-     * @return True if the renderTechnique was defined.
+     * \param ro the render object to modofy
+     * \return True if the renderTechnique was defined.
      */
     virtual bool buildRenderTechnique( RenderObject* ro ) const = 0;
 
     /**
      *  Loops over all available renderobjects and, build the associated render technique using
      *  buildRenderTechnique(RenderObject *ro)
-     * @return the number of render objects initialized
+     * \return the number of render objects initialized
      */
     int buildAllRenderTechniques() const;
 
     /**
      * get the content of the current frame
-     * @param w width of the region to grab
-     * @param h heigth oif the region to grab
-     * @return the pixel array
+     * \param w width of the region to grab
+     * \param h heigth oif the region to grab
+     * \return the pixel array
      */
     virtual std::unique_ptr<uchar[]> grabFrame( size_t& w, size_t& h ) const;
 
@@ -353,7 +353,7 @@ class RA_ENGINE_API Renderer
 
   protected:
     /**
-     * @brief initializeInternal
+     * \brief initializeInternal
      * Initialize the renderer dependant resources.
      */
     virtual void initializeInternal() = 0;
@@ -365,36 +365,36 @@ class RA_ENGINE_API Renderer
 
     /**
      * Update the renderer dependent resources for the next frame
-     * @param renderData
+     * \param renderData
      */
     virtual void updateStepInternal( const Data::ViewingParameters& renderData ) = 0;
 
     /**
-     * @brief All the scene rendering magics basically happens here.
+     * \brief All the scene rendering magics basically happens here.
      *
-     * @param renderData The basic data needed for the rendering :
+     * \param renderData The basic data needed for the rendering :
      * Time elapsed since last frame, camera view matrix, camera projection matrix.
      */
     virtual void renderInternal( const Data::ViewingParameters& renderData ) = 0;
 
     /**
-     * @brief Do all post processing stuff. If you override this method,
-     * be careful to fill @see m_fancyTexture since it is the texture that
-     * will be displayed at the very end of the @see render method.
+     * \brief Do all post processing stuff. If you override this method,
+     * be careful to fill \see m_fancyTexture since it is the texture that
+     * will be displayed at the very end of the \see render method.
      *
-     * @param renderData The basic data needed for the rendering :
+     * \param renderData The basic data needed for the rendering :
      * Time elapsed since last frame, camera view matrix, camera projection matrix.
      */
     virtual void postProcessInternal( const Data::ViewingParameters& renderData ) = 0;
 
     /**
-     * @brief Add the debug layer with useful informations
+     * \brief Add the debug layer with useful informations
      */
     virtual void
     debugInternal( const Data::ViewingParameters& renderData ) = 0; // is viewingParameters useful ?
 
     /**
-     * @brief Draw the UI data
+     * \brief Draw the UI data
      */
     virtual void uiInternal( const Data::ViewingParameters& renderData ) = 0; // idem ?
 
@@ -444,9 +444,9 @@ class RA_ENGINE_API Renderer
     //                It would make more sense if we are able to show the
     //                debugged texture in its own viewport.
     /**
-     * @brief The texture that will be displayed on screen. If no call to
-     * @see debugTexture has been done, this is just a pointer to
-     * @see m_fancyTexture.
+     * \brief The texture that will be displayed on screen. If no call to
+     * \see debugTexture has been done, this is just a pointer to
+     * \see m_fancyTexture.
      */
     Data::Texture* m_displayedTexture { nullptr };
 

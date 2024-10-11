@@ -1,6 +1,6 @@
 # Radium-Engine libraries
 
-![banner](doc/images/radium-banner.png)
+![banner](doc/images/radium-banner.webp)
 
 Radium is a research 3D Engine for rendering, animation and processing.
 It is developed and maintained by the [STORM research group](https://www.irit.fr/STORM/site/).

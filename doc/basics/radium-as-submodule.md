@@ -36,4 +36,4 @@ In your source code:
 
 ## Detailed instructions
 
-See [CMake setup](@ref cmakeutilities) for detailed doc and Radium's cmake utilies function insights.
+See [CMake setup](\ref cmakeutilities) for detailed doc and Radium's cmake utilies function insights.

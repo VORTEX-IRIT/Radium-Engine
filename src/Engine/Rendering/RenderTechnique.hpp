@@ -43,13 +43,13 @@ enum DefaultRenderingPasses : int {
     /**
      * The transparency pass of Radium default renderer.
      * This pass render, with lighting, the transparent fragments using LIT-OIT algorithm
-     * @see Ra::Engine::ForwardRenderer documentation
+     * \see Ra::Engine::ForwardRenderer documentation
      */
     LIGHTING_TRANSPARENT,
     /**
      * The volumetric pass of Radium default renderer.
      * This pass render, with lighting, an object with volumetric material (density matrix)
-     * @see Ra::Engine::ForwardRenderer documentation
+     * \see Ra::Engine::ForwardRenderer documentation
      */
     LIGHTING_VOLUMETRIC
 
@@ -57,7 +57,7 @@ enum DefaultRenderingPasses : int {
 
 /**
  * Set of shaders to be used by the renderer to render objects with associated data.
- * @see Render technique and materials section in the Material management in the Radium Engine
+ * \see Render technique and materials section in the Material management in the Radium Engine
  * documentation
  */
 class RA_ENGINE_API RenderTechnique final
@@ -72,56 +72,56 @@ class RA_ENGINE_API RenderTechnique final
     /**
      * Set the shader configuration for the given pass.
      * m_numActivePass is updated to be the max of all indices that are set this way.
-     * @param newConfig The pass shader configuration
-     * @param pass The index of the pass to set
+     * \param newConfig The pass shader configuration
+     * \param pass The index of the pass to set
      */
     void setConfiguration( const Data::ShaderConfiguration& newConfig,
                            Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE );
 
     /**
      * Test if the given pass was configured
-     * @param pass The index of the pass
-     * @return true if the pass was configured
+     * \param pass The index of the pass
+     * \return true if the pass was configured
      */
     inline bool
     hasConfiguration( Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE ) const;
 
     /**
      * Mark the given configured.
-     * @param pass The index of the pass
+     * \param pass The index of the pass
      */
     inline void
     setConfiguration( Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE );
 
     /**
      * Mark the given not configured.
-     * @param pass The index of the pass
+     * \param pass The index of the pass
      */
     inline void
     clearConfiguration( Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE );
 
     /**
      * Get the configuration of the given pass
-     * @param pass The index of the pass
-     * @return The pass shader configuration
+     * \param pass The index of the pass
+     * \return The pass shader configuration
      */
     inline const Data::ShaderConfiguration&
     getConfiguration( Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE ) const;
 
     /**
      * Get the Data::ShaderProgram associated with the pass
-     * @param pass The index of the pass
-     * @return  The pass shader program if the pass is configured, nullptr otherwise.
+     * \param pass The index of the pass
+     * \return  The pass shader program if the pass is configured, nullptr otherwise.
      */
     const Data::ShaderProgram*
     getShader( Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE ) const;
 
     /**
      * Set the shader parameter provider for the given pass.
-     * @note all passes must be configured first using RenderTechnique::setConfiguration() before
+     * \note all passes must be configured first using RenderTechnique::setConfiguration() before
      * setting the parameter provider for each pass.
-     * @param provider The rendering parameter provider
-     * @param pass The index of the pass to set. If this -1, all active passes will share the same
+     * \param provider The rendering parameter provider
+     * \param pass The index of the pass to set. If this -1, all active passes will share the same
      * provider.
      */
     void setParametersProvider( std::shared_ptr<Data::ShaderParameterProvider> provider,
@@ -129,8 +129,8 @@ class RA_ENGINE_API RenderTechnique final
 
     /**
      * Get the Data::ShaderProgram parameters associated with the pass
-     * @param pass The index of the pass
-     * @return  The pass Data::ShaderParameterProvider if the pass is configured, nullptr otherwise.
+     * \param pass The index of the pass
+     * \return  The pass Data::ShaderParameterProvider if the pass is configured, nullptr otherwise.
      */
     const Data::ShaderParameterProvider* getParametersProvider(
         Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE ) const;
@@ -142,27 +142,27 @@ class RA_ENGINE_API RenderTechnique final
 
     /**
      * Test if the given pass is dirty (openGL state not updated)
-     * @param pass The index of the pass
-     * @return Tru if pass must be updated.
+     * \param pass The index of the pass
+     * \return Tru if pass must be updated.
      */
     inline bool isDirty( Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE ) const;
 
     /**
      * Set the given pass dirty (openGL state not updated)
-     * @param pass The index of the pass
+     * \param pass The index of the pass
      */
     inline void setDirty( Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE );
 
     /**
      * Clear the dirty bit for the given pass (openGL state updated)
-     * @param pass The index of the pass
+     * \param pass The index of the pass
      */
     inline void clearDirty( Core::Utils::Index pass = DefaultRenderingPasses::LIGHTING_OPAQUE );
 
     /**
-     * Add properties (several #define in the shader) for the given pass
-     * @param props the properties list, only strings without the #define
-     * @param pass the pass. If left by default, all active passes will get the properties
+     * Add properties (several \#define in the shader) for the given pass
+     * \param props the properties list, only strings without the \#define
+     * \param pass the pass. If left by default, all active passes will get the properties
      */
     void addPassProperties( const std::list<std::string>& props,
                             Core::Utils::Index pass = Core::Utils::Index {} );
@@ -171,7 +171,7 @@ class RA_ENGINE_API RenderTechnique final
      *  pass 1 --> Z_PREPASS
      *  pass 0 --> LIGHTING_OPAQUE
      *  pass 2 --> LIGHTING_TRANSPARENT
-     * @return the default technique
+     * \return the default technique
      */
     static RenderTechnique createDefaultRenderTechnique();
 
@@ -216,19 +216,19 @@ namespace EngineRenderTechniques {
 using DefaultTechniqueBuilder = std::function<void( RenderTechnique& rt, bool isTransparent )>;
 
 /** register a new default builder for a material class
- *  @return true if builder added, false else (e.g, a builder with the same name already exists)
+ *  \return true if builder added, false else (e.g, a builder with the same name already exists)
  */
 RA_ENGINE_API bool registerDefaultTechnique( const std::string& name,
                                              DefaultTechniqueBuilder builder );
 
 /** remove a default builder
- *  @return true if builder removed, false else (e.g, a builder with the same name does't exists)
+ *  \return true if builder removed, false else (e.g, a builder with the same name does't exists)
  */
 RA_ENGINE_API bool removeDefaultTechnique( const std::string& name );
 
 /**
- * @param name name of the technique to construct
- * @return a pair containing the search result and, if true, the functor to call to build the
+ * \param name name of the technique to construct
+ * \return a pair containing the search result and, if true, the functor to call to build the
  * technique.
  */
 RA_ENGINE_API std::pair<bool, DefaultTechniqueBuilder>
@@ -239,8 +239,8 @@ RA_ENGINE_API bool cleanup();
 
 /**
  * Test if the given pass is dirty (openGL state not updated)
- * @param pass The index of the pass
- * @return Tru if pass must be updated.
+ * \param pass The index of the pass
+ * \return Tru if pass must be updated.
  */
 inline bool RenderTechnique::isDirty( Core::Utils::Index pass ) const {
     return m_dirtyBits & ( 1 << pass );
@@ -248,7 +248,7 @@ inline bool RenderTechnique::isDirty( Core::Utils::Index pass ) const {
 
 /**
  * Set the given pass dirty (openGL state updated)
- * @param pass The index of the pass
+ * \param pass The index of the pass
  */
 inline void RenderTechnique::setDirty( Core::Utils::Index pass ) {
     m_dirtyBits |= ( 1 << pass );

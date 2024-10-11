@@ -184,9 +184,9 @@ void SkinningComponent::initialize() {
         }
 
         // prepare weights material
-        auto mat  = new Data::BlinnPhongMaterial( "SkinningWeights_Mat" );
-        mat->m_kd = Color::Skin();
-        mat->m_ks = Color::White();
+        auto mat = new Data::BlinnPhongMaterial( "SkinningWeights_Mat" );
+        mat->setDiffuseColor( Color::Skin() );
+        mat->setSpecularColor( Color::White() );
 
         // assign texture
         Data::TextureParameters texParam;

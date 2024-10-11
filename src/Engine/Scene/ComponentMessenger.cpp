@@ -10,7 +10,7 @@ RA_SINGLETON_IMPLEMENTATION( ComponentMessenger );
 
 void ComponentMessenger::unregisterAll( const Entity* entity, Component* comp ) {
     for ( auto& entityList : std::array<std::reference_wrapper<EntityMap>, 3> {
-              m_entitySetLists, m_entityGetLists, m_entityRwLists } ) {
+              { m_entitySetLists, m_entityGetLists, m_entityRwLists } } ) {
 
         auto listItr = entityList.get().find( entity );
         if ( listItr != entityList.get().end() ) {

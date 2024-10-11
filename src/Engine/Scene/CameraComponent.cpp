@@ -58,10 +58,10 @@ void CameraComponent::initialize() {
     m->loadGeometry( std::move( triMesh ) );
 
     // Create the RO
-    auto mat              = Core::make_shared<PlainMaterial>( m_name + "_Material" );
-    mat->m_color          = { 1_ra, .5_ra, 0_ra, 1_ra };
-    mat->m_perVertexColor = false;
-    m_RO                  = Rendering::RenderObject::createRenderObject( m_name + "_RO",
+    auto mat = Core::make_shared<PlainMaterial>( m_name + "_Material" );
+    mat->setColor( { 1_ra, .5_ra, 0_ra, 1_ra } );
+    mat->setColoredByVertexAttrib( false );
+    m_RO = Rendering::RenderObject::createRenderObject( m_name + "_RO",
                                                         this,
                                                         Rendering::RenderObjectType::Geometry,
                                                         m,

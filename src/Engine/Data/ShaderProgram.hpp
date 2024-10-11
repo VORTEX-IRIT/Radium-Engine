@@ -28,7 +28,7 @@ class Texture;
 
 /**
  * Abstraction of OpenGL Shader Program
- * @see globjects::Program and https://www.khronos.org/opengl/wiki/Shader
+ * \see globjects::Program and https://www.khronos.org/opengl/wiki/Shader
  *
  */
 class RA_ENGINE_API ShaderProgram final
@@ -52,10 +52,15 @@ class RA_ENGINE_API ShaderProgram final
     void setUniform( const char* name, const T& value ) const;
     void setUniform( const char* name, Texture* tex, int texUnit ) const;
 
+    template <typename T>
+    void setUniform( gl::GLint location, const T& value ) const {
+        m_program->setUniform( location, value );
+    }
+
     //! use automatic texture unit computation
     //! if you want to send a particular texture unit, use setUniform.
     //! It binds tex on an "arbitrary" tex unit.
-    //! @warning, call a std::map::find (in O(log(active tex unit in the shader)))
+    //! \warning, call a std::map::find (in O(log(active tex unit in the shader)))
     void setUniformTexture( const char* name, Texture* tex ) const;
 
     globjects::Program* getProgramObject() const;

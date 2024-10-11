@@ -1,5 +1,6 @@
 set(ra_engine_target Engine)
-list(APPEND CMAKE_MESSAGE_INDENT "[${ra_engine_target}] ")
+
+message_prefix_push("${ra_engine_target}")
 
 project(${ra_engine_target} LANGUAGES CXX VERSION ${Radium_VERSION})
 
@@ -67,3 +68,5 @@ target_compile_options(${ra_engine_target} PRIVATE PUBLIC ${DEFAULT_COMPILE_OPTI
 if(RADIUM_ENABLE_PCH)
     target_precompile_headers(${ra_engine_target} PRIVATE pch.hpp)
 endif()
+
+message_prefix_pop()

@@ -18,8 +18,6 @@ class Entity;
 class RA_ENGINE_API CameraComponent : public Scene::Component
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     CameraComponent( Entity* entity, const std::string& name, Scalar height = 1, Scalar width = 1 );
 
     ~CameraComponent() override;

@@ -79,7 +79,6 @@ if(LIBXML2_XMLLINT_EXECUTABLE AND SED_EXECUTABLE)
                 -DCXX_FILESYSTEM_NAMESPACE=${CXX_FILESYSTEM_NAMESPACE}
     )
 
-    add_custom_target(integration_${INTEGRATION_TEST}_create_ref)
     add_test(
         NAME integration_${INTEGRATION_TEST}_save_output
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${INTEGRATION_TEST}/
@@ -101,6 +100,11 @@ if(LIBXML2_XMLLINT_EXECUTABLE AND SED_EXECUTABLE)
             ${CMAKE_COMMAND} -E compare_files
             ${CMAKE_CURRENT_BINARY_DIR}/keymapping-valid-out-lint.xml
             ${CMAKE_CURRENT_BINARY_DIR}/keymapping-valid-in-lint.xml
+    )
+
+    set_tests_properties(
+        integration_${INTEGRATION_TEST}_compare_to_ref
+        PROPERTIES DEPENDS integration_${INTEGRATION_TEST}_save_output
     )
 
     add_dependencies(integration integration_${INTEGRATION_TEST})

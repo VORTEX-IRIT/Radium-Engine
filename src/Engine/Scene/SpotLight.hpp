@@ -16,8 +16,6 @@ class RA_ENGINE_API SpotLight final : public Ra::Engine::Scene::Light
 {
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     explicit SpotLight( Entity* entity, const std::string& name = "spotlight" );
     ~SpotLight() override = default;
 
@@ -56,7 +54,7 @@ class RA_ENGINE_API SpotLight final : public Ra::Engine::Scene::Light
 
 inline void SpotLight::setPosition( const Eigen::Matrix<Scalar, 3, 1>& position ) {
     m_position = position;
-    getRenderParameters().addParameter( "light.spot.position", m_position );
+    getRenderParameters().setVariable( "light.spot.position", m_position );
 }
 
 inline const Eigen::Matrix<Scalar, 3, 1>& Scene::SpotLight::getPosition() const {
@@ -65,7 +63,7 @@ inline const Eigen::Matrix<Scalar, 3, 1>& Scene::SpotLight::getPosition() const 
 
 inline void SpotLight::setDirection( const Eigen::Matrix<Scalar, 3, 1>& direction ) {
     m_direction = direction.normalized();
-    getRenderParameters().addParameter( "light.spot.direction", m_direction );
+    getRenderParameters().setVariable( "light.spot.direction", m_direction );
 }
 
 inline const Eigen::Matrix<Scalar, 3, 1>& SpotLight::getDirection() const {
@@ -74,12 +72,12 @@ inline const Eigen::Matrix<Scalar, 3, 1>& SpotLight::getDirection() const {
 
 inline void SpotLight::setInnerAngleInRadians( Scalar angle ) {
     m_innerAngle = angle;
-    getRenderParameters().addParameter( "light.spot.innerAngle", m_innerAngle );
+    getRenderParameters().setVariable( "light.spot.innerAngle", m_innerAngle );
 }
 
 inline void SpotLight::setOuterAngleInRadians( Scalar angle ) {
     m_outerAngle = angle;
-    getRenderParameters().addParameter( "light.spot.outerAngle", m_outerAngle );
+    getRenderParameters().setVariable( "light.spot.outerAngle", m_outerAngle );
 }
 
 inline void SpotLight::setInnerAngleInDegrees( Scalar angle ) {
@@ -100,10 +98,10 @@ inline Scalar SpotLight::getOuterAngle() const {
 
 inline void SpotLight::setAttenuation( const Attenuation& attenuation ) {
     m_attenuation = attenuation;
-    getRenderParameters().addParameter( "light.spot.attenuation.constant", m_attenuation.constant );
-    getRenderParameters().addParameter( "light.spot.attenuation.linear", m_attenuation.linear );
-    getRenderParameters().addParameter( "light.spot.attenuation.quadratic",
-                                        m_attenuation.quadratic );
+    getRenderParameters().setVariable( "light.spot.attenuation.constant", m_attenuation.constant );
+    getRenderParameters().setVariable( "light.spot.attenuation.linear", m_attenuation.linear );
+    getRenderParameters().setVariable( "light.spot.attenuation.quadratic",
+                                       m_attenuation.quadratic );
 }
 
 inline void SpotLight::setAttenuation( Scalar constant, Scalar linear, Scalar quadratic ) {

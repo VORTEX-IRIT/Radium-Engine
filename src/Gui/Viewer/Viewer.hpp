@@ -68,7 +68,7 @@ class RA_GUI_API Viewer : public WindowQt, public KeyMappingManageable<Viewer>
     /** Prepare the viewer to display a scene.
      * This will ask the renderer to build its specific OenGL related objects
      * and set the camera to its default state
-     * @return true if the scene is ready to display.
+     * \return true if the scene is ready to display.
      */
     virtual bool prepareDisplay();
 
@@ -126,9 +126,9 @@ class RA_GUI_API Viewer : public WindowQt, public KeyMappingManageable<Viewer>
     /// Blocks until rendering is finished.
     void swapBuffers();
 
-    /// @name
+    /// \name
     /// Misc functions
-    /// @{
+    /// \{
 
     /// Emits signals corresponding to picking requests.
     void processPicking();
@@ -152,7 +152,7 @@ class RA_GUI_API Viewer : public WindowQt, public KeyMappingManageable<Viewer>
     addCustomAction( const std::string& actionName,
                      const KeyMappingManager::EventBinding& binding,
                      std::function<void( QEvent* )> callback );
-    ///@}
+    ///\}
 
     Scalar getDepthUnderMouse() const { return m_depthUnderMouse; }
 
@@ -225,8 +225,8 @@ class RA_GUI_API Viewer : public WindowQt, public KeyMappingManageable<Viewer>
 
     /// Initialize openGL. Called on by the first "show" call to the main window.
     /// \warning This function is NOT reentrant, and may behave incorrectly
-    /// if called at the same time than #intializeRenderer
-    /// @note Must be called only when a valid openGLContext is bound (see WindowsQt::initialize)
+    /// if called at the same time than initializeRenderer()
+    /// \note Must be called only when a valid openGLContext is bound (see WindowsQt::initialize)
     bool initializeGL() override;
 
     /// Resize the view port and the camera. Called by the resize event.
@@ -235,11 +235,11 @@ class RA_GUI_API Viewer : public WindowQt, public KeyMappingManageable<Viewer>
     Engine::Rendering::Renderer::PickingMode
     getPickingMode( const Ra::Gui::KeyMappingManager::KeyMappingAction& action ) const;
 
-    /// @name
+    /// \name
     /// If GL is initialized, do the viewer stuff, and call handle*Event to perform actual event
     /// handling, according to keyMapping. If event is not processed by Viewer, it's forwarded to
     /// parent() (if any).
-    ///@{
+    ///\{
     void keyPressEvent( QKeyEvent* event ) override;
     void keyReleaseEvent( QKeyEvent* event ) override;
 
@@ -252,17 +252,17 @@ class RA_GUI_API Viewer : public WindowQt, public KeyMappingManageable<Viewer>
     void mouseMoveEvent( QMouseEvent* event ) override;
     ///\todo propagateToParent
     void wheelEvent( QWheelEvent* event ) override;
-    ///@}
+    ///\}
 
     void showEvent( QShowEvent* ev ) override;
 
     /// reset key pressed, in case a key is pressed when focus lost
     void focusOutEvent( QFocusEvent* event ) override;
 
-    /// @name
+    /// \name
     /// handle the events, called by *Event, do the actual work, should be overriden in
     /// derived classes.
-    ///@{
+    ///\{
     virtual bool handleKeyPressEvent( QKeyEvent* event );
     virtual bool handleKeyReleaseEvent( QKeyEvent* event );
     virtual void handleMousePressEvent( QMouseEvent* event,
@@ -271,7 +271,7 @@ class RA_GUI_API Viewer : public WindowQt, public KeyMappingManageable<Viewer>
     virtual void handleMouseMoveEvent( QMouseEvent* event,
                                        Ra::Engine::Rendering::Renderer::PickingResult& result );
     virtual void handleWheelEvent( QWheelEvent* event );
-    ///@}
+    ///\}
   private:
     /// update keymapping according to keymapping manager's config, should be
     /// called each time the configuration changes, or added to observer's list

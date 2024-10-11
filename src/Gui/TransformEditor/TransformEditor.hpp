@@ -8,8 +8,6 @@ namespace Gui {
 class RA_GUI_API TransformEditor
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     TransformEditor() : m_transform( Core::Transform::Identity() ) {}
     virtual ~TransformEditor();
 

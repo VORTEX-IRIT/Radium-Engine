@@ -13,7 +13,7 @@ Radium Engine © the Radium Contributors :
 * Hugo Rens (imgui and shader editor)
 * Valentin Roussellet (core engine, animation and skinning plugins, Windows port)
 * Thomas Subileau (spatial data structures)
-* David Vanderhaeghe (core, engine, gui, rendering)
+* David Vanderhaeghe (core, engine, gui, rendering, logo and graphics)
 * Florian Canezin (core, engine, gui, plugins, file loading)
 
 # Third-party libraries
@@ -61,7 +61,3 @@ be obtained at [https://github.com/assimp/assimp/blob/master/LICENSE](https://gi
 STB image is a header-only library, released in the public domain.
 
 The source code is included in this repository or can be obtained at [https://github.com/nothings/stb](https://github.com/nothings/stb)
-
-## Additional material
-
-X-ray Icon, made by *Freepik* from www.flaticon.com is licensed under CC BY 3.0

@@ -1,3 +1,6 @@
 [submodule "external/doxygen-awesome-css"]
 	path = external/doxygen-awesome-css
 	url = https://github.com/jothepro/doxygen-awesome-css.git
+[submodule "cmake/cmake-message-helpers"]
+	path = cmake/cmake-message-helpers
+	url = https://github.com/dlyr/cmake-message-helpers.git

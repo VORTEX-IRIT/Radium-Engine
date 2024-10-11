@@ -1,7 +1,7 @@
 # https://cmake.org/cmake/help/latest/manual/ctest.1.html
 # https://cmake.org/Wiki/CMake/Testing_With_CTest
 # https://cmake.org/cmake/help/latest/command/add_test.html
-list(APPEND CMAKE_MESSAGE_INDENT "[Tests] ")
+message_prefix_push("Tests")
 
 # Adds convenience methods, see cmake/CleanCppExtensions.cmake
 include(CleanCppExtensions)
@@ -38,7 +38,8 @@ add_custom_target(
     check
     COMMAND echo [----] Running tests
     USES_TERMINAL
-    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_BUILD_TYPE}
+    COMMAND ${CMAKE_CTEST_COMMAND} -j $ENV{CMAKE_BUILD_PARALLEL_LEVEL} --output-on-failure -C
+            ${CMAKE_BUILD_TYPE}
     DEPENDS unittests integration
 )
 
@@ -46,8 +47,9 @@ add_custom_target(
     check_verbose
     COMMAND echo [----] Running tests
     USES_TERMINAL
-    COMMAND ${CMAKE_CTEST_COMMAND} -V --output-on-failure -C ${CMAKE_BUILD_TYPE}
+    COMMAND ${CMAKE_CTEST_COMMAND} -j $ENV{CMAKE_BUILD_PARALLEL_LEVEL} -V --output-on-failure -C
+            ${CMAKE_BUILD_TYPE}
     DEPENDS unittests integration
 )
 
-list(REMOVE_AT CMAKE_MESSAGE_INDENT -1)
+message_prefix_pop()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/CoreMacros.hpp>
+#include <Core/Utils/StringUtils.hpp>
 
 #ifndef _WIN32
 #    include <cxxabi.h>
@@ -10,8 +11,7 @@
 #endif
 
 #include <string>
-
-#include <Core/Utils/StringUtils.hpp>
+#include <typeindex>
 
 namespace Ra {
 namespace Core {
@@ -19,11 +19,81 @@ namespace Utils {
 
 /// Return the human readable version of the type name T
 template <typename T>
-const char* demangleType() noexcept;
+std::string demangleType() noexcept;
 
 /// Return the human readable version of the given object's type
 template <typename T>
-const char* demangleType( const T& ) noexcept;
+std::string demangleType( const T& ) noexcept;
+
+/// Return the human readable version of the given type name
+std::string demangleType( const std::type_index& typeIndex ) noexcept;
+
+/// \brief Return the human readable version of the type name T with simplified radium type names
+template <typename T>
+auto simplifiedDemangledType() noexcept -> std::string;
+
+/// \brief Return the human readable version of the type name T with simplified radium type names
+template <typename T>
+auto simplifiedDemangledType( const T& ) noexcept -> std::string;
+
+/// \brief Return the human readable version of the type name whose index is known, with simplified
+/// radium type names
+/// \param typeName The typeIndex whose simplified named is requested
+/// \return The Radium-simplified type name
+// RA_CORE_API auto simplifiedDemangledType( const std::type_index& typeName ) noexcept ->
+// std::string;
+
+// -----------------------------------------------------------------
+// ---------------------- inline methods ---------------------------
+
+namespace TypeInternal {
+RA_CORE_API auto makeTypeReadable( const std::string& ) -> std::string;
+}
+
+template <typename T>
+auto simplifiedDemangledType() noexcept -> std::string {
+    static auto demangled_name = []() {
+        std::string demangledType =
+            TypeInternal::makeTypeReadable( Ra::Core::Utils::demangleType<T>() );
+        return demangledType;
+    }();
+    return demangled_name;
+}
+
+template <typename T>
+auto simplifiedDemangledType( const T& ) noexcept -> std::string {
+    return simplifiedDemangledType<T>();
+}
+
+inline auto simplifiedDemangledType( const std::type_index& typeName ) noexcept -> std::string {
+    return TypeInternal::makeTypeReadable( Ra::Core::Utils::demangleType( typeName ) );
+}
+
+// Check if a type is a container with access to its element type and number
+// adapted from https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
+namespace detail {
+
+using std::begin;
+using std::end;
+
+template <typename T>
+auto is_container_impl( int )
+    -> decltype( begin( std::declval<T&>() ) !=
+                     end( std::declval<T&>() ), // begin/end and operator !=
+                 void(),                        // Handle evil operator ,
+                 std::declval<T&>().empty(),
+                 std::declval<T&>().size(),
+                 ++std::declval<decltype( begin( std::declval<T&>() ) )&>(), // operator ++
+                 void( *begin( std::declval<T&>() ) ),                       // operator*
+                 std::true_type {} );
+
+template <typename T>
+std::false_type is_container_impl( ... );
+
+} // namespace detail
+
+template <typename T>
+using is_container = decltype( detail::is_container_impl<T>( 0 ) );
 
 // TypeList taken and adapted from
 // https://github.com/AcademySoftwareFoundation/openvdb/blob/master/openvdb/openvdb/TypeList.h
@@ -35,26 +105,26 @@ struct TypeList;
 
 namespace TypeListInternal {
 
-/// \brief   Append any number of types to a @c TypeList
-/// \details Defines a new @c TypeList with the provided types appended
-/// \tparam ListT  The @c TypeList to append to
+/// \brief   Append any number of types to a \c TypeList
+/// \details Defines a new \c TypeList with the provided types appended
+/// \tparam ListT  The \c TypeList to append to
 /// \tparam Ts     Types to append
 template <typename ListT, typename... Ts>
 struct TSAppendImpl;
 
-/// \brief  Partial specialization for a @c TypeList with a list of zero or more
+/// \brief  Partial specialization for a \c TypeList with a list of zero or more
 ///         types to append
-/// \tparam Ts Current types within the @c TypeList
+/// \tparam Ts Current types within the \c TypeList
 /// \tparam OtherTs Other types to append
 template <typename... Ts, typename... OtherTs>
 struct TSAppendImpl<TypeList<Ts...>, OtherTs...> {
     using type = TypeList<Ts..., OtherTs...>;
 };
 
-/// \brief  Partial specialization for a @c TypeList with another @c TypeList.
+/// \brief  Partial specialization for a \c TypeList with another \c TypeList.
 ///         Appends the other TypeList's members.
-/// \tparam Ts Types within the first @c TypeList
-/// \tparam OtherTs Types within the second @c TypeList
+/// \tparam Ts Types within the first \c TypeList
+/// \tparam OtherTs Types within the second \c TypeList
 template <typename... Ts, typename... OtherTs>
 struct TSAppendImpl<TypeList<Ts...>, TypeList<OtherTs...>> {
     using type = TypeList<Ts..., OtherTs...>;
@@ -89,55 +159,49 @@ struct TypeList {
 };
 
 #ifdef _WIN32
-// On windows (since MSVC 2019), typeid( T ).name() returns the demangled name
-template <typename T>
-const char* demangleType() noexcept {
-    static auto demangled_name = []() {
-        std::string retval { typeid( T ).name() };
-        removeAllInString( retval, "class " );
-        removeAllInString( retval, "struct " );
-        replaceAllInString( retval, ",", ", " );
-        replaceAllInString( retval, "> >", ">>" );
-        return retval;
-    }();
-
-    return demangled_name.data();
+// On windows (since MSVC 2019), typeid( T ).name() (and then typeIndex.name() returns the demangled
+// name
+inline std::string demangleType( const std::type_index& typeIndex ) noexcept {
+    std::string retval = typeIndex.name();
+    removeAllInString( retval, "class " );
+    removeAllInString( retval, "struct " );
+    removeAllInString( retval, "__cdecl" );
+    replaceAllInString( retval, "& __ptr64", "&" );
+    replaceAllInString( retval, ",", ", " );
+    replaceAllInString( retval, " >", ">" );
+    replaceAllInString( retval, "__int64", "long" );
+    replaceAllInString( retval, "const &", "const&" );
+    return retval;
 }
 #else
-template <typename T>
-const char* demangleType() noexcept {
-    // once per one type
-    static auto demangled_name = []() {
-        int error = 0;
-        std::string retval;
-        char* name = abi::__cxa_demangle( typeid( T ).name(), 0, 0, &error );
-
-        switch ( error ) {
-        case 0:
-            retval = name;
-            break;
-        case -1:
-            retval = "memory allocation failed";
-            break;
-        case -2:
-            retval = "not a valid mangled name";
-            break;
-        default:
-            retval = "__cxa_demangle failed";
-            break;
-        }
-        std::free( name );
-        removeAllInString( retval, "__1::" ); // or "::__1" ?
-        replaceAllInString( retval, "> >", ">>" );
-        return retval;
-    }();
-
-    return demangled_name.data();
+// On Linux/macos, use the C++ ABI demangler
+inline std::string demangleType( const std::type_index& typeIndex ) noexcept {
+    int error = 0;
+    std::string retval;
+    char* name = abi::__cxa_demangle( typeIndex.name(), 0, 0, &error );
+    if ( error == 0 ) { retval = name; }
+    else {
+        // error : -1 --> memory allocation failed
+        // error : -2 --> not a valid mangled name
+        // error : other --> __cxa_demangle
+        retval = std::string( "Type demangler error : " ) + std::to_string( error );
+    }
+    std::free( name );
+    removeAllInString( retval, "__1::" ); // or "::__1" ?
+    replaceAllInString( retval, " >", ">" );
+    return retval;
 }
 #endif
+template <typename T>
+std::string demangleType() noexcept {
+    // once per one type
+    static auto demangled_name = demangleType( std::type_index( typeid( T ) ) );
+    return demangled_name;
+}
+
 // calling with instances
 template <typename T>
-const char* demangleType( const T& ) noexcept {
+std::string demangleType( const T& ) noexcept {
     return demangleType<T>();
 }
 

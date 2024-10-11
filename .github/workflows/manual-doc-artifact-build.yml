@@ -1,0 +1,14 @@
+name: Build doc artifact (trigger manually)
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch to build'
+        required: true
+
+jobs:
+  call-build-doc:
+    uses: ./.github/workflows/deploy-doc.yml
+    with:
+      deploy-on-gh-pages: "false"

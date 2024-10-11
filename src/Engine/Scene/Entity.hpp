@@ -22,7 +22,6 @@ class System;
 class RA_ENGINE_API Entity : public Core::Utils::IndexedObject
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     explicit Entity( const std::string& name = "" );
 
     // Entities are not copyable.

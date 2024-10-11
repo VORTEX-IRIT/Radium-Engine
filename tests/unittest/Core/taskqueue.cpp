@@ -8,6 +8,34 @@
 using namespace Ra::Core;
 using namespace Ra::Core::Utils;
 
+// run some dummy task, to check that there is no deadlock
+TEST_CASE( "Core/TaskQueueInit", "[Core][TaskQueue]" ) {
+    for ( int i = 0; i < 5; ++i ) {
+        TaskQueue taskQueue1( 10 );
+        for ( int j = 0; j < 20; ++j ) {
+            taskQueue1.registerTask( std::make_unique<FunctionTask>(
+                []() { std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) ); }, "" ) );
+        }
+        taskQueue1.startTasks();
+        taskQueue1.waitForTasks();
+        taskQueue1.flushTaskQueue();
+    }
+    for ( int i = 0; i < 50; ++i ) {
+        TaskQueue taskQueue1( 10 );
+        TaskQueue taskQueue2( 20 );
+        TaskQueue taskQueue3( 30 );
+        taskQueue1.startTasks();
+        taskQueue1.waitForTasks();
+        taskQueue1.flushTaskQueue();
+        taskQueue2.startTasks();
+        taskQueue2.waitForTasks();
+        taskQueue2.flushTaskQueue();
+        taskQueue3.startTasks();
+        taskQueue3.waitForTasks();
+        taskQueue3.flushTaskQueue();
+    }
+}
+
 TEST_CASE( "Core/TaskQueue", "[Core][TaskQueue]" ) {
     TaskQueue taskQueue( 4 );
 

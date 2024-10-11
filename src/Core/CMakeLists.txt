@@ -1,9 +1,10 @@
 set(ra_core_target Core)
 
+message_prefix_push("${ra_core_target}")
+
 project(${ra_core_target} LANGUAGES CXX VERSION ${Radium_VERSION})
 
 option(RADIUM_QUIET "Disable Radium Log messages" OFF)
-list(APPEND CMAKE_MESSAGE_INDENT "[${ra_core_target}] ")
 
 set(RA_VERSION_CPP "${CMAKE_CURRENT_BINARY_DIR}/Version.cpp")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Utils/Version.cpp.in" "${RA_VERSION_CPP}")
@@ -76,3 +77,5 @@ set(RADIUM_COMPONENTS ${RADIUM_COMPONENTS} ${ra_core_target} PARENT_SCOPE)
 if(RADIUM_ENABLE_PCH)
     target_precompile_headers(${ra_core_target} PRIVATE pch.hpp)
 endif()
+
+message_prefix_pop()

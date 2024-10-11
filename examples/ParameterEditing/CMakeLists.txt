@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 cmake_policy(SET CMP0042 NEW)
 
-project(ParameterEdition VERSION 1.0.0)
+project(ParameterEditing VERSION 1.0.0)
 
 # ------------------------------------------------------------------------------
 # set wanted application defaults for cmake settings

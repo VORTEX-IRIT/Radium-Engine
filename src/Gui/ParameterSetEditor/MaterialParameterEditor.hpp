@@ -22,7 +22,7 @@ class RenderParameters;
 namespace Gui {
 
 /**
- * \brief Simple Widget for Material/RenderParameter edition
+ * \brief Simple Widget for Material/RenderParameter editing
  * A material editor will show information about the selected material and expose a control panel
  * containing all of its editable parameters to allow the user to edit them.
  */
@@ -32,14 +32,14 @@ class RA_GUI_API MaterialParameterEditor : public QWidget
   public:
     /** Constructors and destructor
      */
-    /** @{ */
+    /** \{ */
     explicit MaterialParameterEditor( QWidget* parent = nullptr );
     MaterialParameterEditor( const MaterialParameterEditor& )            = delete;
     MaterialParameterEditor& operator=( const MaterialParameterEditor& ) = delete;
     MaterialParameterEditor( MaterialParameterEditor&& )                 = delete;
     MaterialParameterEditor&& operator=( MaterialParameterEditor&& )     = delete;
     ~MaterialParameterEditor() override                                  = default;
-    /** @} */
+    /** \} */
 
     /**
      * \brief Update the different UI element with the given renderParameter, using the given
@@ -85,7 +85,7 @@ class RA_GUI_API MaterialParameterEditor : public QWidget
     /// The layout containing the control panel
     QVBoxLayout* m_matParamsLayout;
     /// The control panel re-generated whenever setupFromMaterial is called
-    ParameterSetEditor* m_parametersControlPanel;
+    VariableSetEditor* m_parametersControlPanel;
     /// wether to show the unspecified materials
     bool m_showUnspecified = false;
 

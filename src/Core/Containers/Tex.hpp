@@ -17,7 +17,6 @@ class Tex : public Grid<T, N>
 {
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     using IdxVector = typename Grid<T, N>::IdxVector;
     using Vector    = Eigen::Matrix<Scalar, N, 1>;
     using AabbND    = Eigen::AlignedBox<Scalar, N>;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.18)
 
 project(radiumcore-external VERSION 1.0.0)
 
@@ -70,15 +70,15 @@ if(NOT DEFINED cpplocate_DIR OR NOT cpplocate_DIR)
         GIT_TAG tags/v2.2.0
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
-        PATCH_COMMAND git reset --hard && git apply -v --ignore-whitespace
-                      "${CMAKE_CURRENT_LIST_DIR}/patches/cpplocate.patch"
-        INSTALL_DIR "${CMAKE_INSTALL_PREFIX}"
+        INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cpplocate"
         CMAKE_ARGS ${RADIUM_EXTERNAL_CMAKE_OPTIONS} -DOPTION_BUILD_TESTS=OFF
-                   -DOPTION_BUILD_DOCS=OFF -DCMAKE_MESSAGE_INDENT=${indent_string}\;
+                   -DOPTION_BUILD_DOCS=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+                   "-DCMAKE_MESSAGE_INDENT=${indent_string}\;"
     )
     add_dependencies(CoreExternals cpplocate)
-    set_external_dir(cpplocate "share/cpplocate/")
+    set_external_dir(cpplocate "cpplocate/")
 else()
+    add_custom_target(cpplocate)
     status_message("" "cpplocate" ${cpplocate_DIR})
 endif()
 

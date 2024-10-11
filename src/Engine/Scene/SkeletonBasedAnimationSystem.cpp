@@ -27,12 +27,10 @@ SkeletonBasedAnimationSystem::SkeletonBasedAnimationSystem() : System(), m_xrayO
         auto* engine  = RadiumEngine::getInstance();
         auto* texMngr = engine->getTextureManager();
         // Register an entry into the texture manager
-        auto& heatmapData = texMngr->addTexture( "Engine:Skinning:weights", 1, 128, nullptr );
         // load the texture image without OpenGL initialization
-        heatmapData.name = *resourceDir + "/Textures/heatmap.png";
-        texMngr->loadTextureImage( heatmapData );
-        // Set the registered name again for further access to the texture
-        heatmapData.name = "Engine:Skinning:weights";
+        auto image = texMngr->loadTextureImage( *resourceDir + "/Textures/heatmap.png" );
+        Data::TextureParameters heatMapTexturePamameters = { "Engine:Skinning:weights", {}, image };
+        m_heatMapTextureHandle = texMngr->addTexture( heatMapTexturePamameters );
     }
 }
 

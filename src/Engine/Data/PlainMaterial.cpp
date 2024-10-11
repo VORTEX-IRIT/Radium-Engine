@@ -19,8 +19,6 @@ nlohmann::json PlainMaterial::s_parametersMetadata = {};
 PlainMaterial::PlainMaterial( const std::string& instanceName ) :
     SimpleMaterial( instanceName, materialName, Material::MaterialAspect::MAT_OPAQUE ) {}
 
-PlainMaterial::~PlainMaterial() = default;
-
 void PlainMaterial::registerMaterial() {
     // Get the Radium Resource location on the filesystem
     auto resourcesRootDir { RadiumEngine::getInstance()->getResourcesDir() };
@@ -63,8 +61,8 @@ void PlainMaterial::unregisterMaterial() {
 
 void PlainMaterial::updateFromParameters() {
     auto& renderParameters = getParameters();
-    m_color                = renderParameters.getParameter<Core::Utils::Color>( "material.color" );
-    m_perVertexColor       = renderParameters.getParameter<bool>( "material.perVertexColor" );
+    setColor( renderParameters.getVariable<Core::Utils::Color>( "material.color" ) );
+    setColoredByVertexAttrib( renderParameters.getVariable<bool>( "material.perVertexColor" ) );
 }
 
 nlohmann::json PlainMaterial::getParametersMetadata() const {

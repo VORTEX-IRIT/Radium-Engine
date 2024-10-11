@@ -82,7 +82,7 @@ inline Scalar angle( const Vector_& v1, const Vector_& v2 );
 template <typename Vector_>
 inline Vector_ slerp( const Vector_& v1, const Vector_& v2, Scalar t );
 
-/// @return the projection of point on the plane define by plane and planeNormal
+/// \return the projection of point on the plane define by plane and planeNormal
 inline Vector3
 projectOnPlane( const Vector3& planePos, const Vector3& planeNormal, const Vector3& point );
 
@@ -372,6 +372,33 @@ bool checkInvalidNumbers( Eigen::Ref<const Matrix_> matrix, const bool FAIL_ON_A
         .eval();
 
     return !invalid;
+}
+
+/// \brief Returns True if two arrays are element-wise equal within a tolerance.
+
+/// The tolerance values are positive, typically very small numbers. The relative difference (\b
+/// rtol * abs(\b b)) and the absolute difference \b atol are added together to compare against the
+/// absolute difference between \b a and \b b.
+///
+/// Parameters:
+///
+/// \param a,b Input Matrix to compare
+/// \param rtol The relative tolerance parameter (see Notes).
+/// \param atol The absolute tolerance parameter (see Notes).
+/// \see
+/// https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen,
+/// https://numpy.org/doc/stable/reference/generated/numpy.allclose.html
+template <typename DerivedA, typename DerivedB>
+bool allClose( const Eigen::DenseBase<DerivedA>& a,
+               const Eigen::DenseBase<DerivedB>& b,
+               const typename DerivedA::RealScalar& rtol =
+                   Eigen::NumTraits<typename DerivedA::RealScalar>::dummy_precision(),
+               const typename DerivedA::RealScalar& atol =
+                   Eigen::NumTraits<typename DerivedA::RealScalar>::epsilon() ) {
+
+    return ( ( a.derived() - b.derived() ).array().abs() <=
+             ( atol + rtol * a.derived().array().abs().max( b.derived().array().abs() ) ) )
+        .all();
 }
 
 } // namespace Math

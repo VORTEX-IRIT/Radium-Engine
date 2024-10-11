@@ -15,8 +15,6 @@ class Entity;
 class RA_ENGINE_API DirectionalLight final : public Ra::Engine::Scene::Light
 {
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     explicit DirectionalLight( Entity* entity, const std::string& name = "dirlight" );
     ~DirectionalLight() override = default;
 
@@ -34,7 +32,7 @@ class RA_ENGINE_API DirectionalLight final : public Ra::Engine::Scene::Light
 
 inline void DirectionalLight::setDirection( const Eigen::Matrix<Scalar, 3, 1>& dir ) {
     m_direction = dir.normalized();
-    getRenderParameters().addParameter( "light.directional.direction", m_direction );
+    getRenderParameters().setVariable( "light.directional.direction", m_direction );
 }
 
 inline const Eigen::Matrix<Scalar, 3, 1>& DirectionalLight::getDirection() const {

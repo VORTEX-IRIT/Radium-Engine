@@ -147,11 +147,9 @@ void TimelineScrollArea::wheelEvent( QWheelEvent* event ) {
         }
 
         double hScroll = horizontalScrollBar()->value();
-#if QT_VERSION < QT_VERSION_CHECK( 5, 15, 0 )
-        double x = event->x();
-#else
+
         double x = event->position().x();
-#endif
+
         double time = ( hScroll + x - double( m_zero ) ) / double( m_pixPerSec );
 
         onDrawRuler( newRulerWidth );

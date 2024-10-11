@@ -27,19 +27,19 @@ class LineMesh;
 
 /// A set of convenient functions to instantiate simple displays such as points, lines, etc.
 /// note that objects will be drawn in their entity's local frame.
-/// For "instant" debug drawing, @see DebugDisplay.
+/// For "instant" debug drawing, \see DebugDisplay.
 namespace DrawPrimitives {
 using MeshPtr                   = std::shared_ptr<Mesh>;
 using LineMeshPtr               = std::shared_ptr<LineMesh>;
 using AttribArrayDisplayablePtr = std::shared_ptr<AttribArrayDisplayable>;
 
-///@{
+///\{
 /// Renturn a render object to display the given geometry
 RA_ENGINE_API Rendering::RenderObject* Primitive( Scene::Component* comp, const MeshPtr& mesh );
 RA_ENGINE_API Rendering::RenderObject* Primitive( Scene::Component* comp, const LineMeshPtr& mesh );
 RA_ENGINE_API Rendering::RenderObject* Primitive( Scene::Component* comp,
                                                   const AttribArrayDisplayablePtr& mesh );
-///@}
+///\}
 
 /// Displays given point shown as the crossing of 3 lines of length 'scale'
 RA_ENGINE_API LineMeshPtr Point( const Core::Vector3& point,
@@ -78,7 +78,7 @@ RA_ENGINE_API MeshPtr QuadStrip( const Core::Vector3& a,
 
 /// Displays circle computed with given center and radius,
 /// in plane normal to given vector in wireframe
-/// @note normal must be a normalized vector.
+/// \note normal must be a normalized vector.
 RA_ENGINE_API LineMeshPtr Circle( const Core::Vector3& center,
                                   const Core::Vector3& normal,
                                   Scalar radius,
@@ -87,7 +87,7 @@ RA_ENGINE_API LineMeshPtr Circle( const Core::Vector3& center,
 
 /// Displays arc of a circle computed with given center, radius and angle
 /// in plane normal to given vector in wireframe
-/// @note normal must be a normalized vector.
+/// \note normal must be a normalized vector.
 RA_ENGINE_API LineMeshPtr CircleArc( const Core::Vector3& center,
                                      const Core::Vector3& normal,
                                      Scalar radius,
@@ -115,7 +115,7 @@ RA_ENGINE_API MeshPtr Capsule( const Core::Vector3& p1,
 
 /// Displays disk (filled circle) computed with given center and radius,
 /// in plane normal to given vector in wireframe
-/// @note normal must be a normalized vector.
+/// \note normal must be a normalized vector.
 RA_ENGINE_API MeshPtr Disk( const Core::Vector3& center,
                             const Core::Vector3& normal,
                             Scalar radius,

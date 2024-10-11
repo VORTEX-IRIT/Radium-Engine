@@ -8,6 +8,7 @@
 #include <QAbstractItemModel>
 #include <QVariant>
 
+/// \file TreeModel.hpp
 /// This file contains a basic implementation of a tree model object with QAbstractItemModel
 /// See http://doc.qt.io/qt-5/qtwidgets-itemviews-simpletreemodel-example.html
 /// This could have been a template with the object type, but QObjects cannot be
@@ -22,7 +23,8 @@ namespace Ra {
 namespace Gui {
 
 /**
- * Base class for element of the tree representation.
+ * \brief Base class for element of the tree representation.
+ *
  * It just maintains a tree structure leaving the data storage to derived classes.
  */
 class RA_GUI_API TreeItem
@@ -84,15 +86,15 @@ class RA_GUI_API TreeModel : public QAbstractItemModel
     /// \{
     /** Returns the number of rows, i.e .the number of children of a given parent item.
      *
-     * @param parent
-     * @return
+     * \param parent
+     * \return
      */
     int rowCount( const QModelIndex& parent = QModelIndex() ) const override;
 
     /** Returns the number of columns (only one in our case).
      *
-     * @param parent
-     * @return
+     * \param parent
+     * \return
      */
     int columnCount( const QModelIndex& parent = QModelIndex() ) const override {
         CORE_UNUSED( parent );
@@ -101,9 +103,9 @@ class RA_GUI_API TreeModel : public QAbstractItemModel
 
     /** Return the data corresponding to the given index : in this case a string with the item name.
      *
-     * @param index
-     * @param role
-     * @return
+     * \param index
+     * \param role
+     * \return
      */
     QVariant data( const QModelIndex& index, int role ) const override;
 
@@ -111,10 +113,10 @@ class RA_GUI_API TreeModel : public QAbstractItemModel
 
     /** Return the header data of the given section.
      *
-     * @param section
-     * @param orientation
-     * @param role
-     * @return
+     * \param section
+     * \param orientation
+     * \param role
+     * \return
      */
     QVariant headerData( int section,
                          Qt::Orientation orientation,
@@ -122,25 +124,25 @@ class RA_GUI_API TreeModel : public QAbstractItemModel
 
     /** Create an index for the given row, column and parent.
      *
-     * @param row
-     * @param column
-     * @param parent
-     * @return
+     * \param row
+     * \param column
+     * \param parent
+     * \return
      */
     QModelIndex
     index( int row, int column, const QModelIndex& parent = QModelIndex() ) const override;
 
     /** Get the parent of a given child item.
      *
-     * @param child
-     * @return
+     * \param child
+     * \return
      */
     QModelIndex parent( const QModelIndex& child ) const override;
 
     /** Get the flags of the object.
      *
-     * @param index
-     * @return
+     * \param index
+     * \return
      */
     Qt::ItemFlags flags( const QModelIndex& index ) const override;
 

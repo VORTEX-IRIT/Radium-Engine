@@ -5,7 +5,7 @@ The main renderer of Radium, implemented in the class Ra::Engine::Rendering::For
 rendering loop.
 Even if the material association to a drawable object, realized by the so called Ra::Engine::Rendering::RenderTechnique is tightly
 coupled with the main rendering loop, Plugins might define new renderers and interact differently with shader and
-materials properties (see chapter on [Materials](@ref develmaterials) ).
+materials properties (see chapter on [Materials](\ref develmaterials) ).
 
 Here is a summary of the different passes of the Ra::Engine::Rendering::ForwardRenderer
 

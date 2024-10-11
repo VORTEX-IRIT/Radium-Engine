@@ -30,11 +30,11 @@ class TranslateGizmo : public Gizmo
 
   private:
     Ra::Core::Vector3 m_startPoint;   ///< The picked 3D point on the gizmo.
-    Ra::Core::Vector3 m_initialTrans; ///< The translation matrix at edition start.
-    Core::Vector2 m_initialPix;       ///< The pixel position when edition starts.
+    Ra::Core::Vector3 m_initialTrans; ///< The translation matrix at editing start.
+    Core::Vector2 m_initialPix;       ///< The pixel position when editing starts.
     int m_selectedAxis;               ///< The axis to translate on.
     int m_selectedPlane;              ///< The plane to translate on.
-    bool m_start;                     ///< Did the edition start.
+    bool m_start;                     ///< Did the editing start.
 };
 
 } // namespace Gui

@@ -30,12 +30,12 @@ class RotateGizmo : public Gizmo
                                bool whole ) override;
 
   private:
-    Core::Vector2 m_initialPix; ///< The pixel location when edition starts.
+    Core::Vector2 m_initialPix; ///< The pixel location when editing starts.
     int m_selectedAxis;         ///< The axis to rotate around.
     bool m_start;               ///< Has the manipulation started.
     bool m_stepped;             ///< Is the manipulation stepped.
-    Scalar m_totalAngle;        ///< The total edition angle.
-    Core::Matrix3 m_initialRot; ///< The rotation matrix at edition start.
+    Scalar m_totalAngle;        ///< The total editing angle.
+    Core::Matrix3 m_initialRot; ///< The rotation matrix at editing start.
 };
 
 } // namespace Gui

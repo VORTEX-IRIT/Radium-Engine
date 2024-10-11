@@ -44,31 +44,31 @@ class RA_GUI_API CameraManipulator : public QObject
     /// associated Camera.
     virtual ~CameraManipulator();
 
-    /// @return the mapping context for keymapping, Index::Invalid() if no mapping is available
+    /// \return the mapping context for keymapping, Index::Invalid() if no mapping is available
     virtual KeyMappingManager::Context mappingContext();
 
-    /// @return true if the event has been taken into account, false otherwise
+    /// \return true if the event has been taken into account, false otherwise
     virtual bool handleMousePressEvent( QMouseEvent* event,
                                         const Qt::MouseButtons& buttons,
                                         const Qt::KeyboardModifiers& modifiers,
                                         int key );
-    /// @return true if the event has been taken into account, false otherwise
+    /// \return true if the event has been taken into account, false otherwise
     virtual bool handleMouseReleaseEvent( QMouseEvent* event );
-    /// @return true if the event has been taken into account, false otherwise
+    /// \return true if the event has been taken into account, false otherwise
     virtual bool handleMouseMoveEvent( QMouseEvent* event,
                                        const Qt::MouseButtons& buttons,
                                        const Qt::KeyboardModifiers& modifiers,
                                        int key );
-    /// @return true if the event has been taken into account, false otherwise
+    /// \return true if the event has been taken into account, false otherwise
     virtual bool handleWheelEvent( QWheelEvent* event,
                                    const Qt::MouseButtons& buttons,
                                    const Qt::KeyboardModifiers& modifiers,
                                    int key );
 
-    /// @return true if the event has been taken into account, false otherwise
+    /// \return true if the event has been taken into account, false otherwise
     virtual bool handleKeyPressEvent( QKeyEvent* event,
                                       const KeyMappingManager::KeyMappingAction& action );
-    /// @return true if the event has been taken into account, false otherwise
+    /// \return true if the event has been taken into account, false otherwise
     virtual bool handleKeyReleaseEvent( QKeyEvent* event,
                                         const KeyMappingManager::KeyMappingAction& action );
 
@@ -86,7 +86,7 @@ class RA_GUI_API CameraManipulator : public QObject
     /// \note CameraManipulator doesn't have ownership.
     void attachLight( Engine::Scene::Light* light );
 
-    /// @return true if a Light is attached to the camera, false otherwise.
+    /// \return true if a Light is attached to the camera, false otherwise.
     bool hasLightAttached() const { return m_light != nullptr; }
 
     /// pointer acces to the attached light if it exists, returns nullptr otherwise.
@@ -94,13 +94,13 @@ class RA_GUI_API CameraManipulator : public QObject
 
   public slots:
     /// \name Camera properties setters
-    ///@{
+    ///\{
     void setCameraSensitivity( Scalar sensitivity );
     void setCameraFov( Scalar fov );
     void setCameraFovInDegrees( Scalar fov );
     void setCameraZNear( Scalar zNear );
     void setCameraZFar( Scalar zFar );
-    ///@}
+    ///\}
 
     /// Set the AABB to restrain the camera behavior against.
     void mapCameraBehaviourToAabb( const Core::Aabb& aabb );
