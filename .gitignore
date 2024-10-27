@@ -8,6 +8,8 @@
 *.swp
 *.old
 \#*\#
+compile_commands.json
+
 # All dot files, if you wish to track one, just add it
 .*
 
