@@ -454,7 +454,7 @@ void AttribBase::setName( const std::string& name ) {
     m_name = name;
 }
 
-bool inline AttribBase::operator==( const AttribBase& rhs ) {
+bool inline AttribBase::operator==( const AttribBase & rhs ) {
     return m_name == rhs.getName();
 }
 

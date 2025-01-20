@@ -23,7 +23,9 @@
     TYPE( const TYPE& )           = delete;                                            \
     void operator=( const TYPE& ) = delete;                                            \
     struct Deleter {                                                                   \
-        void operator()( TYPE* p ) const { delete p; }                                 \
+        void operator()( TYPE* p ) const {                                             \
+            delete p;                                                                  \
+        }                                                                              \
     };                                                                                 \
     static std::unique_ptr<TYPE, Deleter> s_instance;                                  \
                                                                                        \
@@ -33,8 +35,12 @@
         s_instance = std::unique_ptr<TYPE, Deleter>( new TYPE( args... ), Deleter() ); \
         return getInstance();                                                          \
     }                                                                                  \
-    inline static TYPE* getInstance() { return s_instance.get(); }                     \
-    inline static void destroyInstance() { s_instance.reset( nullptr ); }
+    inline static TYPE* getInstance() {                                                \
+        return s_instance.get();                                                       \
+    }                                                                                  \
+    inline static void destroyInstance() {                                             \
+        s_instance.reset( nullptr );                                                   \
+    }
 
 /// Add this macro in the singleton cpp, followed by a semicolon.
 // Limitations : TYPE cannot be a nested type
