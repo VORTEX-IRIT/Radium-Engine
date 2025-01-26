@@ -4,9 +4,13 @@
 # from ./scripts directory
 # ----------------------------------------------------
 
-set(io_sources CameraLoader/CameraLoader.cpp)
+set(io_sources CameraLoader/CameraLoader.cpp AsciiPCLoader/asciipcloader.cpp
+               LasLoader/lasloader.cpp
+)
 
-set(io_headers CameraLoader/CameraLoader.hpp RaIO.hpp)
+set(io_headers CameraLoader/CameraLoader.hpp LasLoader/lasloader.hpp
+               AsciiPCLoader/asciipcloader.hpp RaIO.hpp
+)
 
 if(RADIUM_IO_DEPRECATED)
     list(APPEND io_sources deprecated/OBJFileManager.cpp deprecated/OFFFileManager.cpp)
