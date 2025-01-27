@@ -719,7 +719,7 @@ auto VariableSet::addVariableType() -> Utils::optional<VariableContainer<T>*> {
         // used to visit the variableSet with a dynamic visitor
         m_vtable->m_visitFunctions.emplace_back(
             []( const VariableSet& c, const DynamicVisitorBase& v )
-                -> std::pair<bool, std::function<void( DynamicVisitorBase&, std::any && )>> {
+                -> std::pair<bool, std::function<void( DynamicVisitorBase&, std::any&& )>> {
                 auto id = getVariableVisitTypeIndex<T>();
                 if ( v.accept( id ) ) {
                     auto& storage = c.getVariableStorage<T>();
@@ -887,9 +887,11 @@ struct VariableSet::DynamicVisitor::MakeVisitOperatorHelper<T, F, false> {
 template <class T, class F>
 inline auto VariableSet::DynamicVisitor::makeVisitorOperator( F& f )
     -> OperatorsStorageType::value_type {
-    auto opBuilder = MakeVisitOperatorHelper < T, F,
-         std::is_invocable<F, const std::string&, T, std::any&&>::value ||
-             std::is_invocable<F, const std::string&, T&, std::any&&>::value > {};
+    auto opBuilder = MakeVisitOperatorHelper<
+        T,
+        F,
+        std::is_invocable<F, const std::string&, T, std::any&&>::value ||
+            std::is_invocable<F, const std::string&, T&, std::any&&>::value> {};
     return opBuilder.makeOperator( f );
 }
 

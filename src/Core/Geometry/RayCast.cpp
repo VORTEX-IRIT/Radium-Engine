@@ -266,7 +266,7 @@ bool RayCastCylinder( const Ray& r,
                 return true;
             }
         } // End if (distance between ray and cyl axis < radius)
-    }     // End of else (ray not parallel to the cylinder.
+    } // End of else (ray not parallel to the cylinder.
 
     return false;
 }
